@@ -1,0 +1,14 @@
+---
+# Subrepos' definition
+#
+# subrepos:
+# - path: relative_path
+#   repo: URL to git service
+#   [gitref: gitref]
+
+# An example taken from 'simplest-git-subrepos'
+# Don't forget including your subrepos' roots to .gitignore!
+subrepos:
+- path: 'projects/simplest-git-subrepos'
+  repo: 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+  gitref: 'python'
