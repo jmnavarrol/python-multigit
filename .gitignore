@@ -3,3 +3,6 @@ projects/
 
 # Python development
 __pycache__/
+build/
+dist/
+*.egg-info/
