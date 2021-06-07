@@ -10,7 +10,7 @@ This script is a Python implementation of multigit.
 :package: <null>
 :copyright: Jesús M. Navarro
 """
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 # Import stuff
 import os, errno, sys

@@ -23,6 +23,14 @@ For development purposes, you should create a Python 3 *virtualenv* using [the c
 
 Then, you can run this code by means of [the helper cmd script](./python-multigit-cmd.py), i.e.: `./python-multigit-cmd.py`.
 
+### build
+The [included Makefile](./src/Makefile) will use Python's setup tools to build both *source* and *binary-based* Python *eggs*.  Provided everthing went OK, look for packages under the *dist/* directory.
+
+Run `make` to see available *make targets*.
+
+### publish
+Provided *Makefile* includes publication targets to both testing and live PyPi services by means of *twine*.  Make sure your ~/.pypi.rc file includes proper entries named *[testpypi]* and *[pypi]* respectively.  Remember, also, that you can't publish the same version twice to these services, so make sure you udpate the package's version before attempting an upload.
+
 ------
 
 ### License
