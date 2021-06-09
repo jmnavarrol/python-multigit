@@ -7,6 +7,8 @@ While the multigit Bash script at [simplest-git-subrepos](https://github.com/jmn
 The general idea is to offer a simple way of managing *"workspaces"* integrating multiple git repos starting from a top one, and without the need of difficult *"arcanes"* like *git submodules*, *git-subtree*, etc.: you only need to declare your intended *layout* in a YAML file, and let this script do its job.  See the [simplest-git-subrepos README](https://github.com/jmnavarrol/simplest-git-subrepos) for a long-wired explanation.
 
 ## usage
+This project [is published to the PyPI index](https://pypi.org/project/multigit/) so, in order to install it you just need to run `pip install multigit`.
+
 *multigit* expects a YAML file named **subrepos** on the *root directory* of the current repo (see [example](./subrepos)).
 
 For each defined *subrepo*, it will clone/checkout it to the defined relative path.  Optionally, it will *checkout* the given *gitref*, provided the repo's local sandbox is *"clean"* (i.e. no pending modifications).  
