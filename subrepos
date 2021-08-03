@@ -11,4 +11,4 @@
 subrepos:
 - path: 'projects/simplest-git-subrepos'
   repo: 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
-  gitref: 'python'
+  gitref: 'python-example'
