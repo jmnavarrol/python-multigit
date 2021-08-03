@@ -2,7 +2,7 @@
 BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x00)
 
 [Filters]
-size=33
+size=34
 
 [Filters][0]
 inclusive=0
@@ -137,6 +137,11 @@ targets=1
 [Filters][32]
 inclusive=1
 pattern=.enviro
+targets=1
+
+[Filters][33]
+inclusive=1
+pattern=.bme_env
 targets=1
 
 [Filters][4]

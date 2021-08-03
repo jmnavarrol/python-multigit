@@ -21,9 +21,11 @@ For each defined *subrepo*, it will clone/checkout it to the defined relative pa
 This way you just need to manage your repos with `git` in the standard way, just as if they were individually checked out in isolation.
 
 ## development
-For development purposes, you should create a Python 3 *virtualenv* using [the companion requirements file](./requirements.txt), i.e. (I'm using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io) here): `mkvirtualenv --python=$(which python3) -r requirements.txt python-multigit`.
+This project uses the help of [Bash Magic Enviro](https://github.com/jmnavarrol/bash-magic-enviro) to configure its development environment.
 
-Then, you can run this code by means of [the helper cmd script](./python-multigit-cmd.py), i.e.: `./python-multigit-cmd.py`.
+It creates a Python 3 *virtualenv* using [the companion requirements file](./python-virtualenvs/multigit.requirements).
+
+Once the *virtualenv* is (automatically) activated, you can run this code by means of [the helper cmd script](./python-multigit-cmd.py), i.e.: `./python-multigit-cmd.py`.
 
 ### build
 The [included Makefile](./src/Makefile) will use Python's setup tools to build both *source* and *binary-based* Python *eggs*.  Provided everthing went OK, look for packages under the *dist/* directory.
