@@ -25,9 +25,9 @@ setup(
 	url = 'https://github.com/jmnavarrol/python-multigit',
 	license = 'GPLv3',
 	install_requires = [
-		'colorama>=0.4',
-		'GitPython>=3.1',
-		'PyYAML>=5.3',
+		'colorama==0.4.4',
+		'GitPython==3.1.20',
+		'PyYAML==5.4.1',
 	],
 	classifiers = [
 		'Development Status :: 4 - Beta',
