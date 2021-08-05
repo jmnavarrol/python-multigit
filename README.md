@@ -23,7 +23,7 @@ This way you just need to manage your repos with `git` in the standard way, just
 ## development
 This project uses the help of [Bash Magic Enviro](https://github.com/jmnavarrol/bash-magic-enviro) to configure its development environment.
 
-It creates a Python 3 *virtualenv* using [the companion requirements file](./python-virtualenvs/multigit.requirements).
+It creates a Python 3 *virtualenv* using [the companion requirements file](./python-virtualenvs/multigit-development.requirements).
 
 Once the *virtualenv* is (automatically) activated, you can run this code by means of [the helper cmd script](./python-multigit-cmd.py), i.e.: `./python-multigit-cmd.py`.
 

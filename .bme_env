@@ -17,7 +17,7 @@ bme_custom_clean() {
 
 # This workaround is required to apply customizations on the "root" project dir itself
 run_on_this_dir() {
-	load_virtualenv 'multigit' || return -1
+	load_virtualenv 'multigit-development' || return -1
 }
 
 [ -n "${PROJECT_DIR}" ] && run_on_this_dir
