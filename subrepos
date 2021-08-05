@@ -2,9 +2,13 @@
 # Subrepos' definition
 #
 # subrepos:
-# - path: relative_path
-#   repo: URL to git service
-#   [gitref: gitref]
+# - path: relative_path (mandatory)
+#   repo: URL to git service (mandatory)
+#   [commit|branch|tag]: (optional.  One and only one of commit, branch or tag)
+# - path: another subrepo
+#   repo: ...
+#   [commit|branch|tag]: ...
+# - ...
 
 # An example taken from 'simplest-git-subrepos'
 # Don't forget including your subrepos' roots to .gitignore!
