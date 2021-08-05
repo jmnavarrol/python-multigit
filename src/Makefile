@@ -3,7 +3,7 @@ SHELL := /bin/bash
 
 PYTOOL = python -m build
 PYTHON_FILES = $(shell find . -type f -name '*.py')
-OTHER_INCLUDES = LICENSE README.md MANIFEST.in
+OTHER_INCLUDES = LICENSE README.md MANIFEST.in setup.cfg
 SDIST_FILES = dist/*.tar.gz
 WHEELS = dist/*.whl
 UPTOOL = python -m twine upload
