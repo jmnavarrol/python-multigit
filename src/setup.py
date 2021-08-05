@@ -19,6 +19,7 @@ setup(
 	version = version,
 	description = "Manages git repos within git repos.",
 	long_description = long_descr,
+	long_description_content_type="text/markdown",
 	author = 'Jesús M. Navarro',
 	author_email = 'jesusmnavarrolopez@gmail.com',
 	url = 'https://github.com/jmnavarrol/python-multigit',
