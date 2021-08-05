@@ -1,7 +1,7 @@
 # Makefile for python-multigit
 SHELL := /bin/bash
 
-PYTOOL = python setup.py
+PYTOOL = python -m build
 PYTHON_FILES = $(shell find . -type f -name '*.py')
 OTHER_INCLUDES = LICENSE README.md MANIFEST.in
 SDIST_FILES = dist/*.tar.gz
@@ -29,10 +29,10 @@ targets:
 build: $(SDIST_FILES) $(WHEELS)
 
 $(SDIST_FILES): $(PYTHON_FILES) $(OTHER_INCLUDES)
-	$(PYTOOL) sdist
+	$(PYTOOL) --sdist
 	
 $(WHEELS): $(PYTHON_FILES) $(OTHER_INCLUDES)
-	$(PYTOOL) bdist_wheel
+	$(PYTOOL) --wheel
 	
 upload-tmp: build
 	$(UPTOOL) --repository testpypi dist/*
@@ -41,7 +41,8 @@ upload: build
 	$(UPTOOL) --repository pypi dist/*
 	
 clean:
-	python setup.py clean
 	rm -rf MANIFEST build dist *.egg-info
 	find -type f -name '*.pyc' -exec rm -f '{}' \;
+	find -type d -name '__pycache__' | xargs rm -rf
+	rm -rf ../projects
 	
