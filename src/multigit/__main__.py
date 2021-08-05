@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""multigit.__main__: executed when multigit directory is called as script."""
+from . import main
 
-from .multigit import main
-main()
+if __name__ == '__main__':
+	main()
+	
