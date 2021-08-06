@@ -196,6 +196,11 @@ def manage_subrepo(subrepo):
 				print("wrong gitref type at " + Style.BRIGHT + "'" + os.path.abspath(__file__) + Style.BRIGHT + "'", end=', ')
 				print("line number " + Style.BRIGHT + "'" + error_line + "'", end='.\n')
 				sys.exit(errno.EINVAL)
+		else:
+			print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
+			print("at " + Style.BRIGHT + "'" + subrepo['path'] + "'")
+			print(Style.BRIGHT + "\tSubrepo is dirty:", end=' ')
+			print("won't try to update.")
 
 
 
