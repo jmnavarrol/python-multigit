@@ -4,7 +4,7 @@ A Python version of the [multigit Bash script](https://github.com/jmnavarrol/sim
 
 While the multigit Bash script at [simplest-git-subrepos](https://github.com/jmnavarrol/simplest-git-subrepos) was created for illustration purposes, this one is intended to be a full-fledged implementation.
 
-The general idea is to offer a simple way of managing *"workspaces"* integrating multiple git repos starting from a top one, and without the need of difficult *"arcanes"* like *git submodules*, *git-subtree*, etc.: you only need to declare your intended *layout* in a YAML file, and let this script do its job.  See the [simplest-git-subrepos README](https://github.com/jmnavarrol/simplest-git-subrepos#readme) for a long-wired explanation.
+The general idea is to offer a simple way of managing *"workspaces"* integrating multiple git repos starting from a top one, and without the need of difficult *"arcanes"* like *git submodules*, *git-subtree*, etc.: you only need to declare your intended *layout* in a YAML file, and let this script (**multigit**) do its job.  See the [simplest-git-subrepos README](https://github.com/jmnavarrol/simplest-git-subrepos#readme) for a long-wired explanation.
 
 **Contents:**<a name="contents"></a>
 1. [usage](#usage)
@@ -18,9 +18,9 @@ The general idea is to offer a simple way of managing *"workspaces"* integrating
 ## usage<a name="usage"></a>
 This project [is published to the PyPI index](https://pypi.org/project/multigit/) so, in order to install it you just need to run `pip install multigit`.
 
-*multigit* expects a YAML file named **subrepos** on the *root directory* of the current repo (see [example](./subrepos)).
+*multigit* expects a YAML file named **subrepos** on the *root directory* of the current git repo (see [example](./subrepos)).  Optionally, if the current directory is not within a git sandbox, it will try to find a *subrepos* file right there.
 
-For each defined *subrepo*, it will clone/checkout it to the defined relative path.  Optionally, it will *checkout* the given *gitref* (either *commit*, *branch* or *tag*), provided the repo's local sandbox is *"clean"* (i.e. no pending modifications).  
+For each defined *subrepo* within the *subrepos* file, it will clone/checkout it to the defined relative path.  Optionally, it will *checkout* the given *gitref* (either *commit*, *branch* or *tag*), provided the repo's local sandbox is *"clean"* (i.e. no pending modifications).  
   **NOTE:** pay attention to the fact that if the *gitref* you record is a specific *commit* or *tag*, the related sandbox will be in disconnected state.
 
 *multigit* will also recursively look for new *subrepos* files on the repositories it manages.
@@ -36,7 +36,7 @@ This project uses the help of [Bash Magic Enviro](https://github.com/jmnavarrol/
 
 It creates a Python 3 *virtualenv* using [the companion requirements file](./python-virtualenvs/multigit-development.requirements).
 
-Once the *virtualenv* is (automatically) activated, you can run this code by means of [the helper cmd script](./python-multigit-cmd.py), i.e.: `./python-multigit-cmd.py`.
+Once the *virtualenv* is (automatically) activated, you can run this code just invoking its main script, i.e.: `multigit`.
 
 <sub>[back to top](#top).</sub>
 
