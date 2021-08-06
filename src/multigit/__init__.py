@@ -21,7 +21,7 @@ from colorama import init, Fore, Back, Style
 #Style: DIM, NORMAL, BRIGHT, RESET_ALL
 
 # Globals
-SUBREPO_FILE = 'subrepos'
+SUBREPOS_FILE = 'subrepos'
 SUBREPO_FORMAT = {
 	'MANDATORY': [
 		'path',
@@ -36,26 +36,12 @@ SUBREPO_FORMAT = {
 }
 
 
-def find_current_tree_dir(current_dir):
-	# First, check if we are in a git sandbox at all
-	try:
-		repo = Repo('.', search_parent_directories=True)
-	except git_exception.InvalidGitRepositoryError as e:
-		print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-		print("Current dir " + Style.BRIGHT + "'" + current_dir + "'", end=' ')
-		print("is not within a valid git repo!")
-		sys.exit(errno.EINVAL)
-		
-	# We are in a git sandbox: return is "root dir"
-	return repo.working_tree_dir
-
-
-def find_subrepos(current_dir):
-	subrepo_file = current_dir + "/" + SUBREPO_FILE
+def load_subrepos_file(current_dir):
+	subrepos_file = current_dir + "/" + SUBREPOS_FILE
 	
 	# Check if we can find here a 'subrepos' definition file
 	try:
-		f_config = open(subrepo_file, 'r')
+		f_config = open(subrepos_file, 'r')
 		try:
 			configMap = yaml.safe_load(f_config)
 		except yaml.parser.ParserError as e:
@@ -69,6 +55,7 @@ def find_subrepos(current_dir):
 			configMap = None
 		else: raise
 	
+	# 'subrepos' file found: validate and load its contents
 	if configMap:
 		try:
 			subrepo_list = configMap['subrepos']
@@ -78,7 +65,7 @@ def find_subrepos(current_dir):
 				for key in SUBREPO_FORMAT['MANDATORY']:
 					if not key in subrepo:
 						print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-						print(Style.BRIGHT + "'" + subrepo_file + "'", end='\n')
+						print(Style.BRIGHT + "'" + subrepos_file + "'", end='\n')
 						print("\tSubrepo entry " + Style.BRIGHT + "[" + str(index) + "]", end=': ')
 						print('mandatory key ' + Style.BRIGHT + "'" + key + "'", end=' ')
 						print("couldn't be found!")
@@ -89,14 +76,14 @@ def find_subrepos(current_dir):
 				for key in optional_keys:
 					if not key in SUBREPO_FORMAT['GITREF']:
 						print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-						print(Style.BRIGHT + "'" + subrepo_file + "'", end='\n')
+						print(Style.BRIGHT + "'" + subrepos_file + "'", end='\n')
 						print("\tSubrepo entry " + Style.BRIGHT + "[" + str(index) + "]", end=': ')
 						print("invalid key " + Style.BRIGHT + "'" + key + "'", end='!\n')
 						sys.exit(errno.EINVAL)
 				# tests 'gitrefs' (only one of 'commit','tag','branch' is allowed)
 				if(sum(x in optional_keys for x in SUBREPO_FORMAT['GITREF']) > 1):
 					print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-					print(Style.BRIGHT + "'" + subrepo_file + "'", end='\n')
+					print(Style.BRIGHT + "'" + subrepos_file + "'", end='\n')
 					print("\tSubrepo entry " + Style.BRIGHT + "[" + str(index) + "]", end=': ')
 					print("incompatible keys.  Only one of " + Style.BRIGHT + str(SUBREPO_FORMAT['GITREF']), end=' ')
 					print("allowed!")
@@ -106,7 +93,7 @@ def find_subrepos(current_dir):
 				subrepo['path'] = current_dir + '/' + subrepo['path']
 		except KeyError as e:
 			print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-			print(Style.BRIGHT + "'" + subrepo_file + "'", end='\n')
+			print(Style.BRIGHT + "'" + subrepos_file + "'", end='\n')
 			print('\tMandatory key ' + Style.BRIGHT + "'subrepos'", end=' ')
 			print("couldn't be found!")
 			sys.exit(errno.ENOENT)
@@ -217,17 +204,32 @@ def main():
 	# Activates colored output
 	init(autoreset=True)
 	
-	# Fist load
-	current_dir = find_current_tree_dir(os.getcwd())
-	subrepos = find_subrepos(current_dir)
+	# First, let's check if we are in a git sandbox at all
+	try:
+		repo = Repo(os.getcwd(), search_parent_directories=True)
+		# we are: let's go to its "root" to look for a subrepos file
+		working_dir = repo.working_tree_dir
+	except git_exception.InvalidGitRepositoryError as e:
+		# Not a git repo; fall back to current dir as "root"
+		working_dir = os.getcwd()
+		print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
+		print("Current dir " + Style.BRIGHT + "'" + working_dir + "'", end=' ')
+		print("is not within a valid git repo.")
+		print("\tLooking for a " + Style.BRIGHT + "'"  + SUBREPOS_FILE + "'", end=' ')
+		print("file right here instead.")
+	
+	# Let's find the "main" subrepos file (if any)
+	subrepos = load_subrepos_file(working_dir)
 	
 	# Recursively work on findings
 	while len(subrepos):
+		# Operates (clone, update...) the first subrepo on the list
 		manage_subrepo(subrepos[0])
-		new_subrepos = find_subrepos(subrepos[0]['path'])
+		# See if new subrepos files have appeared
+		new_subrepos = load_subrepos_file(subrepos[0]['path'])
 		# done with this subrepo
 		subrepos.remove(subrepos[0])
-		# Now, let's add new additions to the queue
+		# Now, let's add new additions to the queue (if any)
 		if new_subrepos:
 			subrepos.extend(new_subrepos)
 	
