@@ -15,7 +15,7 @@ idna==3.2
 importlib-metadata==4.6.3
 jeepney==0.7.1
 keyring==23.0.1
-# $PROJECT_DIR is defined by BME
+# $PROJECT_DIR is defined by Bash Magic Enviro
 -e "${PROJECT_DIR}/src"
 packaging==21.0
 pep517==0.11.0
