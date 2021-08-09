@@ -13,6 +13,7 @@ __version__ = '0.4.0'
 
 # Import stuff
 import os, errno, sys
+import argparse
 import yaml
 from git import Repo, exc as git_exception
 
@@ -184,32 +185,50 @@ def main():
 	# Activates colored output
 	init(autoreset=True)
 	
-	# First, let's check if we are in a git sandbox at all
-	try:
-		repo = Repo(os.getcwd(), search_parent_directories=True)
-		# we are: let's go to its "root" to look for a subrepos file
-		working_dir = repo.working_tree_dir
-	except git_exception.InvalidGitRepositoryError as e:
-		# Not a git repo; fall back to current dir as "root"
-		working_dir = os.getcwd()
-		print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
-		print("Current dir " + Style.BRIGHT + "'" + working_dir + "'", end=' ')
-		print("is not within a valid git repo.")
-		print("\tLooking for a " + Style.BRIGHT + "'"  + SUBREPOS_FILE + "'", end=' ')
-		print("file right here instead.")
+# Processes command line parameters
+	parser = argparse.ArgumentParser(
+		description="Manages git repos within git repos.",
+		epilog="With no options: finds and processes '" + SUBREPOS_FILE + "' files.",
+	)
 	
-	# Let's find the "main" subrepos file (if any)
-	subrepos = load_subrepos_file(working_dir)
+# Main options
+	parser.add_argument('-V', '--version', action='store_true', help="show " + parser.prog + " version and exit")
 	
-	# Recursively work on findings
-	while len(subrepos):
-		# Operates (clone, update...) the first subrepo on the list
-		manage_subrepo(subrepos[0])
-		# See if new subrepos files have appeared
-		new_subrepos = load_subrepos_file(subrepos[0]['path'])
-		# done with this subrepo
-		subrepos.remove(subrepos[0])
-		# Now, let's add new additions to the queue (if any)
-		if new_subrepos:
-			subrepos.extend(new_subrepos)
+# Ready to parse args
+	args = parser.parse_args()
+	#print(args)
 	
+	if len(sys.argv) > 1:
+		if args.version:
+			print("%s %s" % (parser.prog, __version__))
+	else:
+	# Program called with no arguments (runs default action)
+		# First, let's check if we are in a git sandbox at all
+		try:
+			repo = Repo(os.getcwd(), search_parent_directories=True)
+			# we are: let's go to its "root" to look for a subrepos file
+			working_dir = repo.working_tree_dir
+		except git_exception.InvalidGitRepositoryError as e:
+			# Not a git repo; fall back to current dir as "root"
+			working_dir = os.getcwd()
+			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
+			print("Current dir " + Style.BRIGHT + "'" + working_dir + "'", end=' ')
+			print("is not within a valid git repo.")
+			print("\tLooking for a " + Style.BRIGHT + "'"  + SUBREPOS_FILE + "'", end=' ')
+			print("file right here instead.")
+		
+		# Let's find the "main" subrepos file (if any)
+		subrepos = load_subrepos_file(working_dir)
+		
+		# Recursively work on findings
+		while len(subrepos):
+			# Operates (clone, update...) the first subrepo on the list
+			manage_subrepo(subrepos[0])
+			# See if new subrepos files have appeared
+			new_subrepos = load_subrepos_file(subrepos[0]['path'])
+			# done with this subrepo
+			subrepos.remove(subrepos[0])
+			# Now, let's add new additions to the queue (if any)
+			if new_subrepos:
+				subrepos.extend(new_subrepos)
+				
