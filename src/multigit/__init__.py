@@ -182,7 +182,7 @@ def manage_subrepo(subrepo):
 
 # MAIN entry point
 def main():
-	# Activates colored output
+# Activates colored output
 	init(autoreset=True)
 	
 # Processes command line parameters
