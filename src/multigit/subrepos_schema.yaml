@@ -1,0 +1,44 @@
+---
+# Subrepos' schema definition
+#
+# subrepos:
+# - path: relative_path (mandatory)
+#   repo: URL to git service (mandatory)
+#   [commit|branch|tag]: (optional.  One and only one)
+# - path: another subrepo
+#   repo: ...
+#   [commit|branch|tag]: ...
+# - ...
+
+subrepos:
+# A list of dictionaries
+  type: "list"
+  required: True
+  schema:
+  # Each list entry represents a "subrepo":
+    type: "dict"
+    schema:
+    # 'path' and 'repo' are mandatory
+      path:
+        type: "string"
+        required: True
+      repo:
+        type: "string"
+        required: True
+    # optionally, one and only one of 'branch', 'tag' or 'commit'
+      branch:
+        type: "string"
+        excludes:
+        - tag
+        - commit
+      tag:
+        type: "string"
+        excludes:
+        - branch
+        - commit
+      commit:
+        type: "string"
+        excludes:
+        - branch
+        - tag
+        

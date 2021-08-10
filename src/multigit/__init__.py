@@ -9,7 +9,7 @@ This script is a Python implementation of multigit.
 :package: multigit
 :copyright: Jesús M. Navarro
 """
-__version__ = '0.4.1'
+__version__ = '0.5.0'
 
 # Import stuff
 import os, sys
@@ -40,14 +40,15 @@ def loop():
 		print("file right here instead.")
 	
 	# Let's find the "main" subrepos file (if any)
-	subrepos = SubreposFile.load(working_dir)
+	my_subrepos_file = SubreposFile()
+	subrepos = my_subrepos_file.load(working_dir)
 	
 	# Recursively work on findings
 	while len(subrepos):
 		# Operates (clone, update...) the first subrepo on the list
 		Subrepo.process(subrepos[0])
-		# See if new subrepos did have appear
-		new_subrepos = SubreposFile.load(subrepos[0]['path'])
+		# See if new subrepos did appear
+		new_subrepos = my_subrepos_file.load(subrepos[0]['path'])
 		# done with this subrepo entry
 		subrepos.remove(subrepos[0])
 		

@@ -17,6 +17,9 @@ bme_custom_clean() {
 
 # This workaround is required to apply customizations on the "root" project dir itself
 run_on_this_dir() {
+	# Shows current branch
+	echo -e "${C_BOLD}Current git branch:${C_GREEN}" `git rev-parse --abbrev-ref HEAD` "${C_NC}"
+	# Loads a "root" Python virtualenv for development purposes
 	load_virtualenv 'multigit-development' || return -1
 }
 
