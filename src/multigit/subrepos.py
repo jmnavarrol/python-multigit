@@ -49,7 +49,8 @@ class Subrepos(object):
 			print(Style.BRIGHT + "'" + str(validator_resource) + "'", end='.\n')
 			if (
 				type(e) is schema.SchemaError
-				or type(e) is TypeError):
+				or type(e) is TypeError
+			):
 				print("\t" + str(e))
 				sys.exit(errno.EINVAL)
 			else:
@@ -58,7 +59,6 @@ class Subrepos(object):
 		
 	def process(self, base_path):
 		# First, let's check if we are in a git sandbox at all
-		
 		working_dir = self.__find_root(base_path)
 		subrepos = self.__load_subrepos(working_dir)
 		
@@ -76,24 +76,24 @@ class Subrepos(object):
 				subrepos.extend(new_subrepos)
 		 
 		
-	def __find_root(self, path):
+	def __find_root(self, base_path):
 		'''
 		Returns the root path or the current git repo, or itself, if 'path' is not within a git sandbox
 		'''
 		
 		try:
-			repo = Repo(path, search_parent_directories=True)
+			repo = Repo(base_path, search_parent_directories=True)
 			# we are in a git sandbox: return its "root"
-			path = repo.working_tree_dir
+			base_path = repo.working_tree_dir
 		except git_exception.InvalidGitRepositoryError as e:
 			# Not a git repo
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
-			print("Current dir " + Style.BRIGHT + "'" + path + "'", end=' ')
+			print("Current dir " + Style.BRIGHT + "'" + base_path + "'", end=' ')
 			print("is not within a valid git sandbox.")
 			print("\tLooking for a " + Style.BRIGHT + "'"  + SUBREPOS_FILE + "'", end=' ')
 			print("file right here instead.")
 		
-		return path
+		return base_path
 	
 	
 	def __load_subrepos(self, path):
@@ -105,15 +105,14 @@ class Subrepos(object):
 		subrepos_file = path + "/" + SUBREPOS_FILE
 		# Check if we can find here a 'subrepos' definition file
 		try:
-			f_config = open(subrepos_file, 'r')
-			try:
-				configMap = yaml.safe_load(f_config)
-			except yaml.parser.ParserError as e:
-				print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-				print(Style.BRIGHT + "Malformed YAML file", end=' - ')
-				print(e)
-				sys.exit(errno.EINVAL)
-			f_config.close()
+			with open(subrepos_file, 'r') as f_config:
+				try:
+					configMap = yaml.safe_load(f_config)
+				except yaml.parser.ParserError as e:
+					print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
+					print(Style.BRIGHT + "Malformed YAML file", end=' - ')
+					print(e)
+					sys.exit(errno.EINVAL)
 		except IOError as e:
 			if e.errno==errno.ENOENT:
 				configMap = None
@@ -167,6 +166,7 @@ class Subrepos(object):
 		current_commit = repo.commit().hexsha
 		repo.remotes.origin.fetch()
 		
+		# Find the "new" topmost commit
 		if 'branch' in subrepo:
 			desired_commit = str(repo.commit('origin/' + subrepo['branch']))
 			gitref = subrepo['branch']
@@ -201,5 +201,6 @@ class Subrepos(object):
 				print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
 				print("at " + Style.BRIGHT + "'" + subrepo['path'] + "'")
 				print(Style.BRIGHT + "\tSubrepo is dirty:", end=' ')
-				print("won't try to update.")		
+				print("won't try to update.")
+		
 		
