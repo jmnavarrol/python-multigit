@@ -29,7 +29,7 @@ For each defined *subrepo* within the *subrepos* file, it will clone/checkout it
 
 This way you just need to manage your repos with `git` in the standard way, just as if they were individually checked out in isolation.
 
-*multigit* with no options will process the *subrepos* files it finds.  See the output of `multigit --help` for further info.
+Run `multigit` with no options or `multigit --help` for usage.
 
 <sub>[back to top](#top).</sub>
 
