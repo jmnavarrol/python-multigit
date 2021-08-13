@@ -155,7 +155,7 @@ class Subrepos(object):
 					repo = Repo.clone_from(subrepo['repo'], subrepo['path'])
 			except git_exception.GitCommandError as e:
 				print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-				print(Style.BRIGHT + e.stderr)
+				print(Style.BRIGHT + e.stderr.strip('\n'))
 				sys.exit(errno.EBADE)
 				
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
@@ -168,7 +168,15 @@ class Subrepos(object):
 		
 		# Find the "new" topmost commit
 		if 'branch' in subrepo:
-			desired_commit = str(repo.commit('origin/' + subrepo['branch']))
+			try:
+				desired_commit = str(repo.commit('origin/' + subrepo['branch']))
+			except git_exception.BadName as e:
+				print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
+				print("Repo " + Style.BRIGHT + "'" + subrepo['repo'] + "'")
+				print("\tCloned at: " + Style.BRIGHT + "'" + subrepo['path'] + "'")
+				print("\tNo such branch: " + Style.BRIGHT + "'" + subrepo['branch'] + "'", end=': ')
+				print(e)
+				sys.exit(errno.ENOENT)
 			gitref = subrepo['branch']
 		elif 'tag' in subrepo:
 			desired_commit = str(repo.commit(subrepo['tag']))

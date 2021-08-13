@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 
 PYTOOL = python -m build
-PYTHON_FILES = $(shell find . -type f -name '*.py')
+PYTHON_FILES = $(shell find . -not \( -path './build/*' -prune \) -type f -name '*.py')
 OTHER_INCLUDES = LICENSE README.md MANIFEST.in setup.cfg
 SDIST_FILES = dist/*.tar.gz
 WHEELS = dist/*.whl
@@ -34,10 +34,10 @@ $(SDIST_FILES): $(PYTHON_FILES) $(OTHER_INCLUDES)
 $(WHEELS): $(PYTHON_FILES) $(OTHER_INCLUDES)
 	$(PYTOOL) --wheel
 	
-upload-tmp: build
+upload-tmp: clean build
 	$(UPTOOL) --repository testpypi dist/*
 	
-upload: build
+upload: clean build
 	$(UPTOOL) --repository pypi dist/*
 	
 clean:
