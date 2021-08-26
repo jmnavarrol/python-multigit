@@ -60,6 +60,9 @@ class Subrepos(object):
 	def process(self, base_path):
 		# First, let's check if we are in a git sandbox at all
 		working_dir = self.__find_root(base_path)
+		if working_dir is None:
+			working_dir = base_path
+			
 		subrepos = self.__load_subrepos(working_dir)
 		
 		# Recursively work on findings
@@ -76,24 +79,50 @@ class Subrepos(object):
 				subrepos.extend(new_subrepos)
 		 
 		
+	def status(self, base_path):
+		'''
+		Outputs current environment estatus
+		'''
+		
+		# First, let's check if we are in a git sandbox at all
+		working_dir = self.__find_root(base_path)
+		if working_dir is None:
+			print("Root is not a git repo")
+		else:
+			print("Git repo, show status")
+			
+		subrepos = self.__load_subrepos(working_dir)
+		
+		# Recursively work on findings
+		while len(subrepos):
+			print(subrepos)
+			# See if new subrepos did appear
+			new_subrepos = self.__load_subrepos(subrepos[0]['path'])
+			# done with this subrepo entry
+			subrepos.remove(subrepos[0])
+			
+			# Now, let's add new findings to the queue (if any)
+			if new_subrepos:
+				subrepos.extend(new_subrepos)
+		
+		
 	def __find_root(self, base_path):
 		'''
-		Returns the root path or the current git repo, or itself, if 'path' is not within a git sandbox
+		Returns the root path or the current git repo, or None, if 'path' is not within a git sandbox
 		'''
 		
 		try:
 			repo = Repo(base_path, search_parent_directories=True)
 			# we are in a git sandbox: return its "root"
-			base_path = repo.working_tree_dir
+			root_path = repo.working_tree_dir
 		except git_exception.InvalidGitRepositoryError as e:
 			# Not a git repo
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
 			print("Current dir " + Style.BRIGHT + "'" + base_path + "'", end=' ')
 			print("is not within a valid git sandbox.")
-			print("\tLooking for a " + Style.BRIGHT + "'"  + SUBREPOS_FILE + "'", end=' ')
-			print("file right here instead.")
+			root_path = None
 		
-		return base_path
+		return root_path
 	
 	
 	def __load_subrepos(self, path):

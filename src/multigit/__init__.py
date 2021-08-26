@@ -9,7 +9,7 @@ This script is a Python implementation of multigit.
 :package: multigit
 :copyright: Jesús M. Navarro
 """
-__version__ = '0.6.1'
+__version__ = '0.7.0'
 
 # Import stuff
 import os, sys
@@ -33,6 +33,7 @@ def main():
 	main_parser.add_argument('-h', '--help', action='store_true', help="shows this help.")
 	main_parser.add_argument('-V', '--version', action='store_true', help="shows " + parser.prog + " version and exit.")
 	main_parser.add_argument('-r', '--run', action='store_true', help="recursively processes '" + SUBREPOS_FILE + "' files found.")
+	main_parser.add_argument('-s', '--status', action='store_true', help="Shows current repostories' status.")
 	
 # Ready to parse args
 	args = parser.parse_args()
@@ -48,6 +49,9 @@ def main():
 		elif args.run:
 			my_subrepos = Subrepos()
 			my_subrepos.process(os.getcwd())
+		elif args.status:
+			my_subrepos = Subrepos()
+			my_subrepos.status(os.getcwd())
 	else:
 	# Program called with no arguments (shows help)
 		print("%s (%s): arguments required.\n" % (parser.prog, __version__))
