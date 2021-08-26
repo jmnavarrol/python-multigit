@@ -57,43 +57,32 @@ class Subrepos(object):
 				raise
 		
 		
-	def process(self, base_path):
-		# First, let's check if we are in a git sandbox at all
-		working_dir = self.__find_root(base_path)
-		if working_dir is None:
-			working_dir = base_path
-			
-		subrepos = self.__load_subrepos(working_dir)
-		
-		# Recursively work on findings
-		while len(subrepos):
-			# Operates (clone, update...) the first subrepo on the list
-			self.__process_subrepo(subrepos[0])
-			# See if new subrepos did appear
-			new_subrepos = self.__load_subrepos(subrepos[0]['path'])
-			# done with this subrepo entry
-			subrepos.remove(subrepos[0])
-			
-			# Now, let's add new findings to the queue (if any)
-			if new_subrepos:
-				subrepos.extend(new_subrepos)
-		 
-		
-	def status(self, base_path):
+	def process(self, base_path, report_only=False):
 		'''
-		Outputs current environment estatus
+		Processes on information from subrepos
+		'''
+		'''
+		Loops over the requested subrepos, operating them as needed
+		report_only=False: processes the requirements; True, just shows status
 		'''
 		
 		# First, let's check if we are in a git sandbox at all
-		working_dir = self.__find_root(base_path)
-		if not working_dir:
-			working_dir = base_path
-		else:
+		try:
+			repo = Repo(base_path, search_parent_directories=True)
+			# we are in a git sandbox: get its "root"
+			working_dir = repo.working_tree_dir
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
 			print("processing a git repository rooted at", end=' ')
 			print(Style.BRIGHT + "'" + working_dir + "'", end='.\n')
+		except git_exception.InvalidGitRepositoryError as e:
+			# Not a git repo (acceptable, we'll just process the requested dir as-is)
+			working_dir = base_path
+			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
+			print("Current dir " + Style.BRIGHT + "'" + working_dir + "'", end=' ')
+			print("is not within a valid git sandbox.")
 			
 		subrepos = self.__load_subrepos(working_dir)
+		
 		if not len(subrepos):
 			print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
 			print("Couldn't find any", end=' ')
@@ -101,21 +90,25 @@ class Subrepos(object):
 		else:
 		# Recursively work on findings
 			while len(subrepos):
-				relpath = subrepos[0]['path'].replace(working_dir + '/', '')
-				print(Style.BRIGHT + "'" + relpath + "/'")
-				print("\trepository:", end=' ')
-				print(Style.BRIGHT + "'" + subrepos[0]['repo'] + "'")
-				
-				# Based on nice trick found at:
-				# https://stackoverflow.com/questions/29201260/a-fast-way-to-find-the-number-of-elements-in-list-intersection-python
-				# NOTE: the subrepos syntax insures only one of ['branch', 'tag', 'commit'] will be found
-				gitref_type = set(['branch', 'tag', 'commit']).intersection(subrepos[0])
-				if gitref_type:
-					gitref_type = list(gitref_type)[0]
-					print("\trequested " + gitref_type + ":", end=' ')
-					print(Style.BRIGHT + "'" + subrepos[0][gitref_type] + "'")
+				if not report_only:
+					# Operates (clone, update...) the first subrepo on the list
+					self.__process_subrepo(subrepos[0])
 				else:
-					print("\tno gitref requested (working on default repo branch)")
+					relpath = subrepos[0]['path'].replace(working_dir + '/', '')
+					print(Style.BRIGHT + "'" + relpath + "/'")
+					print("\trepository:", end=' ')
+					print(Style.BRIGHT + "'" + subrepos[0]['repo'] + "'")
+				
+					# Based on nice trick found at:
+					# https://stackoverflow.com/questions/29201260/a-fast-way-to-find-the-number-of-elements-in-list-intersection-python
+					# NOTE: the subrepos syntax insures only one of ['branch', 'tag', 'commit'] will be found
+					gitref_type = set(['branch', 'tag', 'commit']).intersection(subrepos[0])
+					if gitref_type:
+						gitref_type = list(gitref_type)[0]
+						print("\trequested " + gitref_type + ":", end=' ')
+						print(Style.BRIGHT + "'" + subrepos[0][gitref_type] + "'")
+					else:
+						print("\tno gitref requested (working on default repo branch)")
 					
 				# See if new subrepos did appear
 				new_subrepos = self.__load_subrepos(subrepos[0]['path'])
@@ -124,28 +117,9 @@ class Subrepos(object):
 				
 				# Now, let's add new findings to the queue (if any)
 				if new_subrepos:
-					subrepos.extend(new_subrepos)
+					subrepos.extend(new_subrepos)		 
 		
 		
-	def __find_root(self, base_path):
-		'''
-		Returns the root path or the current git repo, or None, if 'path' is not within a git sandbox
-		'''
-		
-		try:
-			repo = Repo(base_path, search_parent_directories=True)
-			# we are in a git sandbox: return its "root"
-			root_path = repo.working_tree_dir
-		except git_exception.InvalidGitRepositoryError as e:
-			# Not a git repo
-			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
-			print("Current dir " + Style.BRIGHT + "'" + base_path + "'", end=' ')
-			print("is not within a valid git sandbox.")
-			root_path = None
-		
-		return root_path
-	
-	
 	def __load_subrepos(self, path):
 		'''
 		Loads a 'subrepos' file at path

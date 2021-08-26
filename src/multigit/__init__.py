@@ -46,12 +46,9 @@ def main():
 			parser.print_help()
 		elif args.version:
 			print("%s %s" % (parser.prog, __version__))
-		elif args.run:
+		else:
 			my_subrepos = Subrepos()
-			my_subrepos.process(os.getcwd())
-		elif args.status:
-			my_subrepos = Subrepos()
-			my_subrepos.status(os.getcwd())
+			my_subrepos.process(os.getcwd(), report_only=args.status)
 	else:
 	# Program called with no arguments (shows help)
 		print("%s (%s): arguments required.\n" % (parser.prog, __version__))
