@@ -30,10 +30,10 @@ def main():
 	
 # Main options
 	main_parser = parser.add_mutually_exclusive_group()
-	main_parser.add_argument('-h', '--help', action='store_true', help="shows this help.")
-	main_parser.add_argument('-V', '--version', action='store_true', help="shows " + parser.prog + " version and exit.")
-	main_parser.add_argument('-r', '--run', action='store_true', help="recursively processes '" + SUBREPOS_FILE + "' files found.")
-	main_parser.add_argument('-s', '--status', action='store_true', help="Shows current repostories' status.")
+	main_parser.add_argument('-h', '--help', action='store_true', help="Shows this help.")
+	main_parser.add_argument('-V', '--version', action='store_true', help="Shows " + parser.prog + " version and quits.")
+	main_parser.add_argument('-r', '--run', action='store_true', help="Recursively processes '" + SUBREPOS_FILE + "' files found.")
+	main_parser.add_argument('-s', '--status', action='store_true', help="Shows repositories' current status.")
 	
 # Ready to parse args
 	args = parser.parse_args()
