@@ -81,7 +81,7 @@ class Subrepos(object):
 			print("Current dir " + Style.BRIGHT + "'" + working_dir + "'", end=' ')
 			print("is not within a valid git sandbox.")
 			
-		subrepos = self.__load_subrepos(working_dir)
+		subrepos = self.__load_subrepos_file(working_dir)
 		
 		if not len(subrepos):
 			print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
@@ -111,16 +111,16 @@ class Subrepos(object):
 						print("\tno gitref requested (working on default repo branch)")
 					
 				# See if new subrepos did appear
-				new_subrepos = self.__load_subrepos(subrepos[0]['path'])
+				new_subrepos = self.__load_subrepos_file(subrepos[0]['path'])
 				# done with this subrepo entry
 				subrepos.remove(subrepos[0])
 				
 				# Now, let's add new findings to the queue (if any)
 				if new_subrepos:
-					subrepos.extend(new_subrepos)		 
+					subrepos.extend(new_subrepos)
 		
 		
-	def __load_subrepos(self, path):
+	def __load_subrepos_file(self, path):
 		'''
 		Loads a 'subrepos' file at path
 		'''
