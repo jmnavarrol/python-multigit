@@ -86,24 +86,45 @@ class Subrepos(object):
 		
 		# First, let's check if we are in a git sandbox at all
 		working_dir = self.__find_root(base_path)
-		if working_dir is None:
-			print("Root is not a git repo")
+		if not working_dir:
+			working_dir = base_path
 		else:
-			print("Git repo, show status")
+			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
+			print("processing a git repository rooted at", end=' ')
+			print(Style.BRIGHT + "'" + working_dir + "'", end='.\n')
 			
 		subrepos = self.__load_subrepos(working_dir)
-		
+		if not len(subrepos):
+			print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
+			print("Couldn't find any", end=' ')
+			print(Style.BRIGHT + "'" + SUBREPOS_FILE + "'", end=' file.\n')
+		else:
 		# Recursively work on findings
-		while len(subrepos):
-			print(subrepos)
-			# See if new subrepos did appear
-			new_subrepos = self.__load_subrepos(subrepos[0]['path'])
-			# done with this subrepo entry
-			subrepos.remove(subrepos[0])
-			
-			# Now, let's add new findings to the queue (if any)
-			if new_subrepos:
-				subrepos.extend(new_subrepos)
+			while len(subrepos):
+				relpath = subrepos[0]['path'].replace(working_dir + '/', '')
+				print(Style.BRIGHT + "'" + relpath + "/'")
+				print("\trepository:", end=' ')
+				print(Style.BRIGHT + "'" + subrepos[0]['repo'] + "'")
+				
+				# Based on nice trick found at:
+				# https://stackoverflow.com/questions/29201260/a-fast-way-to-find-the-number-of-elements-in-list-intersection-python
+				# NOTE: the subrepos syntax insures only one of ['branch', 'tag', 'commit'] will be found
+				gitref = set(['branch', 'tag', 'commit']).intersection(subrepos[0].keys())
+				if gitref:
+					gitref = list(gitref)[0]
+					print("\trequested " + gitref + ":", end=' ')
+					print(Style.BRIGHT + "'" + subrepos[0][gitref] + "'")
+				else:
+					print("\tno gitref requested (working on default repo branch)")
+					
+				# See if new subrepos did appear
+				new_subrepos = self.__load_subrepos(subrepos[0]['path'])
+				# done with this subrepo entry
+				subrepos.remove(subrepos[0])
+				
+				# Now, let's add new findings to the queue (if any)
+				if new_subrepos:
+					subrepos.extend(new_subrepos)
 		
 		
 	def __find_root(self, base_path):
