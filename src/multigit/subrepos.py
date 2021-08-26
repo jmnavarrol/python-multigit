@@ -109,11 +109,11 @@ class Subrepos(object):
 				# Based on nice trick found at:
 				# https://stackoverflow.com/questions/29201260/a-fast-way-to-find-the-number-of-elements-in-list-intersection-python
 				# NOTE: the subrepos syntax insures only one of ['branch', 'tag', 'commit'] will be found
-				gitref = set(['branch', 'tag', 'commit']).intersection(subrepos[0].keys())
-				if gitref:
-					gitref = list(gitref)[0]
-					print("\trequested " + gitref + ":", end=' ')
-					print(Style.BRIGHT + "'" + subrepos[0][gitref] + "'")
+				gitref_type = set(['branch', 'tag', 'commit']).intersection(subrepos[0])
+				if gitref_type:
+					gitref_type = list(gitref_type)[0]
+					print("\trequested " + gitref_type + ":", end=' ')
+					print(Style.BRIGHT + "'" + subrepos[0][gitref_type] + "'")
 				else:
 					print("\tno gitref requested (working on default repo branch)")
 					
@@ -192,15 +192,14 @@ class Subrepos(object):
 			repo = Repo(subrepo['path'])
 		except git_exception.NoSuchPathError as e:
 			# repo not yet cloned
-			branch_like = None
-			if 'branch' in subrepo:
-				branch_like = branch=subrepo['branch']
-			elif 'tag' in subrepo:
-				branch_like = branch=subrepo['tag']
-				
+			# Based on nice trick found at:
+			# https://stackoverflow.com/questions/29201260/a-fast-way-to-find-the-number-of-elements-in-list-intersection-python
+			# NOTE: the subrepos syntax insures only one of ['branch', 'tag'] will be found
+			gitref_type = set(['branch', 'tag']).intersection(subrepo)
 			try:
-				if branch_like:
-					repo = Repo.clone_from(subrepo['repo'], subrepo['path'], branch=branch_like)
+				if gitref_type:
+					gitref_type = list(gitref_type)[0]
+					repo = Repo.clone_from(subrepo['repo'], subrepo['path'], branch=subrepo[gitref_type])
 				else:
 					repo = Repo.clone_from(subrepo['repo'], subrepo['path'])
 			except git_exception.GitCommandError as e:
