@@ -93,52 +93,21 @@ class Subrepos(object):
 		# Recursively work on subrepos' contents
 		while len(subrepos):
 			current_subrepo = subrepos[0]
+			current_subrepo['relpath'] = current_subrepo['path'].replace(root_dir + '/', '')
+			
 			# Operates on the current subrepo as requested
 			current_subrepo = self.__process_subrepo(current_subrepo, report_only)
 			
 			# Prints subrepo status
-			relpath = current_subrepo['path'].replace(root_dir + '/', '')
-			print(Style.BRIGHT + "'" + relpath + "/'")
-			print("\trepository:", end=' ')
-			print(Style.BRIGHT + "'" + current_subrepo['repo'] + "'")
-			if current_subrepo['gitref_type']:
-				gitref_type = current_subrepo['gitref_type']
-				print("\trequested " + gitref_type + ":", end=' ')
-				print(Style.BRIGHT + "'" + current_subrepo[gitref_type] + "'")
-			else:
-				print("\tno gitref requested (working on default repo branch)")
-				
-			if current_subrepo['status'] == 'NOT_CLONED':
-				print("\tstatus: " + Style.BRIGHT + "not yet cloned")
-			elif current_subrepo['status'] == 'CLONED':
-				print("\tstatus:", end=' ')
-				print(Style.BRIGHT + Fore.GREEN + "CLONED")
-			elif current_subrepo['status'] == 'UP_TO_DATE':
-				print("\tstatus:", end=' ')
-				print(Style.BRIGHT + Fore.GREEN + "UP TO DATE")
-			elif current_subrepo['status'] == 'PENDING_UPDATE':
-				print("\tpending updates:", end=' ')
-				print(Style.BRIGHT + "'" + current_subrepo['from'] + "'", end=' -> ')
-				print(Style.BRIGHT + "'" + current_subrepo['to'] + "'")
-			elif current_subrepo['status'] == 'UPDATED':
-				print("\tupdated from", end=' ')
-				print(Style.BRIGHT + "'" + current_subrepo['from'] + "'", end=' -> ')
-				print(Style.BRIGHT + "'" + current_subrepo['to'] + "'")
-			elif current_subrepo['status'] == 'DIRTY':
-				print("\tstatus:", end=' ')
-				print(Style.BRIGHT + Fore.YELLOW + "DIRTY", end=' ')
-				print("(won't try to update)")
-			else:
-				print("\tstatus: " + Style.BRIGHT + current_subrepo['status'])
-				
-			# See if new subrepos did appear
-			new_subrepos = self.__load_subrepos_file(current_subrepo['path'])
-			# done with this subrepo entry
-			subrepos.remove(current_subrepo)
+			self.__print_subrepo_status(current_subrepo)
 			
-			# Now, let's add new findings to the queue (if any)
+			# Let's see if new subrepos appeared and (eventually) append them to the queue
+			new_subrepos = self.__load_subrepos_file(current_subrepo['path'])
 			if new_subrepos:
 				subrepos.extend(new_subrepos)
+			
+			# done with this subrepo entry
+			subrepos.remove(current_subrepo)
 		
 		
 	def __load_subrepos_file(self, path):
@@ -287,4 +256,52 @@ class Subrepos(object):
 				subrepo['status'] = 'UP_TO_DATE'
 				
 		return subrepo
+		
+		
+	def __print_subrepo_status(self, subrepo):
+		'''
+		prints a report on the repo info provided as param
+		'''
+		
+		# Header
+		print(Style.BRIGHT + "'" + subrepo['relpath'] + "/'")
+		print("\trepository:", end=' ')
+		print(Style.BRIGHT + "'" + subrepo['repo'] + "'")
+		if subrepo['gitref_type']:
+			gitref_type = subrepo['gitref_type']
+			print("\trequested " + gitref_type + ":", end=' ')
+			print(Style.BRIGHT + "'" + subrepo[gitref_type] + "'")
+		else:
+			print("\tno gitref requested (working on default repo branch)")
+			
+		# Details depending on refered status
+		if subrepo['status'] == 'NOT_CLONED':
+			print("\tstatus: " + Style.BRIGHT + "not yet cloned")
+			
+		elif subrepo['status'] == 'CLONED':
+			print("\tstatus:", end=' ')
+			print(Style.BRIGHT + Fore.GREEN + "CLONED")
+			
+		elif subrepo['status'] == 'UP_TO_DATE':
+			print("\tstatus:", end=' ')
+			print(Style.BRIGHT + Fore.GREEN + "UP TO DATE")
+			
+		elif subrepo['status'] == 'PENDING_UPDATE':
+			print("\tpending updates:", end=' ')
+			print(Style.BRIGHT + "'" + subrepo['from'] + "'", end=' -> ')
+			print(Style.BRIGHT + "'" + subrepo['to'] + "'")
+			
+		elif subrepo['status'] == 'UPDATED':
+			print("\tupdated from", end=' ')
+			print(Style.BRIGHT + "'" + subrepo['from'] + "'", end=' -> ')
+			print(Style.BRIGHT + "'" + subrepo['to'] + "'")
+			
+		elif subrepo['status'] == 'DIRTY':
+			print("\tstatus:", end=' ')
+			print(Style.BRIGHT + Fore.YELLOW + "DIRTY", end=' ')
+			print("(won't try to update)")
+			
+		else:
+			print("\tstatus: " + Style.BRIGHT + subrepo['status'])
+		
 		
