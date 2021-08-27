@@ -192,51 +192,50 @@ class Subrepos(object):
 				
 		# Update sandbox if requested, needed and possible
 		if not 'status' in subrepo:
-			current_commit = repo.commit().hexsha
+			# "names I'm using here:
+			# local_commit: the current local commit on the sandbox
+			# desired_gitref: what's requested? a tag, a branch, a commit...
+			# desired_commit: the "topmost" commit on the desired_gitref
+			# since I "converted" the desired_gitref into a commit,
+			# I can just compare sandbox' current commit with the desired one to know if there're pending updates
+			
+			local_commit = repo.commit().hexsha
+			# grab details about remote updates (if any)
 			repo.remotes.origin.fetch()
 		
 			# Find the "new" topmost commit
 			if subrepo['gitref_type']:
 				gitref_type = subrepo['gitref_type']
+				
+				desired_gitref = subrepo[gitref_type]
+				
 				if gitref_type == 'branch':
-					try:
-						desired_commit = str(repo.commit('origin/' + subrepo['branch']))
-					except git_exception.BadName as e:
-						print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-						print("Repo " + Style.BRIGHT + "'" + subrepo['repo'] + "'")
-						print("\tCloned at: " + Style.BRIGHT + "'" + subrepo['path'] + "'")
-						print("\tNo such branch: " + Style.BRIGHT + "'" + subrepo['branch'] + "'", end=': ')
-						print(e)
-						sys.exit(errno.ENOENT)
-						
-					gitref = subrepo['branch']
-				elif gitref_type == 'tag':
-					try:
-						desired_commit = str(repo.commit(subrepo['tag']))
-					except git_exception.BadName as e:
-						print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-						print("Repo " + Style.BRIGHT + "'" + subrepo['repo'] + "'")
-						print("\tCloned at: " + Style.BRIGHT + "'" + subrepo['path'] + "'")
-						print("\tNo such tag: " + Style.BRIGHT + "'" + subrepo['tag'] + "'", end=': ')
-						print(e)
-						sys.exit(errno.ENOENT)
-						
-					gitref = subrepo['tag']
-				elif gitref_type == 'commit':
-					desired_commit = str(subrepo['commit'])
-					gitref = subrepo['commit']
+					remote_ref = str('origin/' + subrepo[gitref_type])
+				else:
+					remote_ref = str(subrepo[gitref_type])
+				
+				try:
+					desired_commit = str(repo.commit(remote_ref))
+				except git_exception.BadName as e:
+					print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
+					print("Repo " + Style.BRIGHT + "'" + subrepo['repo'] + "'")
+					print("\tCloned at: " + Style.BRIGHT + "'" + subrepo['path'] + "'")
+					print("\tNo such " + gitref_type + ": " + Style.BRIGHT + "'" + subrepo[gitref_type] + "'", end=': ')
+					print(e)
+					sys.exit(errno.ENOENT)
 			else:
 				desired_commit = repo.remotes.origin.refs.HEAD.commit.hexsha
-				gitref = repo.git.symbolic_ref('refs/remotes/origin/HEAD').replace('refs/remotes/origin/','')
+				desired_gitref = repo.git.symbolic_ref('refs/remotes/origin/HEAD').replace('refs/remotes/origin/','')
 				
 			# The sandbox update itself
-			if current_commit != desired_commit:
-				subrepo['from'] = current_commit
+			if local_commit != desired_commit:
+				subrepo['from'] = local_commit
 				subrepo['to'] = desired_commit
+				
 				if not repo.is_dirty():
 					if not report_only:
 						try:
-							repo.git.checkout(gitref)
+							repo.git.checkout(desired_gitref)
 						except git_exception.GitCommandError as e:
 							print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
 							print(Style.BRIGHT + "'" + subrepo['repo'] + "'")
