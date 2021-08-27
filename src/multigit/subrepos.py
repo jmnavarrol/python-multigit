@@ -57,7 +57,7 @@ class Subrepos(object):
 				raise
 		
 		
-	def process(self, base_path, report_only=False):
+	def process(self, base_path, report_only=True):
 		'''
 		Processes on information from subrepos
 		'''
@@ -81,43 +81,46 @@ class Subrepos(object):
 			print("Current dir " + Style.BRIGHT + "'" + working_dir + "'", end=' ')
 			print("is not within a valid git sandbox.")
 			
+		# Load the "root" subrepos file (if any)
 		subrepos = self.__load_subrepos_file(working_dir)
-		
-		if not len(subrepos):
+		if not subrepos:
+		#if not len(subrepos):
 			print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
 			print("Couldn't find any", end=' ')
-			print(Style.BRIGHT + "'" + SUBREPOS_FILE + "'", end=' file.\n')
-		else:
-		# Recursively work on findings
-			while len(subrepos):
-				if not report_only:
-					# Operates (clone, update...) the first subrepo on the list
-					self.__process_subrepo(subrepos[0])
+			print(Style.BRIGHT + "'" + SUBREPOS_FILE + "'", end=' ')
+			print("file... exiting.")
+			sys.exit(errno.ENOENT)
+			
+		# Recursively work on subrepos' contents
+		while len(subrepos):
+			if not report_only:
+				# Operates (clone, update...) the first subrepo on the list
+				self.__process_subrepo(subrepos[0])
+			else:
+				relpath = subrepos[0]['path'].replace(working_dir + '/', '')
+				print(Style.BRIGHT + "'" + relpath + "/'")
+				print("\trepository:", end=' ')
+				print(Style.BRIGHT + "'" + subrepos[0]['repo'] + "'")
+			
+				# Based on nice trick found at:
+				# https://stackoverflow.com/questions/29201260/a-fast-way-to-find-the-number-of-elements-in-list-intersection-python
+				# NOTE: the subrepos syntax insures only one of ['branch', 'tag', 'commit'] will be found
+				gitref_type = set(['branch', 'tag', 'commit']).intersection(subrepos[0])
+				if gitref_type:
+					gitref_type = list(gitref_type)[0]
+					print("\trequested " + gitref_type + ":", end=' ')
+					print(Style.BRIGHT + "'" + subrepos[0][gitref_type] + "'")
 				else:
-					relpath = subrepos[0]['path'].replace(working_dir + '/', '')
-					print(Style.BRIGHT + "'" + relpath + "/'")
-					print("\trepository:", end=' ')
-					print(Style.BRIGHT + "'" + subrepos[0]['repo'] + "'")
+					print("\tno gitref requested (working on default repo branch)")
 				
-					# Based on nice trick found at:
-					# https://stackoverflow.com/questions/29201260/a-fast-way-to-find-the-number-of-elements-in-list-intersection-python
-					# NOTE: the subrepos syntax insures only one of ['branch', 'tag', 'commit'] will be found
-					gitref_type = set(['branch', 'tag', 'commit']).intersection(subrepos[0])
-					if gitref_type:
-						gitref_type = list(gitref_type)[0]
-						print("\trequested " + gitref_type + ":", end=' ')
-						print(Style.BRIGHT + "'" + subrepos[0][gitref_type] + "'")
-					else:
-						print("\tno gitref requested (working on default repo branch)")
-					
-				# See if new subrepos did appear
-				new_subrepos = self.__load_subrepos_file(subrepos[0]['path'])
-				# done with this subrepo entry
-				subrepos.remove(subrepos[0])
-				
-				# Now, let's add new findings to the queue (if any)
-				if new_subrepos:
-					subrepos.extend(new_subrepos)
+			# See if new subrepos did appear
+			new_subrepos = self.__load_subrepos_file(subrepos[0]['path'])
+			# done with this subrepo entry
+			subrepos.remove(subrepos[0])
+			
+			# Now, let's add new findings to the queue (if any)
+			if new_subrepos:
+				subrepos.extend(new_subrepos)
 		
 		
 	def __load_subrepos_file(self, path):
@@ -125,7 +128,6 @@ class Subrepos(object):
 		Loads a 'subrepos' file at path
 		'''
 		
-		subrepo_list = []
 		subrepos_file = path + "/" + SUBREPOS_FILE
 		# Check if we can find here a 'subrepos' definition file
 		try:
@@ -138,6 +140,8 @@ class Subrepos(object):
 					print(e)
 					sys.exit(errno.EINVAL)
 		except IOError as e:
+			# it's acceptable not to find the requested 'subrepos' file.
+			# we'll just return a null subrepo list as a result
 			if e.errno==errno.ENOENT:
 				configMap = None
 			else: raise
@@ -156,7 +160,9 @@ class Subrepos(object):
 				print("Malformed YAML file at " + Style.BRIGHT + "'" + subrepos_file + "'", end='.\n')
 				print("\t" + str(self.yaml_validator.errors))
 				sys.exit(errno.EINVAL)
-				
+		else:
+			subrepo_list = None
+			
 		return subrepo_list
 		
 		
