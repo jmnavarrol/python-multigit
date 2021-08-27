@@ -70,21 +70,20 @@ class Subrepos(object):
 		try:
 			repo = Repo(base_path, search_parent_directories=True)
 			# we are in a git sandbox: get its "root"
-			working_dir = repo.working_tree_dir
+			root_dir = repo.working_tree_dir
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
 			print("processing a git repository rooted at", end=' ')
-			print(Style.BRIGHT + "'" + working_dir + "'", end='.\n')
+			print(Style.BRIGHT + "'" + root_dir + "'", end='.\n')
 		except git_exception.InvalidGitRepositoryError as e:
 			# Not a git repo (acceptable, we'll just process the requested dir as-is)
-			working_dir = base_path
+			root_dir = base_path
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
 			print("Current dir " + Style.BRIGHT + "'" + working_dir + "'", end=' ')
 			print("is not within a valid git sandbox.")
 			
 		# Load the "root" subrepos file (if any)
-		subrepos = self.__load_subrepos_file(working_dir)
+		subrepos = self.__load_subrepos_file(root_dir)
 		if not subrepos:
-		#if not len(subrepos):
 			print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
 			print("Couldn't find any", end=' ')
 			print(Style.BRIGHT + "'" + SUBREPOS_FILE + "'", end=' ')
@@ -97,7 +96,7 @@ class Subrepos(object):
 				# Operates (clone, update...) the first subrepo on the list
 				self.__process_subrepo(subrepos[0])
 			else:
-				relpath = subrepos[0]['path'].replace(working_dir + '/', '')
+				relpath = subrepos[0]['path'].replace(root_dir + '/', '')
 				print(Style.BRIGHT + "'" + relpath + "/'")
 				print("\trepository:", end=' ')
 				print(Style.BRIGHT + "'" + subrepos[0]['repo'] + "'")
