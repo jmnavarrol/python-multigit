@@ -16,3 +16,9 @@ subrepos:
 - path: 'projects/simplest-git-subrepos'
   repo: 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
   branch: 'python-example'
+  # FOR TESTING PURPOSES:
+  #branch: 'non-existant'
+  #tag: 'v1.0.0'
+  #tag: 'vNon.Existant'
+  #commit: 'e00e8f4c48ef6328b4efa10fe1db2ab6dd3c0bdf'
+  #commit: 'WRONGf4c48ef6328b4efa10fe1db2ab6dd3c0bdf'

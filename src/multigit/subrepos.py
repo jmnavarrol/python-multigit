@@ -72,13 +72,13 @@ class Subrepos(object):
 			# we are in a git sandbox: get its "root"
 			root_dir = repo.working_tree_dir
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
-			print("processing a git repository rooted at", end=' ')
-			print(Style.BRIGHT + "'" + root_dir + "'", end='.\n')
+			print("processing git repository rooted at", end=' ')
+			print(Style.BRIGHT + "'" + root_dir + "'", end=':\n')
 		except git_exception.InvalidGitRepositoryError as e:
 			# Not a git repo (acceptable, we'll just process the requested dir as-is)
 			root_dir = base_path
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
-			print("Current dir " + Style.BRIGHT + "'" + working_dir + "'", end=' ')
+			print("Current dir " + Style.BRIGHT + "'" + root_dir + "'", end=' ')
 			print("is not within a valid git sandbox.")
 			
 		# Load the "root" subrepos file (if any)
@@ -92,30 +92,49 @@ class Subrepos(object):
 			
 		# Recursively work on subrepos' contents
 		while len(subrepos):
-			if not report_only:
-				# Operates (clone, update...) the first subrepo on the list
-				self.__process_subrepo(subrepos[0])
-			else:
-				relpath = subrepos[0]['path'].replace(root_dir + '/', '')
-				print(Style.BRIGHT + "'" + relpath + "/'")
-				print("\trepository:", end=' ')
-				print(Style.BRIGHT + "'" + subrepos[0]['repo'] + "'")
+			current_subrepo = subrepos[0]
+			# Operates on the current subrepo as requested
+			current_subrepo = self.__process_subrepo(current_subrepo, report_only)
 			
-				# Based on nice trick found at:
-				# https://stackoverflow.com/questions/29201260/a-fast-way-to-find-the-number-of-elements-in-list-intersection-python
-				# NOTE: the subrepos syntax insures only one of ['branch', 'tag', 'commit'] will be found
-				gitref_type = set(['branch', 'tag', 'commit']).intersection(subrepos[0])
-				if gitref_type:
-					gitref_type = list(gitref_type)[0]
-					print("\trequested " + gitref_type + ":", end=' ')
-					print(Style.BRIGHT + "'" + subrepos[0][gitref_type] + "'")
-				else:
-					print("\tno gitref requested (working on default repo branch)")
+			# Prints subrepo status
+			relpath = current_subrepo['path'].replace(root_dir + '/', '')
+			print(Style.BRIGHT + "'" + relpath + "/'")
+			print("\trepository:", end=' ')
+			print(Style.BRIGHT + "'" + current_subrepo['repo'] + "'")
+			if current_subrepo['gitref_type']:
+				gitref_type = current_subrepo['gitref_type']
+				print("\trequested " + gitref_type + ":", end=' ')
+				print(Style.BRIGHT + "'" + current_subrepo[gitref_type] + "'")
+			else:
+				print("\tno gitref requested (working on default repo branch)")
+				
+			if current_subrepo['status'] == 'NOT_CLONED':
+				print("\tstatus: " + Style.BRIGHT + "not yet cloned")
+			elif current_subrepo['status'] == 'CLONED':
+				print("\tstatus:", end=' ')
+				print(Style.BRIGHT + Fore.GREEN + "CLONED")
+			elif current_subrepo['status'] == 'UP_TO_DATE':
+				print("\tstatus:", end=' ')
+				print(Style.BRIGHT + Fore.GREEN + "UP TO DATE")
+			elif current_subrepo['status'] == 'PENDING_UPDATE':
+				print("\tpending updates:", end=' ')
+				print(Style.BRIGHT + "'" + current_subrepo['from'] + "'", end=' -> ')
+				print(Style.BRIGHT + "'" + current_subrepo['to'] + "'")
+			elif current_subrepo['status'] == 'UPDATED':
+				print("\tupdated from", end=' ')
+				print(Style.BRIGHT + "'" + current_subrepo['from'] + "'", end=' -> ')
+				print(Style.BRIGHT + "'" + current_subrepo['to'] + "'")
+			elif current_subrepo['status'] == 'DIRTY':
+				print("\tstatus:", end=' ')
+				print(Style.BRIGHT + Fore.YELLOW + "DIRTY", end=' ')
+				print("(won't try to update)")
+			else:
+				print("\tstatus: " + Style.BRIGHT + current_subrepo['status'])
 				
 			# See if new subrepos did appear
-			new_subrepos = self.__load_subrepos_file(subrepos[0]['path'])
+			new_subrepos = self.__load_subrepos_file(current_subrepo['path'])
 			# done with this subrepo entry
-			subrepos.remove(subrepos[0])
+			subrepos.remove(current_subrepo)
 			
 			# Now, let's add new findings to the queue (if any)
 			if new_subrepos:
@@ -150,10 +169,20 @@ class Subrepos(object):
 			# Validate the subrepos file's contents
 			if self.yaml_validator.validate(configMap):
 				subrepo_list = configMap['subrepos']
-				# Process the validated contents
+				# "Normalize" the validated contents
 				for subrepo in subrepo_list:
-					# Let's set the repo's local path to its absolute location for easier tracking
+					# Let's set the repo's local path to its absolute location for easy tracking
 					subrepo['path'] = path + '/' + subrepo['path']
+					
+					# Sets the type of the requested gitref to ease processing
+					# Based on nice trick found at:
+					# https://stackoverflow.com/questions/29201260/a-fast-way-to-find-the-number-of-elements-in-list-intersection-python
+					# NOTE: the subrepos syntax insures that only one of ['branch', 'tag', 'commit'] will be found at most
+					gitref_type = set(['branch', 'tag', 'commit']).intersection(subrepo)
+					if gitref_type:
+						subrepo['gitref_type'] = list(gitref_type)[0]
+					else:
+						subrepo['gitref_type'] = None
 			else:
 				print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
 				print("Malformed YAML file at " + Style.BRIGHT + "'" + subrepos_file + "'", end='.\n')
@@ -165,78 +194,97 @@ class Subrepos(object):
 		return subrepo_list
 		
 		
-	def __process_subrepo(self, subrepo):
+	def __process_subrepo(self, subrepo, report_only=True):
+		'''
+		Operates the requested subrepo
+		It returns and "enhanced" subrepo dict reporting its status
+		'''
+		
 		# find or clone given subrepo
 		try:
 			repo = Repo(subrepo['path'])
 		except git_exception.NoSuchPathError as e:
 			# repo not yet cloned
-			# Based on nice trick found at:
-			# https://stackoverflow.com/questions/29201260/a-fast-way-to-find-the-number-of-elements-in-list-intersection-python
-			# NOTE: the subrepos syntax insures only one of ['branch', 'tag'] will be found
-			gitref_type = set(['branch', 'tag']).intersection(subrepo)
-			try:
-				if gitref_type:
-					gitref_type = list(gitref_type)[0]
-					repo = Repo.clone_from(subrepo['repo'], subrepo['path'], branch=subrepo[gitref_type])
-				else:
-					repo = Repo.clone_from(subrepo['repo'], subrepo['path'])
-			except git_exception.GitCommandError as e:
-				print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-				print(Style.BRIGHT + e.stderr.strip('\n'))
-				sys.exit(errno.EBADE)
-				
-			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
-			print("Repo " + Style.BRIGHT + "'" + subrepo['repo'] + "'")
-			print("\tCloned at " + Style.BRIGHT + "'" + subrepo['path'] + "'")
-			
-		# Update sandbox if needed and possible
-		current_commit = repo.commit().hexsha
-		repo.remotes.origin.fetch()
-		
-		# Find the "new" topmost commit
-		if 'branch' in subrepo:
-			try:
-				desired_commit = str(repo.commit('origin/' + subrepo['branch']))
-			except git_exception.BadName as e:
-				print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-				print("Repo " + Style.BRIGHT + "'" + subrepo['repo'] + "'")
-				print("\tCloned at: " + Style.BRIGHT + "'" + subrepo['path'] + "'")
-				print("\tNo such branch: " + Style.BRIGHT + "'" + subrepo['branch'] + "'", end=': ')
-				print(e)
-				sys.exit(errno.ENOENT)
-			gitref = subrepo['branch']
-		elif 'tag' in subrepo:
-			desired_commit = str(repo.commit(subrepo['tag']))
-			gitref = subrepo['tag']
-		elif 'commit' in subrepo:
-			desired_commit = str(subrepo['commit'])
-			gitref = subrepo['commit']
-		else:
-			desired_commit = repo.remotes.origin.refs.HEAD.commit.hexsha
-			gitref = repo.git.symbolic_ref('refs/remotes/origin/HEAD').replace('refs/remotes/origin/','')
-			
-		# The sandbox update itself
-		if current_commit != desired_commit:
-			if not repo.is_dirty():
+			if report_only:
+				subrepo['status'] = 'NOT_CLONED'
+			else:
 				try:
-					repo.git.checkout(gitref)
+					if subrepo['gitref_type']:
+						gitref_type = subrepo['gitref_type']
+						repo = Repo.clone_from(subrepo['repo'], subrepo['path'], branch=subrepo[gitref_type])
+					else:
+						repo = Repo.clone_from(subrepo['repo'], subrepo['path'])
 				except git_exception.GitCommandError as e:
 					print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-					print(Style.BRIGHT + e.stderr)
+					print(Style.BRIGHT + e.stderr.strip('\n'))
 					sys.exit(errno.EBADE)
 					
-				if not repo.head.is_detached:
-					repo.git.pull()
-					
-				print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
-				print("Repo at " + Style.BRIGHT + "'" + subrepo['path'] + "'")
-				print("\tUpdated: " + Style.BRIGHT + "'" + current_commit + "'", end=' -> ')
-				print(Style.BRIGHT + "'" + desired_commit + "'")
-			else:
-				print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
-				print("at " + Style.BRIGHT + "'" + subrepo['path'] + "'")
-				print(Style.BRIGHT + "\tSubrepo is dirty:", end=' ')
-				print("won't try to update.")
+				subrepo['status'] = 'CLONED'
+				
+		# Update sandbox if requested, needed and possible
+		if not 'status' in subrepo:
+			current_commit = repo.commit().hexsha
+			repo.remotes.origin.fetch()
 		
+			# Find the "new" topmost commit
+			if subrepo['gitref_type']:
+				gitref_type = subrepo['gitref_type']
+				if gitref_type == 'branch':
+					try:
+						desired_commit = str(repo.commit('origin/' + subrepo['branch']))
+					except git_exception.BadName as e:
+						print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
+						print("Repo " + Style.BRIGHT + "'" + subrepo['repo'] + "'")
+						print("\tCloned at: " + Style.BRIGHT + "'" + subrepo['path'] + "'")
+						print("\tNo such branch: " + Style.BRIGHT + "'" + subrepo['branch'] + "'", end=': ')
+						print(e)
+						sys.exit(errno.ENOENT)
+						
+					gitref = subrepo['branch']
+				elif gitref_type == 'tag':
+					try:
+						desired_commit = str(repo.commit(subrepo['tag']))
+					except git_exception.BadName as e:
+						print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
+						print("Repo " + Style.BRIGHT + "'" + subrepo['repo'] + "'")
+						print("\tCloned at: " + Style.BRIGHT + "'" + subrepo['path'] + "'")
+						print("\tNo such tag: " + Style.BRIGHT + "'" + subrepo['tag'] + "'", end=': ')
+						print(e)
+						sys.exit(errno.ENOENT)
+						
+					gitref = subrepo['tag']
+				elif gitref_type == 'commit':
+					desired_commit = str(subrepo['commit'])
+					gitref = subrepo['commit']
+			else:
+				desired_commit = repo.remotes.origin.refs.HEAD.commit.hexsha
+				gitref = repo.git.symbolic_ref('refs/remotes/origin/HEAD').replace('refs/remotes/origin/','')
+				
+			# The sandbox update itself
+			if current_commit != desired_commit:
+				subrepo['from'] = current_commit
+				subrepo['to'] = desired_commit
+				if not repo.is_dirty():
+					if not report_only:
+						try:
+							repo.git.checkout(gitref)
+						except git_exception.GitCommandError as e:
+							print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
+							print(Style.BRIGHT + "'" + subrepo['repo'] + "'")
+							print("\tat " + Style.BRIGHT + "'" + subrepo['path'] + "'")
+							print(Style.BRIGHT + "\t" + e.stderr.strip())
+							sys.exit(errno.EBADE)
+							
+						if not repo.head.is_detached:
+							repo.git.pull()
+							
+						subrepo['status'] = 'UPDATED'
+					else:
+						subrepo['status'] = 'PENDING_UPDATE'
+				else:
+					subrepo['status'] = 'DIRTY'
+			else:
+				subrepo['status'] = 'UP_TO_DATE'
+				
+		return subrepo
 		
