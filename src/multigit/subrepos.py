@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Processes subrepos files
-"""
 
 # Import stuff
 import errno, os, sys
@@ -17,12 +14,21 @@ from colorama import init, Fore, Back, Style
 
 
 # Globals
+
 SUBREPOS_FILE = 'subrepos'
+'''
+The *"fixed"* name of the YAML file with subrepos' definitions.
+
+Within a git sandbox, it will be looked for at the git sandbox' root.
+
+Otherwise, it will be looked for in current dir.
+'''  # pylint: disable=W0105
 
 class Subrepos(object):
+	'''Processes subrepos files'''
 	
 	def __init__(self):
-		# Activates colored output
+		'''Activates colored output'''
 		init(autoreset=True)
 		
 		# Loads the YAML schema validator
@@ -59,11 +65,14 @@ class Subrepos(object):
 		
 	def process(self, base_path, report_only=True):
 		'''
-		Processes on information from subrepos
-		'''
-		'''
-		Loops over the requested subrepos, operating them as needed
-		report_only=False: processes the requirements; True, just shows status
+		Recursively finds and processes subrepos files.
+		
+		If `base_path` is within a git sandbox, it starts the search at its root.
+		
+		If `base_path` is not within a git sandbox, it tries to find a subrepos file right at `base_path`.
+		
+		:param str base_path: the absolute path to the directory where subrepos file will be searched and processed.
+		:param bool report_only: `True`, just shows dirtree status; `False`, updates dirtree.
 		'''
 		
 		# First, let's check if we are in a git sandbox at all
@@ -111,9 +120,7 @@ class Subrepos(object):
 		
 		
 	def __load_subrepos_file(self, path):
-		'''
-		Loads a 'subrepos' file at path
-		'''
+		'''Loads a 'subrepos' file at path'''
 		
 		subrepos_file = path + "/" + SUBREPOS_FILE
 		# Check if we can find here a 'subrepos' definition file
@@ -258,9 +265,7 @@ class Subrepos(object):
 		
 		
 	def __print_subrepo_status(self, subrepo):
-		'''
-		prints a report on the repo info provided as param
-		'''
+		'''prints a report on the repo info provided as param'''
 		
 		# Header
 		print(Style.BRIGHT + "'" + subrepo['relpath'] + "/'")
@@ -304,3 +309,6 @@ class Subrepos(object):
 			print("\tstatus: " + Style.BRIGHT + subrepo['status'])
 		
 		
+if __name__ == '__main__':
+	# execute only if run as a script
+	main()

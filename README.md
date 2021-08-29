@@ -9,6 +9,7 @@ The general idea is to offer a simple way of managing *"workspaces"* integrating
 **Contents:**<a name="contents"></a>
 1. [usage](#usage)
 1. [development](#development)
+   1. [code documentation](#sphinx)
    1. [build](#build)
    1. [publish](#publish)
 1. [license](#license)
@@ -39,6 +40,13 @@ This project uses the help of [Bash Magic Enviro](https://github.com/jmnavarrol/
 It creates a Python 3 *virtualenv* using [the companion requirements file](./python-virtualenvs/multigit-development.requirements).
 
 Once the *virtualenv* is (automatically) activated, you can run this code just invoking its main script, i.e.: `multigit`.
+
+<sub>[back to top](#top).</sub>
+
+### code documentation<a name="sphinx"></a>
+Code documentation is produced with the help of [Sphinx](https://www.sphinx-doc.org), with configurations at [src/sphinx/](./src/sphinx/).  While sphinx includes [its own Makefile](./src/sphinx/Makefile), HTML doc can be generated from [the Makefile at src/](./src/Makefile), starting at the local `src/build/html/index.html` file.
+
+As of now, this documentation is only available for local development.
 
 <sub>[back to top](#top).</sub>
 

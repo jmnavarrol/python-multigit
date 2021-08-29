@@ -5,6 +5,7 @@ PYTOOL = python -m build
 PYTHON_FILES = $(shell find . -not \( -path './build/*' -prune \) -type f -name '*.py')
 OTHER_INCLUDES = LICENSE README.md MANIFEST.in setup.cfg
 SDIST_FILES = dist/*.tar.gz
+SPHINXDIR = sphinx
 WHEELS = dist/*.whl
 UPTOOL = python -m twine upload
 
@@ -16,23 +17,27 @@ export C_RED := \033[1;31m
 export C_NC := \033[0m
 
 # Basic targets
-.PHONY: targets build clean
+.PHONY: targets build clean doc
 
 targets:
 	@echo -e "${C_BOLD}Main targets are:${C_NC}"
 	@echo -e "\t${C_BOLD}targets:${C_NC} this one (default)."
-	@echo -e "\t${C_BOLD}build:${C_NC} builds source tarball and binary egg (sdist, wheels)."
+	@echo -e "\t${C_BOLD}build:${C_NC} builds source tarball, binary egg (sdist, wheels) and HTML sphinx docs."
+	@echo -e "\t${C_BOLD}doc:${C_NC} builds HTML sphinx docs."
 	@echo -e "\t${C_BOLD}upload-tmp:${C_NC} uploads version to testing PyPi service."
 	@echo -e "\t${C_BOLD}upload:${C_NC} uploads version to live PyPi service."
 	@echo -e "\t${C_BOLD}clean:${C_NC} deletes temp files."
 	
-build: $(SDIST_FILES) $(WHEELS)
+build: $(SDIST_FILES) $(WHEELS) doc
 
 $(SDIST_FILES): $(PYTHON_FILES) $(OTHER_INCLUDES)
 	$(PYTOOL) --sdist
 	
 $(WHEELS): $(PYTHON_FILES) $(OTHER_INCLUDES)
 	$(PYTOOL) --wheel
+	
+doc:
+	@$(MAKE) html -C $(SPHINXDIR)
 	
 upload-tmp: clean build
 	$(UPTOOL) --repository testpypi dist/*
@@ -41,8 +46,8 @@ upload: clean build
 	$(UPTOOL) --repository pypi dist/*
 	
 clean:
+	@$(MAKE) clean -C $(SPHINXDIR)
 	rm -rf MANIFEST build dist *.egg-info
 	find -type f -name '*.pyc' -exec rm -f '{}' \;
 	find -type d -name '__pycache__' | xargs rm -rf
 	rm -rf ../projects
-	

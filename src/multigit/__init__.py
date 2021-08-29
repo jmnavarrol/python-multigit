@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-
 """
-This script is a Python implementation of multigit.
-(see https://github.com/jmnavarrol/simplest-git-subrepos)
+This script is a Python implementation of `simplest-git-subrepos <https://github.com/jmnavarrol/simplest-git-subrepos>`_.
 
-:author: jesusmnavarrolopez@gmail.com
-:version: Beta
-:package: multigit
-:copyright: Jesús M. Navarro
+:package: multigit |release|
+:author: `Jesús M. Navarro <mailto:jesusmnavarrolopez@gmail.com>`_
+:license: `GNU General Public License v3.0 <https://github.com/jmnavarrol/python-multigit/blob/main/LICENSE>`_
+:source: https://github.com/jmnavarrol/python-multigit
 """
-__version__ = '0.7.0'
+
+__version__ = '0.8.0'
 
 # Import stuff
 import os, sys
@@ -22,7 +21,7 @@ from .subrepos import Subrepos, SUBREPOS_FILE
 
 # MAIN entry point
 def main():
-# Processes command line parameters
+	'''Processes command line parameters'''
 	parser = argparse.ArgumentParser(
 		description="Manages git repos within git repos.",
 		add_help=False,  # this way I can force help to be an exclusion option along the others
@@ -54,3 +53,7 @@ def main():
 		print("%s (%s): arguments required.\n" % (parser.prog, __version__))
 		parser.print_help()
 		
+		
+if __name__ == '__main__':
+	# execute only if run as a script
+	main()
