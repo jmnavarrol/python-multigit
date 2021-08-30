@@ -25,7 +25,7 @@ Otherwise, it will be looked for in current dir.
 '''  # pylint: disable=W0105
 
 class Subrepos(object):
-	'''Processes subrepos files'''
+	'''Recursively reads subrepos files and runs git commands as per its findings'''
 	
 	def __init__(self):
 		'''Activates colored output'''
@@ -120,7 +120,18 @@ class Subrepos(object):
 		
 		
 	def __load_subrepos_file(self, path):
-		'''Loads a 'subrepos' file at path'''
+		"""
+		Loads a 'subrepos' file at path.
+		
+		:param str path: the absolute path in which load a SUBREPOS_FILE (if any).
+		:return list of dicts: list of dictionaries similar to the SUBREPOS_FILE one, or *None* if couldn't find it.
+		
+			* subrepo:
+				* **subrepo['path']:** will be translated to an absolute path.
+				* **subrepo['gitref_type']:** will be one of *'branch'*, *'tag'*, *'commit'*, or *None*.
+				* **subrepo[gitref_type]:** (they will be named after the contents of *subrepo['gitref_type']*): the specific *gitref* value (a commit, branch or tag).
+			* subrepo: (...)
+		"""
 		
 		subrepos_file = path + "/" + SUBREPOS_FILE
 		# Check if we can find here a 'subrepos' definition file
@@ -172,8 +183,13 @@ class Subrepos(object):
 		
 	def __process_subrepo(self, subrepo, report_only=True):
 		'''
-		Operates the requested subrepo
-		It returns and "enhanced" subrepo dict reporting its status
+		Operates the requested subrepo.
+		
+		:param dict subrepo:  a dictionary in the form returned by __load_subrepos_file()
+		:param bool report_only: when True, only reviews subrepo's current status.  When False, tries to honor the requested values of *subrepo*.
+		:return dict: an "enhanced" subrepo dict reporting its status.  It will add the following keys:
+		
+			* **subrepo['status']:** one of *'NOT_CLONED'*, *'CLONED'*, *'UPDATED'*, *'PENDING_UPDATE'*, *'DIRTY'* or *'UP_TO_DATE'*.
 		'''
 		
 		# find or clone given subrepo
@@ -265,7 +281,10 @@ class Subrepos(object):
 		
 		
 	def __print_subrepo_status(self, subrepo):
-		'''prints a report on the repo info provided as param'''
+		'''prints a report on the repo info provided as param.
+		
+		:param dict subrepo: a dictionary in the enhanced form returned by __process_subrepo()
+		'''
 		
 		# Header
 		print(Style.BRIGHT + "'" + subrepo['relpath'] + "/'")
