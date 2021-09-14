@@ -14,7 +14,6 @@ from colorama import init, Fore, Back, Style
 
 
 # Globals
-
 SUBREPOS_FILE = 'subrepos'
 '''
 The *"fixed"* name of the YAML file with subrepos' definitions.
@@ -207,14 +206,24 @@ class Subrepos(object):
 					else:
 						repo = Repo.clone_from(subrepo['repo'], subrepo['path'])
 				except git_exception.GitCommandError as e:
-					print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-					print(Style.BRIGHT + e.stderr.strip('\n'))
-					sys.exit(errno.EBADE)
-					
-				subrepo['status'] = 'CLONED'
+					if (
+						e.status == 128
+						and 'Could not read from remote repository' in e.stderr
+					):
+						subrepo['status'] = 'ERROR'
+						subrepo['extra_info'] = e.stderr.replace('stderr: ','').strip('\n').strip()
+					else:
+						print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
+						print(Style.BRIGHT + e.stderr.strip('\n'))
+						sys.exit(errno.EBADE)
+				else:
+					subrepo['status'] = 'CLONED'
 				
 		# Update sandbox if requested, needed and possible
-		if not 'status' in subrepo:
+		if (
+			not 'status' in subrepo
+			or subrepo['status'] != 'ERROR'
+		):
 			# "names I'm using here:
 			# local_commit: the current local commit on the sandbox
 			# desired_gitref: what's requested? a tag, a branch, a commit...
@@ -298,7 +307,14 @@ class Subrepos(object):
 			print("\tno gitref requested (working on default repo branch)")
 			
 		# Details depending on refered status
-		if subrepo['status'] == 'NOT_CLONED':
+		if subrepo['status'] == 'ERROR':
+			print("\tstatus:", end=' ')
+			print(Style.BRIGHT + Fore.RED + "ERROR")
+			if 'extra_info' in subrepo:
+				print("\textra info:", end=' ')
+				print(Style.BRIGHT + subrepo['extra_info'].replace('\n','\n\t\t'))
+			
+		elif subrepo['status'] == 'NOT_CLONED':
 			print("\tstatus: " + Style.BRIGHT + "not yet cloned")
 			
 		elif subrepo['status'] == 'CLONED':
