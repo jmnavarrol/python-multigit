@@ -180,6 +180,10 @@ class Subrepos(object):
 		return subrepo_list
 		
 		
+	# TODO: Refactor this method, most possibly "breaking it" into steps:
+	# 1. clone
+	# 2. fetch (if no previous error)
+	# 3. update (if no previous error and gitref mismatch)
 	def __process_subrepo(self, subrepo, report_only=True):
 		'''
 		Operates the requested subrepo.
@@ -188,7 +192,7 @@ class Subrepos(object):
 		:param bool report_only: when True, only reviews subrepo's current status.  When False, tries to honor the requested values of *subrepo*.
 		:return dict: an "enhanced" subrepo dict reporting its status.  It will add the following keys:
 		
-			* **subrepo['status']:** one of *'NOT_CLONED'*, *'CLONED'*, *'UPDATED'*, *'PENDING_UPDATE'*, *'DIRTY'* or *'UP_TO_DATE'*.
+			* **subrepo['status']:** one of *'ERROR'*, *'NOT_CLONED'*, *'CLONED'*, *'UPDATED'*, *'PENDING_UPDATE'*, *'DIRTY'* or *'UP_TO_DATE'*.
 		'''
 		
 		# find or clone given subrepo
@@ -233,59 +237,75 @@ class Subrepos(object):
 			
 			local_commit = repo.commit().hexsha
 			# grab details about remote updates (if any)
-			repo.remotes.origin.fetch()
+			try:
+				repo.remotes.origin.fetch()
+			except git_exception.GitCommandError as e:
+				if (
+					e.status == 128
+					and 'Could not read from remote repository' in e.stderr
+				):
+					subrepo['status'] = 'ERROR'
+					subrepo['extra_info'] = e.stderr.replace('stderr: ','').strip('\n').strip()
+				else:
+					print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
+					print(Style.BRIGHT + e.stderr.strip('\n'))
+					sys.exit(errno.EBADE)
 		
 			# Find the "new" topmost commit
-			if subrepo['gitref_type']:
-				gitref_type = subrepo['gitref_type']
-				
-				desired_gitref = subrepo[gitref_type]
-				
-				if gitref_type == 'branch':
-					remote_ref = str('origin/' + subrepo[gitref_type])
-				else:
-					remote_ref = str(subrepo[gitref_type])
-				
-				try:
-					desired_commit = str(repo.commit(remote_ref))
-				except git_exception.BadName as e:
-					print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-					print("Repo " + Style.BRIGHT + "'" + subrepo['repo'] + "'")
-					print("\tCloned at: " + Style.BRIGHT + "'" + subrepo['path'] + "'")
-					print("\tNo such " + gitref_type + ": " + Style.BRIGHT + "'" + subrepo[gitref_type] + "'", end=': ')
-					print(e)
-					sys.exit(errno.ENOENT)
-			else:
-				desired_commit = repo.remotes.origin.refs.HEAD.commit.hexsha
-				desired_gitref = repo.git.symbolic_ref('refs/remotes/origin/HEAD').replace('refs/remotes/origin/','')
-				
-			# The sandbox update itself
-			if local_commit != desired_commit:
-				subrepo['from'] = local_commit
-				subrepo['to'] = desired_commit
-				
-				if not repo.is_dirty():
-					if not report_only:
-						try:
-							repo.git.checkout(desired_gitref)
-						except git_exception.GitCommandError as e:
-							print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-							print(Style.BRIGHT + "'" + subrepo['repo'] + "'")
-							print("\tat " + Style.BRIGHT + "'" + subrepo['path'] + "'")
-							print(Style.BRIGHT + "\t" + e.stderr.strip())
-							sys.exit(errno.EBADE)
-							
-						if not repo.head.is_detached:
-							repo.git.pull()
-							
-						subrepo['status'] = 'UPDATED'
+			if (
+				not 'status' in subrepo
+				or subrepo['status'] != 'ERROR'
+			):
+				if subrepo['gitref_type']:
+					gitref_type = subrepo['gitref_type']
+					
+					desired_gitref = subrepo[gitref_type]
+					
+					if gitref_type == 'branch':
+						remote_ref = str('origin/' + subrepo[gitref_type])
 					else:
-						subrepo['status'] = 'PENDING_UPDATE'
+						remote_ref = str(subrepo[gitref_type])
+					
+					try:
+						desired_commit = str(repo.commit(remote_ref))
+					except git_exception.BadName as e:
+						print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
+						print("Repo " + Style.BRIGHT + "'" + subrepo['repo'] + "'")
+						print("\tCloned at: " + Style.BRIGHT + "'" + subrepo['path'] + "'")
+						print("\tNo such " + gitref_type + ": " + Style.BRIGHT + "'" + subrepo[gitref_type] + "'", end=': ')
+						print(e)
+						sys.exit(errno.ENOENT)
 				else:
-					subrepo['status'] = 'DIRTY'
-			else:
-				subrepo['status'] = 'UP_TO_DATE'
-				
+					desired_commit = repo.remotes.origin.refs.HEAD.commit.hexsha
+					desired_gitref = repo.git.symbolic_ref('refs/remotes/origin/HEAD').replace('refs/remotes/origin/','')
+					
+				# The sandbox update itself
+				if local_commit != desired_commit:
+					subrepo['from'] = local_commit
+					subrepo['to'] = desired_commit
+					
+					if not repo.is_dirty():
+						if not report_only:
+							try:
+								repo.git.checkout(desired_gitref)
+							except git_exception.GitCommandError as e:
+								print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
+								print(Style.BRIGHT + "'" + subrepo['repo'] + "'")
+								print("\tat " + Style.BRIGHT + "'" + subrepo['path'] + "'")
+								print(Style.BRIGHT + "\t" + e.stderr.strip())
+								sys.exit(errno.EBADE)
+								
+							if not repo.head.is_detached:
+								repo.git.pull()
+								
+							subrepo['status'] = 'UPDATED'
+						else:
+							subrepo['status'] = 'PENDING_UPDATE'
+					else:
+						subrepo['status'] = 'DIRTY'
+				else:
+					subrepo['status'] = 'UP_TO_DATE'
+					
 		return subrepo
 		
 		
