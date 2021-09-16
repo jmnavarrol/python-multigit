@@ -8,7 +8,7 @@ This script is a Python implementation of `simplest-git-subrepos <https://github
 :source: https://github.com/jmnavarrol/python-multigit
 """
 
-__version__ = '0.9.1.dev0'
+__version__ = '0.9.1'
 
 # Import stuff
 import os, sys
