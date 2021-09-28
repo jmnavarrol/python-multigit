@@ -19,14 +19,14 @@ The general idea is to offer a simple way of managing *"workspaces"* integrating
 ## usage<a name="usage"></a>
 This project [is published to the PyPI index](https://pypi.org/project/multigit/) so, in order to install it you just need to run `pip install multigit`.
 
-*multigit* expects a YAML file named **subrepos** on the *root directory* of the current git repo (see [example](./subrepos)).  Optionally, if the current directory is not within a git sandbox, it will try to find a *subrepos* file right there.
+*multigit* expects a YAML file named **subrepos** in the current dir (see [example](./subrepos)).  Optionally, if there's no *subrepos* file in the current dir **and** the current directory is within a git sandbox, *multigit* will try to find a *subrepos* file at the git sandbox's root.
 
 For each defined *subrepo* within the *subrepos* file, it will clone/checkout it to the defined relative path.  Optionally, it will *checkout* the given *gitref* (either *commit*, *branch* or *tag*), provided the repo's local sandbox is *"clean"* (i.e. no pending modifications).  
   **NOTE:** pay attention to the fact that if the *gitref* you record is a specific *commit* or *tag*, the related sandbox will be in disconnected state.
 
 *multigit* will also recursively look for new *subrepos* files on the repositories it manages.
 
-**You should make sure** your [*.gitignore* file](./.gitignore) ignores all your *subrepos*.
+When working within a git repository, **you should make sure** your [*.gitignore* file](./.gitignore) ignores all your *subrepos*.
 
 This way you just need to manage your repos with `git` in the standard way, just as if they were individually checked out in isolation.
 

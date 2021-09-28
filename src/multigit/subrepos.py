@@ -66,29 +66,40 @@ class Subrepos(object):
 		'''
 		Recursively finds and processes subrepos files.
 		
-		If `base_path` is within a git sandbox, it starts the search at its root.
+		If there's a 'subrepos' file right a `base_path`, it will be processed.
 		
-		If `base_path` is not within a git sandbox, it tries to find a subrepos file right at `base_path`.
+		If there is **not** a 'subrepos' file at `base_path` **and** `base_path` is within a git repo, it will try to find one at its root.
 		
 		:param str base_path: the absolute path to the directory where subrepos file will be searched and processed.
 		:param bool report_only: `True`, just shows dirtree status; `False`, updates dirtree.
 		'''
 		
-		# First, let's check if we are in a git sandbox at all
-		try:
-			repo = Repo(base_path, search_parent_directories=True)
-			# we are in a git sandbox: get its "root"
-			root_dir = repo.working_tree_dir
-			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
-			print("processing git repository rooted at", end=' ')
-			print(Style.BRIGHT + "'" + root_dir + "'", end=':\n')
-		except git_exception.InvalidGitRepositoryError as e:
-			# Not a git repo (acceptable, we'll just process the requested dir as-is)
+		subrepos_file = base_path + "/" + SUBREPOS_FILE
+		if os.path.isfile(subrepos_file) and os.access(subrepos_file, os.R_OK):
+			# found and readable: let's use it
 			root_dir = base_path
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
-			print("Current dir " + Style.BRIGHT + "'" + root_dir + "'", end=' ')
-			print("is not within a valid git sandbox.")
-			
+			print("processing '" + SUBREPOS_FILE + "' file rooted at", end=' ')
+			print(Style.BRIGHT + "'" + base_path + "'", end=':\n')
+		else:
+			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
+			print("no valid '" + SUBREPOS_FILE + "' file found at", end=' ')
+			print(Style.BRIGHT + "'" + base_path + "'", end=':\n')
+			# Let's check if within a git sandbox
+			try:
+				repo = Repo(base_path, search_parent_directories=True)
+				# we are in a git sandbox: get its "root"
+				root_dir = repo.working_tree_dir
+				print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
+				print("processing git repository rooted at", end=' ')
+				print(Style.BRIGHT + "'" + root_dir + "'", end=':\n')
+			except git_exception.InvalidGitRepositoryError as e:
+				# Not a git repo: no more options left
+				print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
+				print("Current dir " + Style.BRIGHT + "'" + base_path + "'", end=' ')
+				print("is not within a valid git sandbox.")
+				sys.exit(errno.ENOENT)
+				
 		# Load the "root" subrepos file (if any)
 		subrepos = self.__load_subrepos_file(root_dir)
 		if not subrepos:
