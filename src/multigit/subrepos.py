@@ -16,11 +16,11 @@ from colorama import init, Fore, Back, Style
 # Globals
 SUBREPOS_FILE = 'subrepos'
 '''
-The *"fixed"* name of the YAML file with subrepos' definitions.
+The *"fixed"* name of the YAML file with subrepo definitions.
 
-Within a git sandbox, it will be looked for at the git sandbox' root.
+This file will first be loaded from current dir.
 
-Otherwise, it will be looked for in current dir.
+Otherwise, if within a git sandbox, it will be looked for at the git sandbox' root.
 '''  # pylint: disable=W0105
 
 class Subrepos(object):
@@ -203,7 +203,7 @@ class Subrepos(object):
 		:param bool report_only: when True, only reviews subrepo's current status.  When False, tries to honor the requested values of *subrepo*.
 		:return dict: an "enhanced" subrepo dict reporting its status.  It will add the following keys:
 		
-			* **subrepo['status']:** one of *'ERROR'*, *'NOT_CLONED'*, *'CLONED'*, *'UPDATED'*, *'PENDING_UPDATE'*, *'DIRTY'* or *'UP_TO_DATE'*.
+			* **subrepo['status']:** one of *'ERROR'*, *'NOT_CLONED'*, *'CLONED'*, *'EMPTY'*, *'UPDATED'*, *'PENDING_UPDATE'*, *'DIRTY'* or *'UP_TO_DATE'*.
 		'''
 		
 		# find or clone given subrepo
