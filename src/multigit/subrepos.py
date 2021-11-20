@@ -229,7 +229,7 @@ class Subrepos(object):
 						subrepo['extra_info'] = e.stderr.replace('stderr: ','').strip('\n').strip()
 					else:
 						print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-						print(Style.BRIGHT + e.stderr.strip('\n'))
+						print(Style.BRIGHT + e.stderr.strip(' \t\n\r'))
 						sys.exit(errno.EBADE)
 				else:
 					subrepo['status'] = 'CLONED'
@@ -245,8 +245,18 @@ class Subrepos(object):
 			# desired_commit: the "topmost" commit on the desired_gitref
 			# since I "converted" the desired_gitref into a commit,
 			# I can just compare sandbox' current commit with the desired one to know if there're pending updates
-			
-			local_commit = repo.commit().hexsha
+			try:
+				local_commit = repo.commit().hexsha
+			except ValueError as e:
+				if (
+					"Reference at 'refs/heads/master' does not exist" in str(e)
+					or "Reference at 'refs/heads/main' does not exist" in str(e)
+				):
+					# Remote repo exists, but it's still "un-intialized" (lacks its first commit)
+					subrepo['status'] = 'EMPTY'
+				else:
+					raise e
+				
 			# grab details about remote updates (if any)
 			try:
 				repo.remotes.origin.fetch()
@@ -261,11 +271,14 @@ class Subrepos(object):
 					print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
 					print(Style.BRIGHT + e.stderr.strip('\n'))
 					sys.exit(errno.EBADE)
-		
+					
 			# Find the "new" topmost commit
 			if (
 				not 'status' in subrepo
-				or subrepo['status'] != 'ERROR'
+				or (
+					subrepo['status'] != 'ERROR'
+					and subrepo['status'] != 'EMPTY'
+				)
 			):
 				if subrepo['gitref_type']:
 					gitref_type = subrepo['gitref_type']
@@ -351,6 +364,10 @@ class Subrepos(object):
 		elif subrepo['status'] == 'CLONED':
 			print("\tstatus:", end=' ')
 			print(Style.BRIGHT + Fore.GREEN + "CLONED")
+			
+		elif subrepo['status'] == 'EMPTY':
+			print("\tstatus:", end=' ')
+			print(Style.BRIGHT + Fore.YELLOW + "REMOTE REPO NOT YET INITIALIZED")
 			
 		elif subrepo['status'] == 'UP_TO_DATE':
 			print("\tstatus:", end=' ')

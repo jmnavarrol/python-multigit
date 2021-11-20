@@ -24,7 +24,7 @@ This project [is published to the PyPI index](https://pypi.org/project/multigit/
 For each defined *subrepo* within the *subrepos* file, it will clone/checkout it to the defined relative path.  Optionally, it will *checkout* the given *gitref* (either *commit*, *branch* or *tag*), provided the repo's local sandbox is *"clean"* (i.e. no pending modifications).  
   **NOTE:** pay attention to the fact that if the *gitref* you record is a specific *commit* or *tag*, the related sandbox will be in disconnected state.
 
-*multigit* will also recursively look for new *subrepos* files on the repositories it manages.
+*multigit* will also recursively look for new *subrepos* files on the root directory of the repositories it manages.
 
 When working within a git repository, **you should make sure** your [*.gitignore* file](./.gitignore) ignores all your *subrepos*.
 
@@ -51,7 +51,7 @@ As of now, this documentation is only available for local development.
 <sub>[back to top](#top).</sub>
 
 ### build<a name="build"></a>
-The [included Makefile](./src/Makefile) will use Python's setup tools to build both *source* and *binary-based* Python *eggs*.  Provided everthing went OK, look for packages under the *dist/* directory.
+The [included Makefile](./src/Makefile) will use Python's setup tools to build both *source* and *binary-based* Python *eggs*.  Provided everything went OK, look for packages under the *dist/* directory.
 
 Run `make` to see available *make targets*.
 
