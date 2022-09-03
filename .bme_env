@@ -1,26 +1,3 @@
-# Environment file to be loaded by Bash interactive shell
+# subdirectory-level BME enviro file
 
-#---
-# 'MAIN' .bme_env file for this project
-#---
-PROJECT_NAME='python-multigit'
-
-# Modules' activation (modules are disabled by default, so uncomment those you want to enable
-BME_MODULES=(
-	python3-virtualenvs  # manages Python 3 virtualenvs
-)
-
-# Custom "clean" as supported by Bash Magic Enviro
-bme_custom_clean() {
-	unset -f run_on_this_dir
-}
-
-# This workaround is required to apply customizations on the "root" project dir itself
-run_on_this_dir() {
-	# Shows current branch
-	echo -e "${C_BOLD}Current git branch:${C_GREEN}" `git rev-parse --abbrev-ref HEAD` "${C_NC}"
-	# Loads a "root" Python virtualenv for development purposes
-	load_virtualenv 'multigit-development' || return $?
-}
-
-[ -n "${PROJECT_DIR}" ] && run_on_this_dir
+load_virtualenv 'multigit-development' || return $?

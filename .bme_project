@@ -1,0 +1,11 @@
+# Environment file to be loaded by Bash interactive shell
+
+#---
+# 'MAIN' .bme_env file for this project
+#---
+BME_PROJECT_NAME='python_multigit'
+
+# Modules' activation (modules are disabled by default, so uncomment those you want to enable)
+BME_MODULES=(
+	python3-virtualenvs  # manages Python 3 virtualenvs
+)
