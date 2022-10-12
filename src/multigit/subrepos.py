@@ -233,6 +233,12 @@ class Subrepos(object):
 						sys.exit(errno.EBADE)
 				else:
 					subrepo['status'] = 'CLONED'
+		except git_exception.InvalidGitRepositoryError as e:
+			# directory exists but, for whatever reason, is not a valid repo
+			my_error_msg =  "directory '" + subrepo['path'] + "' exists, but it's not a valid git sandbox."
+			my_error_msg += "\n\tPlease, review its contents."
+			subrepo['status'] = 'ERROR'
+			subrepo['extra_info'] = my_error_msg
 				
 		# Update sandbox if requested, needed and possible
 		if (

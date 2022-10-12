@@ -17,18 +17,22 @@ export C_RED := \033[1;31m
 export C_NC := \033[0m
 
 # Basic targets
-.PHONY: targets build clean doc
+.PHONY: targets tests build clean doc
 
 targets:
 	@echo -e "${C_BOLD}Main targets are:${C_NC}"
 	@echo -e "\t${C_BOLD}targets:${C_NC} this one (default)."
+	@echo -e "\t${C_BOLD}tests:${C_NC} runs unit tests."
 	@echo -e "\t${C_BOLD}build:${C_NC} builds source tarball, binary egg (sdist, wheels) and HTML sphinx docs."
 	@echo -e "\t${C_BOLD}doc:${C_NC} builds HTML sphinx docs."
 	@echo -e "\t${C_BOLD}upload-tmp:${C_NC} uploads version to testing PyPi service."
 	@echo -e "\t${C_BOLD}upload:${C_NC} uploads version to live PyPi service."
 	@echo -e "\t${C_BOLD}clean:${C_NC} deletes temp files."
 	
-build: $(SDIST_FILES) $(WHEELS) doc
+tests:
+	python -m unittest discover
+	
+build: tests $(SDIST_FILES) $(WHEELS) doc
 
 $(SDIST_FILES): $(PYTHON_FILES) $(OTHER_INCLUDES)
 	$(PYTOOL) --sdist

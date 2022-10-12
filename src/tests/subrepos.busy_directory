@@ -1,0 +1,8 @@
+---
+# A Subrepos' test template
+# For this test 'busydir' will be created.  That means git should fail trying to clone to that path.
+# multgit should throw an error message.
+subrepos:
+- path: 'busydir'
+  repo: 'git@github.com:jmnavarrol/python-multgit-empty-repo.git'
+  

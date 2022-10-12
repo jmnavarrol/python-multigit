@@ -1,2 +1,3 @@
 include LICENSE
 include multigit/subrepos_schema.yaml
+include tests/subrepos.busy_directory
