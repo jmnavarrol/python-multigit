@@ -8,6 +8,7 @@ The general idea is to offer a simple way of managing *"workspaces"* integrating
 
 **Contents:**<a name="contents"></a>
 1. [usage](#usage)
+   1. [subrepos' file format](#subrepos-format)
 1. [development](#development)
    1. [code documentation](#sphinx)
    1. [build](#build)
@@ -31,6 +32,47 @@ When working within a git repository, **you should make sure** your [*.gitignore
 This way you just need to manage your repos with `git` in the standard way, just as if they were individually checked out in isolation.
 
 Run `multigit` with no options or `multigit --help` for usage.
+
+<sub>[back to top](#top).</sub>
+
+### subrepos' file format<a name="subrepos-format"></a>
+The *'subrepos'* file holds a yaml dictionary describing the desired lay-out.
+
+It starts with a **subrepos** key with a list of entries underneath, each of them describing a repository entry point (see ['subrepos' example](./subrepos) for further details).  Some detailed explanations follow:
+* **general description:**
+  ```yml
+  ---
+  # High-level structure
+  subrepos: # main key
+  - [first entry]   # first repository description
+  - [second entry]  # second repository description
+  - [third entry]   # third repository description
+  - [...]           # (more repositories)
+  ```
+* **each repository entry:** Each repository definition requires two mandatory keys and an optional one:
+  * **repository:** (mandatory) the [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier "Uniform Resource Identifier") to operate the remote repository.  
+  Its format is just the one you'd use to `git clone` the repository with same effect, i.e. if you need to pass a username/password for an https site, or a password to decrypt you ssh key, etc. here you'll be requested to do it too.
+  * **path:** (mandatory) the path the repository sandbox will the deployed to, relative to the subrepos file itself.
+  * **[commit|branch|tag]:** (optional) the *gitref* you want your sandbox to be *pinned* to.  
+    * You can provide **one** of either *'commit'*, *'branch'* or *'tag'*.
+    * Note that if you provide either a *commit* or a *tag* the resulting sandbox will be in a [*detached head state*](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefdetachedHEADadetachedHEAD).
+    * If you don't provide this key, your sandbox will track the remote's default branch.
+  
+**A full (conceptual) example:**
+```yml
+---
+# Don't forget including your subrepos' roots to .gitignore!
+subrepos:
+- repo: 'git@github.com:jmnavarrol/python-multigit.git'  # the remote using git+ssh protocol.  It may request your ssh key's password
+  path: 'a-subdir'  # it will be cloned to 'subdir/' relative to 'subrepos' file
+  # no gitref, so this will track the remote's default branch
+- repo: 'https://github.com/jmnavarrol/python-multigit.git'  # the remote using https protocol.  It may request user/password
+  path: 'a-subdir/another-subdir'  # it will be cloned to 'a-subdir/subdir/' relative to 'subrepos' file
+  branch: 'a-branch'  # the sandbox will track the 'a-branch' branch.
+```
+
+**NOTE:** Since repositories are listed in an array, order matters: first repository is processed before the second one and so on.  This means that you can declare first a repository to be deployed to a subdirectory and then another repository to be deployed to a subdirectory of that first subdirectory and things will behave as expected.  
+It's usually better that you declare the *"deeper"* subdirectory within its own 'subrepos' file in the intermediate repository, though.
 
 <sub>[back to top](#top).</sub>
 
