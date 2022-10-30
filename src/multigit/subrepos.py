@@ -368,7 +368,7 @@ class Subrepos(object):
 				print(Style.BRIGHT + subrepo['extra_info'].replace('\n','\n\t\t'))
 			
 		elif subrepo['status'] == 'NOT_CLONED':
-			print("\tstatus: " + Style.BRIGHT + "not yet cloned")
+			print("\tstatus: " + Style.BRIGHT + Fore.YELLOW + "NOT YET CLONED")
 			
 		elif subrepo['status'] == 'CLONED':
 			print("\tstatus:", end=' ')
