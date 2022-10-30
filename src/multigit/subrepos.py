@@ -242,8 +242,11 @@ class Subrepos(object):
 				
 		# Update sandbox if requested, needed and possible
 		if (
-			not 'status' in subrepo
-			or subrepo['status'] != 'ERROR'
+			not report_only
+			and (
+				not 'status' in subrepo
+				or subrepo['status'] != 'ERROR'
+			)
 		):
 			# "names I'm using here:
 			# local_commit: the current local commit on the sandbox
