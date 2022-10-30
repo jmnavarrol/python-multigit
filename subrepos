@@ -23,7 +23,7 @@ subrepos:
   #commit: 'e00e8f4c48ef6328b4efa10fe1db2ab6dd3c0bdf'
   #commit: 'WRONGf4c48ef6328b4efa10fe1db2ab6dd3c0bdf'
 - path: 'projects/empty-repo'
-  repo: 'git@github.com:jmnavarrol/python-multgit-empty-repo.git'
+  repo: 'git@github.com:jmnavarrol/python-multigit-empty-repo.git'
   # FOR TESTING PURPOSES ONLY
   #branch: 'master'
   
