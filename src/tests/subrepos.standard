@@ -1,7 +1,8 @@
 ---
 # A Subrepos' test template
-# Clones a yet empty repository
 subrepos:
 - path: 'empty-repo'
   repo: 'git@github.com:jmnavarrol/python-multigit-empty-repo.git'
-  
+- path: 'standard-repo'
+  repo: 'git@github.com:jmnavarrol/python-multigit-standard-repo.git'
+  branch: 'a-branch'

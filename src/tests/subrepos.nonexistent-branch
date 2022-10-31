@@ -1,0 +1,6 @@
+---
+# A Subrepos' test template
+subrepos:
+- path: 'standard-repo'
+  repo: 'git@github.com:jmnavarrol/python-multigit-standard-repo.git'
+  branch: 'non-existant'
