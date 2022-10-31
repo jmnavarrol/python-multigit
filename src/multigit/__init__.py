@@ -8,7 +8,7 @@ This script is a Python implementation of `simplest-git-subrepos <https://github
 :source: https://github.com/jmnavarrol/python-multigit
 """
 
-__version__ = '0.10.5'
+__version__ = '0.10.6.dev1'
 
 # Import stuff
 import os, sys
@@ -16,6 +16,8 @@ import argparse
 
 # "local" imports
 from .subrepos import Subrepos, SUBREPOS_FILE
+# Other imports so there's visibility of all classes in the module
+from .gitrepo import Gitrepo
 
 
 

@@ -13,6 +13,9 @@ from colorama import init, Fore, Back, Style
 #Style: DIM, NORMAL, BRIGHT, RESET_ALL
 
 
+# "local" imports
+from .gitrepo import Gitrepo
+
 # Globals
 SUBREPOS_FILE = 'subrepos'
 '''
@@ -115,7 +118,11 @@ class Subrepos(object):
 			current_subrepo['relpath'] = current_subrepo['path'].replace(root_dir + '/', '')
 			
 			# Operates on the current subrepo as requested
-			current_subrepo = self.__process_subrepo(current_subrepo, report_only)
+			git_subrepo = Gitrepo()
+			if report_only:
+				current_subrepo = git_subrepo.status(current_subrepo)
+				
+			#current_subrepo = self.__process_subrepo(current_subrepo, report_only)
 			
 			# Prints subrepo status
 			self.__print_subrepo_status(current_subrepo)

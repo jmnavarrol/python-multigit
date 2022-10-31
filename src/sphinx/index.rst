@@ -25,3 +25,4 @@ multigit documentation
    :maxdepth: 2
    
    Class Subrepos <subrepos>
+   Class Gitrepo <gitrepo>

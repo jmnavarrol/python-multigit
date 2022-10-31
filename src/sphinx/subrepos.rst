@@ -7,4 +7,3 @@ Class Subrepos
    :members:
    :private-members:
    :member-order: bysource
-   
