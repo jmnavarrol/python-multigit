@@ -121,6 +121,8 @@ class Subrepos(object):
 			git_subrepo = Gitrepo()
 			if report_only:
 				current_subrepo = git_subrepo.status(current_subrepo)
+			else:
+				current_subrepo = git_subrepo.update(current_subrepo)
 				
 			#current_subrepo = self.__process_subrepo(current_subrepo, report_only)
 			
