@@ -58,6 +58,31 @@ class Gitrepo(object):
 					repostatus['status'] = 'EMPTY'
 				else:
 					raise e
+				
+		# if still unprocessed, it's a good repo.
+		# Let's check its current commit vs the remote one
+		if repostatus['status'] == 'UNPROCESSED':
+			if (
+				'gitref_type' in repostatus
+				and repostatus['gitref_type'] is not None
+			):
+				gitref_type = repostatus['gitref_type']
+				desired_gitref = repostatus[gitref_type]
+				if gitref_type == 'branch':
+					remote_ref = str('origin/' + repostatus[gitref_type])
+				else:
+					remote_ref = str(repostatus[gitref_type])
+					
+				desired_commit = str(repo.commit(remote_ref))
+			else:
+				desired_commit = repo.remotes.origin.refs.HEAD.commit.hexsha
+				desired_gitref = repo.git.symbolic_ref('refs/remotes/origin/HEAD').replace('refs/remotes/origin/','')
+				
+			if local_commit != desired_commit:
+				repostatus['status'] = 'PENDING_UPDATE'
+				repostatus['from'] = local_commit
+				repostatus['to'] = desired_commit
+			
 			
 		return repostatus
 	
