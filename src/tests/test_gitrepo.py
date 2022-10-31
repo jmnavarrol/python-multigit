@@ -80,6 +80,24 @@ class TestGitrepo(unittest.TestCase):
 		self.assertEqual(result['status'], 'ERROR')
 		
 		
+	def test_wrong_remote(self):
+		print("TEST: 'test_wrong_remote'")
+		# prepares a suitable configuration
+		repoconf = {}
+		repoconf['repo'] = 'git@github.com:jmnavarrol/python-multigit-empty-repo.git'
+		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/empty-repo')
+		
+		# Fist, let's clone an unitialized repo
+		result = self.gitrepo.update(repoconf)
+		
+		# Then, let's change its remote and check
+		repoconf['repo'] = 'git@github.com:jmnavarrol/different-remote.git'
+		result = self.gitrepo.status(repoconf)
+		print(str(result))
+		self.assertEqual(result['status'], 'WRONG_REMOTE')
+		
+		
+		
 	@classmethod
 	def tearDown(self):
 		# clean up after the test

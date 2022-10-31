@@ -36,6 +36,15 @@ class Gitrepo(object):
 			repostatus['extra_info'] = my_error_msg
 			
 		# if still unprocessed it's because the repo is there
+		# Check remotes
+		if repostatus['status'] == 'UNPROCESSED':
+			if repostatus['repo'] != repo.remotes.origin.url:
+				repostatus['status'] = 'WRONG_REMOTE'
+				my_error_msg = "Requested remote is '" + repostatus['repo'] + "' "
+				my_error_msg += "but current origin is '" + repo.remotes.origin.url + "'."
+				repostatus['extra_info'] = my_error_msg
+			
+		# if still unprocessed it's because the repo is there
 		# Let's try to get its status
 		if repostatus['status'] == 'UNPROCESSED':
 			try:
@@ -49,10 +58,6 @@ class Gitrepo(object):
 					repostatus['status'] = 'EMPTY'
 				else:
 					raise e
-				
-		# if still unprocessed it's because the repo is there an initialized
-		if repostatus['status'] == 'UNPROCESSED':
-			repo.remotes.origin.fetch()
 			
 		return repostatus
 	
