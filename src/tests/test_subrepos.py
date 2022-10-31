@@ -26,9 +26,26 @@ class TestSubrepos(unittest.TestCase):
 				os.path.join(current_scenario_path, 'subrepos')
 			)
 			
+		# And a scenario with no subrepos file
+			if not os.path.exists(os.path.join(self.scenarios_path, 'nosubrepos')):
+				os.makedirs(os.path.join(self.scenarios_path, 'nosubrepos'))
+			
 		self.my_subrepos = multigit.Subrepos()
 	
 	
+	def test_no_subrepos_found(self):
+		print("TEST: 'test_no_subrepos_found'")
+		for test_status in [True, False]:
+			print("'test_no_subrepos_found', report_only=" + str(test_status))
+			with self.assertRaises(SystemExit) as cm:
+				self.my_subrepos.process(
+					base_path   = os.path.join(self.scenarios_path, 'nosubrepos'),
+					report_only = test_status
+				)
+				
+			self.assertEqual(cm.exception.code, errno.ENOENT)
+		
+		
 	def test_process_clean_status(self):
 		print("TEST: 'test_process_clean_status'")
 		for test_item in self.test_scenarios:
@@ -63,6 +80,8 @@ class TestSubrepos(unittest.TestCase):
 				base_path   = os.path.join(self.scenarios_path, 'nonexistent-branch'),
 				report_only = False
 			)
+			
+		self.assertEqual(cm.exception.code, errno.EBADE)
 		
 		
 	@classmethod
