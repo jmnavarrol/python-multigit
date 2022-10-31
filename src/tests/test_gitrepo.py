@@ -114,6 +114,22 @@ class TestGitrepo(unittest.TestCase):
 		self.assertEqual(result['status'], 'PENDING_UPDATE')
 		
 		
+	def test_up_to_date(self):
+		print("TEST: 'test_up_to_date'")
+		# prepares a suitable configuration
+		repoconf = {}
+		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
+		
+		# Fist, let's clone a standard repo
+		result = self.gitrepo.update(repoconf)
+		
+		# Then, let's check status is OK
+		result = self.gitrepo.status(repoconf)
+		print(str(result))
+		self.assertEqual(result['status'], 'UP_TO_DATE')
+		
+		
 	@classmethod
 	def tearDown(self):
 		# clean up after the test

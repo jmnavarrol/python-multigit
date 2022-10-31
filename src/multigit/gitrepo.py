@@ -82,7 +82,10 @@ class Gitrepo(object):
 				repostatus['status'] = 'PENDING_UPDATE'
 				repostatus['from'] = local_commit
 				repostatus['to'] = desired_commit
-			
+				
+		# if still unprocessed, it's up to date
+		if repostatus['status'] == 'UNPROCESSED':
+			repostatus['status'] = 'UP_TO_DATE'
 			
 		return repostatus
 	
