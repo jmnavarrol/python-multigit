@@ -47,10 +47,25 @@ class TestGitrepo(unittest.TestCase):
 		# prepares a suitable configuration
 		repoconf = {}
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/empty-repo')
+		
 		result = self.gitrepo.status(repoconf)
 		print(str(result))
 		self.assertEqual(result['status'], 'NOT_CLONED')
 		
+		
+	def test_status_unitialized(self):
+		print("TEST: 'test_status_unitialized'")
+		# prepares a suitable configuration
+		repoconf = {}
+		repoconf['repo'] = 'git@github.com:jmnavarrol/python-multigit-empty-repo.git'
+		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/empty-repo')
+		
+		# Fist, let's clone an unitialized repo
+		result = self.gitrepo.update(repoconf)
+		# Then, check its status
+		result = self.gitrepo.status(repoconf)
+		print(str(result))
+		self.assertEqual(result['status'], 'EMPTY')
 		
 	@classmethod
 	def tearDown(self):

@@ -35,6 +35,21 @@ class Gitrepo(object):
 			my_error_msg += "\n\tPlease, review its contents."
 			repostatus['extra_info'] = my_error_msg
 			
+		# if still unprocessed it's because the repo is there
+		# Let's try to get its status
+		if repostatus['status'] == 'UNPROCESSED':
+			try:
+				local_commit = repo.commit().hexsha
+			except ValueError as e:
+				if (
+					"Reference at 'refs/heads/master' does not exist" in str(e)
+					or "Reference at 'refs/heads/main' does not exist" in str(e)
+				):
+					# Remote repo exists, but it's still "un-intialized" (lacks its first commit)
+					repostatus['status'] = 'EMPTY'
+				else:
+					raise e
+			
 		return repostatus
 	
 	
@@ -55,7 +70,7 @@ class Gitrepo(object):
 			pass
 		elif repostatus['status'] == 'NOT_CLONED':
 			# Let's try to clone it
-			if repostatus['gitref_type']:
+			if 'gitref_type' in repostatus:
 				gitref_type = repostatus['gitref_type']
 				repo = Repo.clone_from(
 					repostatus['repo'],
