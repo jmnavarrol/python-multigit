@@ -67,6 +67,19 @@ class TestGitrepo(unittest.TestCase):
 		print(str(result))
 		self.assertEqual(result['status'], 'EMPTY')
 		
+		
+	def test_wrong_repo(self):
+		print("TEST: 'test_wrong_repo'")
+		# prepares a suitable configuration
+		repoconf = {}
+		repoconf['repo'] = 'git@github.com:jmnavarrol/doesnt-exist.git'
+		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/empty-repo')
+		
+		result = self.gitrepo.update(repoconf)
+		print(str(result))
+		self.assertEqual(result['status'], 'ERROR')
+		
+		
 	@classmethod
 	def tearDown(self):
 		# clean up after the test

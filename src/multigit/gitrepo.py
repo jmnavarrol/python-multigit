@@ -49,6 +49,10 @@ class Gitrepo(object):
 					repostatus['status'] = 'EMPTY'
 				else:
 					raise e
+				
+		# if still unprocessed it's because the repo is there an initialized
+		if repostatus['status'] == 'UNPROCESSED':
+			repo.remotes.origin.fetch()
 			
 		return repostatus
 	
@@ -70,20 +74,30 @@ class Gitrepo(object):
 			pass
 		elif repostatus['status'] == 'NOT_CLONED':
 			# Let's try to clone it
-			if 'gitref_type' in repostatus:
-				gitref_type = repostatus['gitref_type']
-				repo = Repo.clone_from(
-					repostatus['repo'],
-					repostatus['path'],
-					branch=repostatus[gitref_type]
-				)
-			else:
-				repo = Repo.clone_from(
-					repostatus['repo'],
-					repostatus['path']
-				)
+			try:
+				if (
+					'gitref_type' in repostatus
+					and repostatus['gitref_type'] is not None
+				):
+					gitref_type = repostatus['gitref_type']
+					repo = Repo.clone_from(
+						repostatus['repo'],
+						repostatus['path'],
+						branch=repostatus[gitref_type]
+					)
+				else:
+					repo = Repo.clone_from(
+						repostatus['repo'],
+						repostatus['path']
+					)
 				
-			repostatus['status'] = 'CLONED'
+				repostatus['status'] = 'CLONED'
+			except git_exception.GitCommandError as e:
+				if e.status == 128:
+					repostatus['status'] = 'ERROR'
+					repostatus['extra_info'] = e.stderr.replace('stderr: ','').strip('\n').strip()
+				else:
+					raise
 		
 		return repostatus
 		
