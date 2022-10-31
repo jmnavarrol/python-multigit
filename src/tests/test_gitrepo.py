@@ -114,6 +114,24 @@ class TestGitrepo(unittest.TestCase):
 		self.assertEqual(result['status'], 'PENDING_UPDATE')
 		
 		
+	def test_updated(self):
+		print("TEST: 'test_updated'")
+		# prepares a suitable configuration
+		repoconf = {}
+		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
+		
+		# Fist, let's clone a standard repo
+		result = self.gitrepo.update(repoconf)
+		
+		# Then, let's change its remote commit and check
+		repoconf['gitref_type'] = 'branch'
+		repoconf['branch'] = 'python-example'
+		result = self.gitrepo.update(repoconf)
+		print(str(result))
+		self.assertEqual(result['status'], 'UPDATED')
+		
+		
 	def test_up_to_date(self):
 		print("TEST: 'test_up_to_date'")
 		# prepares a suitable configuration

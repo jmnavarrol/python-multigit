@@ -103,7 +103,12 @@ class Gitrepo(object):
 		repostatus = self.status(repoconf)
 		
 		# Then, let's operate on the repository depending on its status
-		if repostatus['status'] == 'ERROR':
+		if (
+			repostatus['status'] == 'ERROR'
+			or repostatus['status'] == 'UP_TO_DATE'
+			or repostatus['status'] == 'EMPTY'
+			or repostatus['status'] == 'DIRTY'
+		):
 			pass
 		elif repostatus['status'] == 'NOT_CLONED':
 			# Let's try to clone it
@@ -131,6 +136,27 @@ class Gitrepo(object):
 					repostatus['extra_info'] = e.stderr.replace('stderr: ','').strip('\n').strip()
 				else:
 					raise
+		elif  repostatus['status'] == 'PENDING_UPDATE':
+			repo = Repo(repostatus['path'])
+			if (
+				'gitref_type' in repostatus
+				and repostatus['gitref_type'] is not None
+			):
+				gitref_type = repostatus['gitref_type']
+				desired_gitref = repostatus[gitref_type]
+				
+				if gitref_type == 'branch':
+					remote_ref = str('origin/' + repostatus[gitref_type])
+				else:
+					remote_ref = str(repostatus[gitref_type])
+			else:
+				desired_gitref = repo.git.symbolic_ref('refs/remotes/origin/HEAD').replace('refs/remotes/origin/','')
+				
+			repo.git.checkout(desired_gitref)
+			if not repo.head.is_detached:
+				repo.git.pull()
+				
+			repostatus['status'] = 'UPDATED'
 		
 		return repostatus
 		
