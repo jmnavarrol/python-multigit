@@ -54,8 +54,8 @@ def main():
 	# Program called with no arguments (shows help)
 		print("%s (%s): arguments required.\n" % (parser.prog, __version__))
 		parser.print_help()
-		
-		
+
+
 if __name__ == '__main__':
 	# execute only if run as a script
-	main()
+	sys.exit(main())
