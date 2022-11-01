@@ -1,3 +1,5 @@
+.. _subrepos:
+
 Class Subrepos
 ==============
 

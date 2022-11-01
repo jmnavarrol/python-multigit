@@ -42,6 +42,7 @@ $(WHEELS): $(PYTHON_FILES) $(OTHER_INCLUDES)
 	
 doc:
 	@$(MAKE) html -C $(SPHINXDIR)
+	@$(MAKE) linkcheck -C $(SPHINXDIR)
 	
 upload-tmp: clean build
 	$(UPTOOL) --repository testpypi dist/*

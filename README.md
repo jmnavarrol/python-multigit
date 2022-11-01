@@ -20,7 +20,7 @@ The general idea is to offer a simple way of managing *"workspaces"* integrating
 ## usage<a name="usage"></a>
 This project [is published to the PyPI index](https://pypi.org/project/multigit/) so, in order to install it you just need to run `pip install multigit`.
 
-*multigit* expects a YAML file named **subrepos** in the current dir (see [example](./subrepos)).  Optionally, if there's no *subrepos* file in the current dir **and** the current directory is within a git sandbox, *multigit* will try to find a *subrepos* file at the git sandbox's root.
+*multigit* expects a YAML file named **subrepos** in the current dir (see [example](./example/subrepos)).  Optionally, if there's no *subrepos* file in the current dir **and** the current directory is within a git sandbox, *multigit* will try to find a *subrepos* file at the git sandbox's root.
 
 For each defined *subrepo* within the *subrepos* file, it will clone/checkout it to the defined relative path.  Optionally, it will *checkout* the given *gitref* (either *commit*, *branch* or *tag*), provided the repo's local sandbox is *"clean"* (i.e. no pending modifications).  
   **NOTE:** pay attention to the fact that if the *gitref* you record is a specific *commit* or *tag*, the related sandbox will be in disconnected state.
@@ -38,7 +38,7 @@ Run `multigit` with no options or `multigit --help` for usage.
 ### subrepos' file format<a name="subrepos-format"></a>
 The *'subrepos'* file holds a yaml dictionary describing the desired lay-out.
 
-It starts with a **subrepos** key with a list of entries underneath, each of them describing a repository entry point (see ['subrepos' example](./subrepos) for further details).  Some detailed explanations follow:
+It starts with a **subrepos** key with a list of entries underneath, each of them describing a repository entry point (see ['subrepos' example](./example/subrepos) for further details).  Some detailed explanations follow:
 * **general description:**
   ```yml
   ---

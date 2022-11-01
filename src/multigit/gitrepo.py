@@ -3,6 +3,7 @@
 # Import stuff
 from git import Repo, exc as git_exception
 
+
 class Gitrepo(object):
 	'''Processes a single git repo entity as defined by multigit.'''
 	
@@ -15,7 +16,7 @@ class Gitrepo(object):
 		Finds the status of the repo configuration that gets as param.
 		
 		:param repoconf: the configuration dictionary of the git repository to be processed.
-		:return: returns the same repoconf dictionary provided as parameter with a new 'status' key populated.
+		:return: returns the same repoconf dictionary provided as parameter with a new 'status' key populated and, optionally a 'extra_info' key.
 		'''
 		
 		repostatus = repoconf
@@ -100,7 +101,7 @@ class Gitrepo(object):
 		Updates a repo entry as per its current state.
 		
 		:param repoconf: the configuration dictionary of the git repository to be processed.
-		:return: returns the same repoconf dictionary provided as parameter with a new 'status' key populated after update process.
+		:return: returns the same repoconf dictionary provided as parameter with a new 'status' key populated after update process and, optionally, a 'extra_info' key.
 		'''
 		
 		repostatus = repoconf

@@ -1,3 +1,5 @@
+.. _gitrepo:
+
 Class Gitrepo
 ==============
 

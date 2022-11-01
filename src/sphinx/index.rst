@@ -5,22 +5,28 @@
 
 multigit documentation
 ======================
+
 * :ref:`genindex`
-* :ref:`modindex`
+* **Classes:**
+   * :ref:`Subrepos<subrepos>`: *"main"* entrypoint for the full process.
+   * :ref:`Gitrepo<gitrepo>`: manages a single git repository as per the requested configuration.
 
 ----
 
 .. automodule:: multigit
    :noindex:
    :members:
+   :undoc-members:
+   :show-inheritance:
 
 ----
 
 *"Main"* entry point is the `multigit` script:
 
 .. command-output:: multigit --help
-   
+
 .. toctree::
+   :caption: Contents:
    :hidden:
    :maxdepth: 2
    
