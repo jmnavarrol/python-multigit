@@ -42,6 +42,20 @@ class TestGitrepo(unittest.TestCase):
 		self.assertEqual(result['status'], 'ERROR')
 		
 		
+	def test_nonexitent_branch(self):
+		print("TEST: 'test_status_not_cloned'")
+		# prepares a suitable configuration
+		repoconf = {}
+		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
+		repoconf['branch'] = 'nonexistent'
+		repoconf['gitref_type'] = 'branch'
+		
+		result = self.gitrepo.update(repoconf)
+		print(str(result))
+		self.assertEqual(result['status'], 'ERROR')
+		
+		
 	def test_status_not_cloned(self):
 		print("TEST: 'test_status_not_cloned'")
 		# prepares a suitable configuration

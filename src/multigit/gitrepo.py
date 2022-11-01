@@ -113,6 +113,7 @@ class Gitrepo(object):
 			or repostatus['status'] == 'UP_TO_DATE'
 			or repostatus['status'] == 'EMPTY'
 			or repostatus['status'] == 'DIRTY'
+			or repostatus['status'] == 'WRONG_REMOTE'
 		):
 			pass
 		elif repostatus['status'] == 'NOT_CLONED':
@@ -164,8 +165,8 @@ class Gitrepo(object):
 			repostatus['status'] = 'UPDATED'
 			
 		return repostatus
-		
-		
+	
+	
 if __name__ == '__main__':
 	# execute only if run as a script
 	main()

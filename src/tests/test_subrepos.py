@@ -54,34 +54,28 @@ class TestSubrepos(unittest.TestCase):
 				base_path   = os.path.join(self.scenarios_path, test_item),
 				report_only = True
 			)
+			print(str(result))
 			self.assertEqual(result, None)
 			
 		
 	def test_process_run_ok(self):
 		print("TEST: 'test_process_run_ok'")
 		# Runs "happy" subrepos
+		print("TEST: 'test_process_run_ok', RUN")
 		result = self.my_subrepos.process(
 			base_path   = os.path.join(self.scenarios_path, 'standard'),
 			report_only = False
 		)
+		print(str(result))
 		self.assertEqual(result, None)
 		# Checks status after run
+		print("TEST: 'test_process_run_ok', STATUS")
 		result = self.my_subrepos.process(
 			base_path   = os.path.join(self.scenarios_path, 'standard'),
 			report_only = True
 		)
+		print(str(result))
 		self.assertEqual(result, None)
-		
-		
-	def test_process_run_nonexistent_branch(self):
-		print("TEST: 'test_process_run_nonexistent_branch'")
-		with self.assertRaises(SystemExit) as cm:
-			self.my_subrepos.process(
-				base_path   = os.path.join(self.scenarios_path, 'nonexistent-branch'),
-				report_only = False
-			)
-			
-		self.assertEqual(cm.exception.code, errno.EBADE)
 		
 		
 	@classmethod
