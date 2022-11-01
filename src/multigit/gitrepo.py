@@ -60,6 +60,11 @@ class Gitrepo(object):
 					raise e
 				
 		# if still unprocessed, it's a good repo.
+		# can it be updated?
+		if repostatus['status'] == 'UNPROCESSED':
+			if repo.is_dirty():
+				repostatus['status'] = 'DIRTY'
+				
 		# Let's check its current commit vs the remote one
 		if repostatus['status'] == 'UNPROCESSED':
 			if (

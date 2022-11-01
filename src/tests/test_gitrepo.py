@@ -60,7 +60,7 @@ class TestGitrepo(unittest.TestCase):
 		repoconf['repo'] = 'git@github.com:jmnavarrol/python-multigit-empty-repo.git'
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/empty-repo')
 		
-		# Fist, let's clone an unitialized repo
+		# First, let's clone an unitialized repo
 		result = self.gitrepo.update(repoconf)
 		# Then, check its status
 		result = self.gitrepo.status(repoconf)
@@ -87,7 +87,7 @@ class TestGitrepo(unittest.TestCase):
 		repoconf['repo'] = 'git@github.com:jmnavarrol/python-multigit-empty-repo.git'
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/empty-repo')
 		
-		# Fist, let's clone an unitialized repo
+		# First, let's clone an unitialized repo
 		result = self.gitrepo.update(repoconf)
 		
 		# Then, let's change its remote and check
@@ -103,7 +103,7 @@ class TestGitrepo(unittest.TestCase):
 		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
 		
-		# Fist, let's clone a standard repo
+		# First, let's clone a standard repo
 		result = self.gitrepo.update(repoconf)
 		
 		# Then, let's change its remote commit and check
@@ -114,6 +114,31 @@ class TestGitrepo(unittest.TestCase):
 		self.assertEqual(result['status'], 'PENDING_UPDATE')
 		
 		
+	def test_dirty(self):
+		print("TEST: 'test_dirty'")
+		# prepares a suitable configuration
+		repoconf = {}
+		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
+		
+		# First, let's clone a standard repo
+		result = self.gitrepo.update(repoconf)
+		# Make it dirty
+		my_file = os.path.join(
+			self.scenarios_path,
+			'standard/simplest-git-subrepos',
+			'README.md'
+		)
+		with open(my_file, 'w') as f:
+			f.write('THIS IS A CHANGE')
+		# Now check the results
+		result = self.gitrepo.update(repoconf)
+		with open(my_file, 'r') as f:
+			print(f.read())
+		print(str(result))
+		self.assertEqual(result['status'], 'DIRTY')
+		
+		
 	def test_updated(self):
 		print("TEST: 'test_updated'")
 		# prepares a suitable configuration
@@ -121,7 +146,7 @@ class TestGitrepo(unittest.TestCase):
 		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
 		
-		# Fist, let's clone a standard repo
+		# First, let's clone a standard repo
 		result = self.gitrepo.update(repoconf)
 		
 		# Then, let's change its remote commit and check
@@ -139,7 +164,7 @@ class TestGitrepo(unittest.TestCase):
 		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
 		
-		# Fist, let's clone a standard repo
+		# First, let's clone a standard repo
 		result = self.gitrepo.update(repoconf)
 		
 		# Then, let's check status is OK
