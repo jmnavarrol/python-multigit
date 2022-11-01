@@ -141,7 +141,7 @@ class Gitrepo(object):
 					repostatus['extra_info'] = e.stderr.replace('stderr: ','').strip('\n').strip()
 				else:
 					raise
-		elif  repostatus['status'] == 'PENDING_UPDATE':
+		elif repostatus['status'] == 'PENDING_UPDATE':
 			repo = Repo(repostatus['path'])
 			if (
 				'gitref_type' in repostatus
@@ -162,7 +162,7 @@ class Gitrepo(object):
 				repo.git.pull()
 				
 			repostatus['status'] = 'UPDATED'
-		
+			
 		return repostatus
 		
 		

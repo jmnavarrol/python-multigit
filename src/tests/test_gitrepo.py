@@ -80,8 +80,8 @@ class TestGitrepo(unittest.TestCase):
 		self.assertEqual(result['status'], 'ERROR')
 		
 		
-	def test_wrong_remote(self):
-		print("TEST: 'test_wrong_remote'")
+	def test_wrong_remote_status(self):
+		print("TEST: 'test_wrong_remote_status'")
 		# prepares a suitable configuration
 		repoconf = {}
 		repoconf['repo'] = 'git@github.com:jmnavarrol/python-multigit-empty-repo.git'
@@ -95,6 +95,7 @@ class TestGitrepo(unittest.TestCase):
 		result = self.gitrepo.status(repoconf)
 		print(str(result))
 		self.assertEqual(result['status'], 'WRONG_REMOTE')
+		
 		
 	def test_pending_updates(self):
 		print("TEST: 'test_pending_updates'")
