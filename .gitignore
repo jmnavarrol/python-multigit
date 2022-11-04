@@ -1,5 +1,6 @@
 # multigit-related (see subrepos file)
-example/
+example/*
+!example/subrepos
 
 # Python development
 __pycache__/

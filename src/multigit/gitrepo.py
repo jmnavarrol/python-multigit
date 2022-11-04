@@ -66,6 +66,21 @@ class Gitrepo(object):
 			if repo.is_dirty():
 				repostatus['status'] = 'DIRTY'
 				
+		# is the proper gitref already checked out?
+		if repostatus['status'] == 'UNPROCESSED':
+			if (
+				'gitref_type' in repostatus
+				and repostatus['gitref_type'] is not None
+			):
+				if repostatus['gitref_type'] == 'branch':
+					if repo.head.ref.name != repostatus['branch']:
+						 repostatus['status'] = 'PENDING_UPDATE'
+						 repostatus['from'] = repo.head.ref.name
+						 repostatus['to'] = repostatus['branch']
+			else:
+				# default branch requested
+				pass
+			
 		# Let's check its current commit vs the remote one
 		if repostatus['status'] == 'UNPROCESSED':
 			if (
