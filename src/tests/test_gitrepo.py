@@ -43,7 +43,7 @@ class TestGitrepo(unittest.TestCase):
 		
 		
 	def test_nonexitent_branch(self):
-		print("TEST: 'test_status_not_cloned'")
+		print("TEST: 'test_nonexitent_branch'")
 		# prepares a suitable configuration
 		repoconf = {}
 		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
