@@ -83,6 +83,7 @@ class Gitrepo(object):
 			
 		# Let's check its current commit vs the remote one
 		if repostatus['status'] == 'UNPROCESSED':
+			repo.git.fetch(prune=True)
 			if (
 				'gitref_type' in repostatus
 				and repostatus['gitref_type'] is not None
@@ -119,12 +120,12 @@ class Gitrepo(object):
 		:return: returns the same repoconf dictionary provided as parameter with a new 'status' key populated after update process and, optionally, a 'extra_info' key.
 		'''
 		
-		repostatus = repoconf
 		# First, let's check the repository's current status
 		repostatus = self.status(repoconf)
 		
 		# Then, let's operate on the repository depending on its status
 		if (
+			# all these are statuses we can't deal with here
 			repostatus['status'] == 'ERROR'
 			or repostatus['status'] == 'UP_TO_DATE'
 			or repostatus['status'] == 'EMPTY'
@@ -160,6 +161,7 @@ class Gitrepo(object):
 					raise
 		elif repostatus['status'] == 'PENDING_UPDATE':
 			repo = Repo(repostatus['path'])
+			repo.git.fetch(prune=True)
 			if (
 				'gitref_type' in repostatus
 				and repostatus['gitref_type'] is not None
@@ -174,11 +176,17 @@ class Gitrepo(object):
 			else:
 				desired_gitref = repo.git.symbolic_ref('refs/remotes/origin/HEAD').replace('refs/remotes/origin/','')
 				
-			repo.git.checkout(desired_gitref)
+			try:
+				repo.git.checkout(desired_gitref)
+			except git_exception.GitCommandError as e:
+				repostatus['status'] = 'ERROR'
+				repostatus['extra_info'] = str(e)
+				
 			if not repo.head.is_detached:
 				repo.git.pull()
 				
-			repostatus['status'] = 'UPDATED'
+			if repostatus['status'] != 'ERROR':
+				repostatus['status'] = 'UPDATED'
 			
 		return repostatus
 	
