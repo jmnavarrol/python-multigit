@@ -45,8 +45,11 @@ class Gitrepo(object):
 				my_error_msg += "but current origin is '" + repo.remotes.origin.url + "'."
 				repostatus['extra_info'] = my_error_msg
 			
-		# if still unprocessed it's because the repo is there
-		# Let's try to get its status
+		# if still unprocessed it's because the repo is there and the remote is right
+		# Let's try to update its status
+		if repostatus['status'] == 'UNPROCESSED':
+			repo.git.fetch(prune=True)
+			
 		if repostatus['status'] == 'UNPROCESSED':
 			try:
 				local_commit = repo.commit().hexsha
@@ -55,7 +58,7 @@ class Gitrepo(object):
 					"Reference at 'refs/heads/master' does not exist" in str(e)
 					or "Reference at 'refs/heads/main' does not exist" in str(e)
 				):
-					# Remote repo exists, but it's still "un-intialized" (lacks its first commit)
+					# Remote repo exists, but it's still "un-initialized" (lacks its first commit)
 					repostatus['status'] = 'EMPTY'
 				else:
 					raise e
@@ -83,7 +86,6 @@ class Gitrepo(object):
 			
 		# Let's check its current commit vs the remote one
 		if repostatus['status'] == 'UNPROCESSED':
-			repo.git.fetch(prune=True)
 			if (
 				'gitref_type' in repostatus
 				and repostatus['gitref_type'] is not None
