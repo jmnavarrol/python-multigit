@@ -55,4 +55,5 @@ clean:
 	rm -rf MANIFEST build dist *.egg-info
 	find -type f -name '*.pyc' -exec rm -f '{}' \;
 	find -type d -name '__pycache__' | xargs rm -rf
+	rm -rf tests/scenarios
 	rm -rf ../projects

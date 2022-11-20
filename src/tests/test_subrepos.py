@@ -33,17 +33,29 @@ class TestSubrepos(unittest.TestCase):
 		self.my_subrepos = multigit.Subrepos()
 	
 	
+	def test_wrong_subrepos_permissions(self):
+		print("TEST: 'test_wrong_subrepos_permissions'")
+		base_path = os.path.join(self.scenarios_path, 'standard')
+		subrepo_file = os.path.join(base_path, 'subrepos')
+		os.chmod(subrepo_file, 0o222)
+			
+		with self.assertRaises(SystemExit) as cm:
+			self.my_subrepos.process(
+				base_path   = base_path,
+				report_only = True
+			)
+			
+		self.assertEqual(cm.exception.code, errno.EPERM)
+	
+	
 	def test_no_subrepos_found(self):
 		print("TEST: 'test_no_subrepos_found'")
-		for test_status in [True, False]:
-			print("'test_no_subrepos_found', report_only=" + str(test_status))
-			with self.assertRaises(SystemExit) as cm:
-				self.my_subrepos.process(
-					base_path   = os.path.join(self.scenarios_path, 'nosubrepos'),
-					report_only = test_status
-				)
-				
-			self.assertEqual(cm.exception.code, errno.ENOENT)
+		with self.assertRaises(SystemExit) as cm:
+			self.my_subrepos.process(
+				base_path   = os.path.join(self.scenarios_path, 'nosubrepos'),
+			)
+			
+		self.assertEqual(cm.exception.code, errno.ENOENT)
 		
 		
 	def test_process_clean_status(self):
