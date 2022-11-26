@@ -124,7 +124,7 @@ class Subrepos(object):
 		'''
 		
 		# Header
-		print(Style.BRIGHT + "'" + subrepo['path'])
+		print(Style.BRIGHT + "'" + subrepo['path'] + "':")
 		print("\trepository:", end=' ')
 		print(Style.BRIGHT + "'" + subrepo['repo'] + "'")
 		if subrepo['gitref_type']:
