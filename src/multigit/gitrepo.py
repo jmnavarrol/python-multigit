@@ -48,7 +48,14 @@ class Gitrepo(object):
 		# if still unprocessed it's because the repo is there and the remote is right
 		# Let's try to update its status
 		if repostatus['status'] == 'UNPROCESSED':
-			repo.git.fetch(prune=True)
+			try:
+				repo.git.fetch(prune=True)
+			except git_exception.GitCommandError as e:
+				if e.status == 128:
+					repostatus['status'] = 'ERROR'
+					repostatus['extra_info'] = e.stderr.replace('stderr: ','').strip('\n').strip()
+				else:
+					raise
 			
 		if repostatus['status'] == 'UNPROCESSED':
 			try:
@@ -164,6 +171,7 @@ class Gitrepo(object):
 		elif repostatus['status'] == 'PENDING_UPDATE':
 			repo = Repo(repostatus['path'])
 			repo.git.fetch(prune=True)
+			
 			if (
 				'gitref_type' in repostatus
 				and repostatus['gitref_type'] is not None
