@@ -1,4 +1,5 @@
 # Environment file to be loaded by Bash interactive shell
+# See https://github.com/jmnavarrol/bash-magic-enviro
 
 #---
 # 'MAIN' .bme_env file for this project
