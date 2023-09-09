@@ -13,6 +13,7 @@ The general idea is to offer a simple way of managing *"workspaces"* integrating
    1. [code documentation](#sphinx)
    1. [build](#build)
    1. [publish](#publish)
+   1. [CHANGELOG](./CHANGELOG.md)
 1. [license](#license)
 
 ----
