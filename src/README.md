@@ -4,4 +4,4 @@ This package offers a simple way of managing *"workspaces"* integrating multiple
 
 Read the [full documentation on GitHub](https://github.com/jmnavarrol/python-multigit#readme).
 
-Also see the [simplest-git-subrepos README](https://github.com/jmnavarrol/simplest-git-subrepos#readme) for a long-wired rationale.
+See also the [simplest-git-subrepos README](https://github.com/jmnavarrol/simplest-git-subrepos#readme) for a long-wired rationale.
