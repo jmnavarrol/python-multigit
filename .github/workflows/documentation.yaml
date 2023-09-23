@@ -1,0 +1,30 @@
+---
+name: Publish Sphinx doc to gh-pages
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: write
+jobs:
+  sphinx_doc:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/publish-sphinx' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+      - name: Install dependencies
+        run: |
+          export BME_PROJECT_DIR="${GITHUB_WORKSPACE}"
+          echo "Python version: "`python --version`
+          echo "pip version: "`pip --version`
+          python3 -m venv env && source ./env/bin/activate
+          pip install --requirement "${GITHUB_WORKSPACE}/python-virtualenvs/multigit-development.requirements"
+      - name: Sphinx build
+        run: |
+          source ./env/bin/activate
+          cd "${GITHUB_WORKSPACE}/src" && make doc
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: src/build/html/
+          force_orphan: true

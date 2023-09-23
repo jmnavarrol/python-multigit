@@ -89,7 +89,7 @@ Once the *virtualenv* is (automatically) activated, you can run this code just i
 ### code documentation<a name="sphinx"></a>
 Code documentation is produced with the help of [Sphinx](https://www.sphinx-doc.org), with configurations at [src/sphinx/](./src/sphinx/).  While sphinx includes [its own Makefile](./src/sphinx/Makefile), HTML doc can be generated from [the Makefile at src/](./src/Makefile), starting at the local `src/build/html/index.html` file.
 
-As of now, this documentation is only available for local development.
+You can browse it on-line at https://jmnavarrol.github.io/python-multigit.
 
 <sub>[back to top](#top).</sub>
 

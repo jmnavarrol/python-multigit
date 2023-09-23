@@ -2,7 +2,7 @@
 BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x00)
 
 [Filters]
-size=36
+size=37
 
 [Filters][0]
 inclusive=0
@@ -153,6 +153,10 @@ targets=1
 inclusive=1
 pattern=.bme_project
 targets=1
+
+[Filters][36]
+inclusive=1
+pattern=.github
 
 [Filters][4]
 inclusive=0
