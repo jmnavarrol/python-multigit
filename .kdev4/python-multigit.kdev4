@@ -156,7 +156,8 @@ targets=1
 
 [Filters][36]
 inclusive=1
-pattern=.github
+pattern=.github*
+targets=3
 
 [Filters][4]
 inclusive=0
