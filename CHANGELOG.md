@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Next Release
+* Found the way for KDevelop to show '.github' dir on project view.
+* BME files added to .gitattributes (as BASH type).
+* setup.py deleted as it's needed no more along setuptools.
+* setup.cfg declared UTF-8.
+
 ## 0.11.4-2
 ### Added
 * A github action now [publishes Sphinx-based code documentation to GitHub Pages](https://jmnavarrol.github.io/python-multigit/).
