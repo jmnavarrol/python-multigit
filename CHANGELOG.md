@@ -5,6 +5,7 @@
 * BME files added to .gitattributes (as BASH type).
 * setup.py deleted as it's needed no more along setuptools.
 * setup.cfg declared UTF-8.
+* Development dependencies relaxed.
 
 ## 0.11.4-2
 ### Added
