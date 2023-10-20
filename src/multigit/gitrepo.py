@@ -202,7 +202,11 @@ class Gitrepo(object):
 				repostatus['extra_info'] = str(e)
 				
 			if not repo.head.is_detached:
-				repo.git.pull()
+				try:
+					repo.git.pull()
+				except git_exception.GitCommandError as e:
+					repostatus['status'] = 'ERROR'
+					repostatus['extra_info'] = e.stderr.replace('stderr: ','').strip('\n').strip()
 				
 			if repostatus['status'] != 'ERROR':
 				repostatus['status'] = 'UPDATED'

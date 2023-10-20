@@ -58,7 +58,7 @@ class TestGitrepo(unittest.TestCase):
 		
 		
 	def test_local_not_in_remote_same_branch(self):
-		print("TEST: 'test_local_not_in_remote'")
+		print("TEST: 'test_local_not_in_remote_same_branch'")
 		# prepares a suitable configuration
 		repoconf = {}
 		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
@@ -80,7 +80,7 @@ class TestGitrepo(unittest.TestCase):
 		
 		
 	def test_local_not_in_remote_different_branch(self):
-		print("TEST: 'test_local_not_in_remote'")
+		print("TEST: 'test_local_not_in_remote_different_branch'")
 		# prepares a suitable configuration
 		repoconf = {}
 		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
@@ -97,7 +97,7 @@ class TestGitrepo(unittest.TestCase):
 		repoconf['gitref_type'] = 'branch'
 		result = self.gitrepo.update(repoconf)
 		print(str(result))
-		self.assertEqual(result['status'], 'WRONG_REMOTE')
+		self.assertEqual(result['status'], 'ERROR')
 		
 		
 	def test_status_not_cloned(self):
