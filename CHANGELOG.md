@@ -1,6 +1,9 @@
 # CHANGELOG
 
 ## Next Release
+
+## 0.11.5 (2023-OCT-21)
+* Differences from [previous tag](/../../compare/v0.11.4-2…v0.11.5).
 * Found the way for KDevelop to show '.github' dir on project view.
 * BME files added to .gitattributes (as BASH type).
 * setup.py deleted as it's needed no more along setuptools.
@@ -9,10 +12,8 @@
 * [#9](https://github.com/jmnavarrol/python-multigit/issues/9) BUG CORRECTED: uncontrolled error when requested a branch which exists locally but not on remote.
 
 ## 0.11.4-2
-### Added
 * A github action now [publishes Sphinx-based code documentation to GitHub Pages](https://jmnavarrol.github.io/python-multigit/).
 * Build environment refactoring to support this new feature.
 
 ## 0.11.4-1
-### Added
 * [#8](https://github.com/jmnavarrol/python-multigit/issues/8): [setup.cfg](./src/setup.cfg) updated so it can manage different dependencies depending on running Python version.
