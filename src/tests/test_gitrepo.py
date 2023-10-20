@@ -57,7 +57,7 @@ class TestGitrepo(unittest.TestCase):
 		self.assertEqual(result['status'], 'ERROR')
 		
 		
-	def test_local_not_in_remote(self):
+	def test_local_not_in_remote_same_branch(self):
 		print("TEST: 'test_local_not_in_remote'")
 		# prepares a suitable configuration
 		repoconf = {}
@@ -71,6 +71,27 @@ class TestGitrepo(unittest.TestCase):
 		repo = Repo(repoconf['path'])
 		new_branch = repo.create_head('new_branch')
 		new_branch.checkout()
+		# Finally, let's update config to request the new local branch
+		repoconf['branch'] = 'new_branch'
+		repoconf['gitref_type'] = 'branch'
+		result = self.gitrepo.update(repoconf)
+		print(str(result))
+		self.assertEqual(result['status'], 'WRONG_REMOTE')
+		
+		
+	def test_local_not_in_remote_different_branch(self):
+		print("TEST: 'test_local_not_in_remote'")
+		# prepares a suitable configuration
+		repoconf = {}
+		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
+		
+		# First, let's clone the repo
+		result = self.gitrepo.update(repoconf)
+		print(str(result))
+		# Then, let's create a local branch
+		repo = Repo(repoconf['path'])
+		new_branch = repo.create_head('new_branch')
 		# Finally, let's update config to request the new local branch
 		repoconf['branch'] = 'new_branch'
 		repoconf['gitref_type'] = 'branch'
