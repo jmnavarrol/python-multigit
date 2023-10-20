@@ -76,7 +76,7 @@ class TestGitrepo(unittest.TestCase):
 		repoconf['gitref_type'] = 'branch'
 		result = self.gitrepo.update(repoconf)
 		print(str(result))
-		self.assertEqual(result['status'], 'ERROR')
+		self.assertEqual(result['status'], 'WRONG_REMOTE')
 		
 		
 	def test_status_not_cloned(self):

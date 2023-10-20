@@ -103,13 +103,22 @@ class Gitrepo(object):
 					remote_ref = str('origin/' + repostatus[gitref_type])
 				else:
 					remote_ref = str(repostatus[gitref_type])
-					
-				desired_commit = str(repo.commit(remote_ref))
+				try:
+					desired_commit = str(repo.commit(remote_ref))
+				except git_exception.BadName as e:
+					if ("Ref '" + remote_ref + "' did not resolve to an object" in str(e)):
+						# The requested gitref doesn't exist at the remote end (for whatever reason)
+						desired_commit = None  # ...so no desired commit possible
+						repostatus['status'] = 'WRONG_REMOTE'
+						repostatus['extra_info'] = "It seems you requested a gitref that can't be found on remote.\n"
+						repostatus['extra_info'] += str(e)
+					else:
+						raise e
 			else:
 				desired_commit = repo.remotes.origin.refs.HEAD.commit.hexsha
 				desired_gitref = repo.git.symbolic_ref('refs/remotes/origin/HEAD').replace('refs/remotes/origin/','')
 				
-			if local_commit != desired_commit:
+			if (desired_commit and local_commit != desired_commit):
 				repostatus['status'] = 'PENDING_UPDATE'
 				repostatus['from'] = local_commit
 				repostatus['to'] = desired_commit
