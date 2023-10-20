@@ -6,6 +6,7 @@
 * setup.py deleted as it's needed no more along setuptools.
 * setup.cfg declared UTF-8.
 * Development dependencies relaxed.
+* Working on [#9](https://github.com/jmnavarrol/python-multigit/issues/9) BUG CORRECTED: uncontrolled error when requested a branch which exists locally but not on remote.
 
 ## 0.11.4-2
 ### Added
