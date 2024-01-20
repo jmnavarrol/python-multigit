@@ -8,7 +8,7 @@ This script is a Python implementation of `simplest-git-subrepos <https://github
 :source: https://github.com/jmnavarrol/python-multigit
 """
 
-__version__ = '0.11.5'
+__version__ = '0.11.5.post2'
 
 # Import stuff
 import os, sys
@@ -29,18 +29,18 @@ def main():
 		description="Manages git repos within git repos.",
 		add_help=False,  # this way I can force help to be an exclusion option along the others
 	)
-	
+
 # Main options
 	main_parser = parser.add_mutually_exclusive_group()
 	main_parser.add_argument('-h', '--help', action='store_true', help="Shows this help.")
 	main_parser.add_argument('-V', '--version', action='store_true', help="Shows " + parser.prog + " version and quits.")
 	main_parser.add_argument('-r', '--run', action='store_true', help="Recursively processes '" + SUBREPOS_FILE + "' files found.")
 	main_parser.add_argument('-s', '--status', action='store_true', help="Shows repositories' current status.")
-	
+
 # Ready to parse args
 	args = parser.parse_args()
 	#print(args)
-	
+
 # Run on the options
 	if len(sys.argv) > 1:
 		if args.help:

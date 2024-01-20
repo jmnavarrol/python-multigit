@@ -1,2 +1,3 @@
+pip>=23
 # $BME_PROJECT_DIR is defined by Bash Magic Enviro
 --editable "${BME_PROJECT_DIR}/src[development]"

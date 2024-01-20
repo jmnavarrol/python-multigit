@@ -1,6 +1,10 @@
 # CHANGELOG
 
 ## Next Release
+* All build config move to [pyproject.toml](./src/pyproject.toml)
+* Build system moved from setuptools to hatchling.
+* Dependencies fully relaxed (no versions defined).
+* Preliminary support for a demonstration/development docker container.
 
 ## 0.11.5 (2023-OCT-21)
 * Differences from [previous tag](/../../compare/v0.11.4-2…v0.11.5).

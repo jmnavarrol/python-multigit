@@ -1,3 +1,59 @@
+# -*- coding: utf-8 -*-
+# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+
+[project]
+name = "multigit"
+authors = [
+    { name  = "Jesús M. Navarro", email = "jesusmnavarrolopez@gmail.com" },
+]
+
+description = "Manages git repos within git repos."
+readme = "README.md"
+keywords = ["Python", "git-utilities"]
+license = { text = "GPL-3.0" }
+dynamic = ["version"]
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"Development Status :: 5 - Production/Stable",
+	"Environment :: Console",
+	"Intended Audience :: Developers",
+	"Topic :: Software Development :: Build Tools",
+	"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+
+requires-python = ">=3.7"
+dependencies = [
+	"Cerberus",
+	"colorama",
+	"GitPython",
+	"PyYAML"
+]
+
+[project.urls]
+Documentation = "https://jmnavarrol.github.io/python-multigit/"
+Source = "https://github.com/jmnavarrol/python-multigit"
+"Bug Tracker" = "https://github.com/jmnavarrol/python-multigit/issues"
+
+[project.optional-dependencies]
+# Other dependencies for development environment
+# Create a virtualenv with --editable "./src[development]" to use them
+development = [
+	"build",
+	"Sphinx",
+	"sphinxcontrib-programoutput",
+	"sphinx-rtd-theme",
+	"twine"
+]
+
+[project.scripts]
+multigit = "multigit:main"
+
 [build-system]
-requires = ["setuptools>=65.5", "wheel>=0.37"]
-build-backend = "setuptools.build_meta"
+requires = [
+	"hatchling",
+	"build"
+]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "multigit/__init__.py"
