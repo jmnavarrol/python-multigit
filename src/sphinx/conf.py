@@ -16,7 +16,7 @@ from multigit import __version__
 # -- Project information -----------------------------------------------------
 
 project = 'multigit'
-copyright = '2021-2023, Jesús M. Navarro'
+copyright = '2021-2024, Jesús M. Navarro'
 author = 'Jesús M. Navarro'
 
 # The full version, including alpha/beta/rc tags
