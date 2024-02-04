@@ -94,7 +94,7 @@ You can browse it on-line at https://jmnavarrol.github.io/python-multigit.
 <sub>[back to top](#top).</sub>
 
 ### build<a name="build"></a>
-The [included Makefile](./src/Makefile) will use Python's setup tools to build both *source* and *binary-based* Python *eggs*.  Provided everything went OK, look for packages under the *dist/* directory.
+The [included Makefile](./src/Makefile) will use Python's [Hatch](https://hatch.pypa.io) to build both *source* and *binary-based* Python *eggs*.  Provided everything went OK, look for packages under the *dist/* directory.
 
 Run `make` to see available *make targets*.
 
