@@ -1,7 +1,8 @@
 # CHANGELOG
 
 ## Next Release
-* All build config move to [pyproject.toml](./src/pyproject.toml)
+* Differences from [previous tag](/../../compare/v0.11.5…main).
+* All build config moved to [pyproject.toml](./src/pyproject.toml)
 * Build system moved from setuptools to hatchling.
 * Dependencies fully relaxed (no versions defined).
 * Preliminary support for a demonstration/development docker container.
