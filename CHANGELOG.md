@@ -3,7 +3,7 @@
 ## Next Release
 * Differences from [previous tag](/../../compare/v0.11.6…main).
 
-## 0.11.6 (2024-03-10)
+## 0.11.6 (2024-MAR-10)
 * Differences from [previous tag](/../../compare/v0.11.5…v0.11.6).
 * [#11](/../../issues/11) BUG CORRECTED: multigit tracks commit instead of branch.
 * All build config moved to [pyproject.toml](./src/pyproject.toml)
