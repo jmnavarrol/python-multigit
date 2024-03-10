@@ -3,10 +3,9 @@
 
 # Import stuff
 from .test_gitrepo import TestGitrepo
-from multigit import Gitrepo
 
-from git import Repo
 import os
+from git import Repo
 
 # Subclasses so it gets parent's setUp and tearDown
 class TestGitrepoRemote(TestGitrepo):
