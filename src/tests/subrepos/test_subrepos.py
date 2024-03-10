@@ -22,7 +22,7 @@ class TestSubrepos(unittest.TestCase):
 				os.makedirs(current_scenario_path)
 				
 			shutil.copy(
-				TESTS_PATH + '/subrepos.' + test_item,
+				TESTS_PATH + '/../helperfiles/subrepos.' + test_item,
 				os.path.join(current_scenario_path, 'subrepos')
 			)
 			

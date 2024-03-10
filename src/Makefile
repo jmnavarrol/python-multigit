@@ -30,7 +30,7 @@ targets:
 	@echo -e "\t${C_BOLD}clean:${C_NC} deletes temp files."
 
 test:
-	python -m unittest discover
+	python -m unittest discover -s tests
 
 build: test $(SDIST_FILES) $(WHEELS) doc
 
