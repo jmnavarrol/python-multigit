@@ -37,6 +37,10 @@ class TestGitrepoRemote(TestGitrepo):
 		
 		# Run multigit on default branch and see what happens
 		result = self.gitrepo.update(repoconf)
+		print(str(result))
 		current_branch_name = repo.head.ref.name
 		# Branch should return to its original value
 		self.assertEqual(current_branch_name, original_branch_name)
+		
+		# Cleansing: delete remote branch
+		repo.git.push('origin', ':test_commit')

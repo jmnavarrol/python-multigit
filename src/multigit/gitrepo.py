@@ -84,13 +84,20 @@ class Gitrepo(object):
 			):
 				if repostatus['gitref_type'] == 'branch':
 					if repo.head.ref.name != repostatus['branch']:
-						 repostatus['status'] = 'PENDING_UPDATE'
-						 repostatus['from'] = repo.head.ref.name
-						 repostatus['to'] = repostatus['branch']
+						repostatus['status'] = 'PENDING_UPDATE'
+						repostatus['from'] = repo.head.ref.name
+						repostatus['to'] = repostatus['branch']
 			else:
 				# default branch requested
-				pass
-			
+				# find its remote name (i.e. 'origin/master')
+				remote_head = next(ref for ref in repo.remotes.origin.refs if '/HEAD' in ref.name).ref.name
+				# ...and convert to a proper local name (i.e. 'master')
+				default_branch = remote_head.split('/', 1)[-1]
+				if default_branch != repo.head.ref.name:
+					repostatus['status'] = 'PENDING_UPDATE'
+					repostatus['from'] = repo.head.ref.name
+					repostatus['to'] = default_branch
+					
 		# Let's check its current commit vs the remote one
 		if repostatus['status'] == 'UNPROCESSED':
 			if (
