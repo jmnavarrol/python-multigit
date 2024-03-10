@@ -2,6 +2,7 @@
 
 ## Next Release
 * Differences from [previous tag](/../../compare/v0.11.5…main).
+* [#11](/../../issues/11) BUG CORRECTED: multigit tracks commit instead of branch.
 * All build config moved to [pyproject.toml](./src/pyproject.toml)
 * Build system moved from setuptools to hatchling.
 * Dependencies fully relaxed (no versions defined).
