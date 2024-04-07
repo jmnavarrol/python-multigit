@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Import stuff
+import sys
 from git import Repo, exc as git_exception
 
 
@@ -223,4 +224,6 @@ class Gitrepo(object):
 	
 if __name__ == '__main__':
 	# execute only if run as a script
-	main()
+	sys.exit(
+		main()
+	)

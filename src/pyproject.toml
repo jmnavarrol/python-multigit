@@ -46,7 +46,7 @@ development = [
 ]
 
 [project.scripts]
-multigit = "multigit:main"
+multigit = "multigit:__main__.main"
 
 [build-system]
 requires = [
@@ -56,4 +56,4 @@ requires = [
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
-path = "multigit/__init__.py"
+path = "multigit/__main__.py"

@@ -6,9 +6,9 @@ Pending actions, general notes, etc. (in no particular order):
   * https://www.codingwiththomas.com/blog/my-sphinx-best-practice-for-a-multiversion-documentation-in-different-languages
 * Refactor code so Makefile, pyproject.toml are at the repository's root?
 * [#10](../../issues/10): Review [vag](https://github.com/charlyoleg2/vag) and [vcstool](https://github.com/dirk-thomas/vcstool) for inspiration.
-* Refactor multigit so it can be used in library mode by other applications.
 * Find the way to simplify subrepos' format allowing for *gitref* instead of *branch|tag|commit* (the code should find what kind of object *gitref* references).
 * Add a `--check-version` option (or something like that) that looks for updates.
 * Refactor tests so they go into subdirectories by "main" feature.
 
 ## IN PROGRESS
+* Refactor multigit so it can be used in library mode by other applications.
