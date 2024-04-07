@@ -2,12 +2,21 @@
 SHELL := /bin/bash
 
 PYTOOL = python -m build
-PYTHON_FILES = $(shell find . -not \( -path './build/*' -prune \) -type f -name '*.py')
-OTHER_INCLUDES = LICENSE README.md MANIFEST.in
-SDIST_FILES = dist/*.tar.gz
-SPHINXDIR = sphinx
-WHEELS = dist/*.whl
+
+SOURCE_DIR = $(CURDIR)/src/
+BUILD_DIR = $(CURDIR)/build/
+
+PYTHON_FILES = $(shell find ${SOURCE_DIR} -type f -name '*.py')
+OTHER_INCLUDES = $(SOURCE_DIR)LICENSE $(SOURCE_DIR)README.md $(SOURCE_DIR)MANIFEST.in
+
+SDIST_FILES = $(BUILD_DIR)/dist/*.tar.gz
+WHEELS = $(BUILD_DIR)/dist/*.whl
+
+SPHINXDIR = $(SOURCE_DIR)sphinx
+SPHINX_OUTPUT = $(BUILD_DIR)sphinx-doc
+
 UPTOOL = python -m twine upload
+
 
 # Style table
 export C_BOLD := \033[1m
@@ -30,29 +39,29 @@ targets:
 	@echo -e "\t${C_BOLD}clean:${C_NC} deletes temp files."
 
 test:
-	python -m unittest discover -s tests
+	python -m unittest discover --start-directory ${SOURCE_DIR}tests
 
 build: test $(SDIST_FILES) $(WHEELS) doc
 
 $(SDIST_FILES): $(PYTHON_FILES) $(OTHER_INCLUDES)
-	python -m build --sdist
+	python -m build --outdir $(BUILD_DIR)dist --sdist
 
 $(WHEELS): $(PYTHON_FILES) $(OTHER_INCLUDES)
-	python -m build --wheel
+	python -m build --outdir $(BUILD_DIR)dist --wheel
 
 doc:
-	@$(MAKE) html --directory=$(SPHINXDIR)
-	@$(MAKE) linkcheck --directory=$(SPHINXDIR)
+	$(MAKE) BUILDDIR=${SPHINX_OUTPUT} html --directory=$(SPHINXDIR)
+	$(MAKE) BUILDDIR=${SPHINX_OUTPUT} linkcheck --directory=$(SPHINXDIR)
 
 upload-tmp: clean build
-	$(UPTOOL) --repository testpypi dist/*
+	$(UPTOOL) --repository testpypi $(BUILD_DIR)dist/*
 
 upload: clean build
-	$(UPTOOL) --repository pypi dist/*
+	$(UPTOOL) --repository pypi $(BUILD_DIR)dist/*
 
 clean:
 	@$(MAKE) clean --directory=$(SPHINXDIR)
-	rm -rf MANIFEST build dist *.egg-info
+	rm -rf ${BUILD_DIR}
 	find -type f -name '*.pyc' -exec rm -f '{}' \;
 	find -type d -name '__pycache__' | xargs rm -rf
 	rm -rf tests/scenarios

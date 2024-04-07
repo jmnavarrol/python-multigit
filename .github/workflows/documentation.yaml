@@ -20,11 +20,11 @@ jobs:
       - name: Sphinx build
         run: |
           source ./env/bin/activate
-          cd "${GITHUB_WORKSPACE}/src" && make doc
+          cd "${GITHUB_WORKSPACE}" && make doc
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: src/build/html/
+          publish_dir: "${GITHUB_WORKSPACE}/build/sphinx-doc/html/"
           force_orphan: true

@@ -36,7 +36,7 @@ Source = "https://github.com/jmnavarrol/python-multigit"
 
 [project.optional-dependencies]
 # Other dependencies for development environment
-# Create a virtualenv with --editable "./src[development]" to use them
+# Create a virtualenv with --editable "./[development]" to use them
 development = [
 	"build",
 	"Sphinx",
@@ -56,4 +56,14 @@ requires = [
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
-path = "multigit/__main__.py"
+path = 'src/multigit/__main__.py'
+
+[tool.hatch.build]
+packages = [
+	'src/multigit',
+]
+# This strips 'src/' from the result (so package/module works as expected)
+sources = ['src']
+
+# This allows editable mode with --editable "./[development]"
+dev-mode-dirs = ['src/']

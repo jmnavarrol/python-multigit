@@ -9,7 +9,7 @@
 :source: https://github.com/jmnavarrol/python-multigit
 """
 
-__version__ = '0.11.7-dev1'
+__version__ = '0.11.7-dev2'
 
 # Import stuff
 import os, sys
