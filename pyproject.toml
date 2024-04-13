@@ -2,58 +2,58 @@
 # https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
 
 [project]
-name = "multigit"
+name = 'multigit'
 authors = [
-    { name  = "Jesús M. Navarro", email = "jesusmnavarrolopez@gmail.com" },
+    { name  = 'Jesús M. Navarro', email = 'jesusmnavarrolopez@gmail.com' },
 ]
 
-description = "Manages git repos within git repos."
-readme = "README.md"
-keywords = ["Python", "git-utilities"]
-license = { text = "GPL-3.0" }
-dynamic = ["version"]
+description = 'Manages git repos within git repos.'
+readme = 'README.md'
+keywords = ['Python', 'git-utilities']
+license = { text = 'GPL-3.0' }
+dynamic = ['version']
 classifiers = [
-	"Programming Language :: Python :: 3",
-	"Development Status :: 5 - Production/Stable",
-	"Environment :: Console",
-	"Intended Audience :: Developers",
-	"Topic :: Software Development :: Build Tools",
-	"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+	'Programming Language :: Python :: 3',
+	'Development Status :: 5 - Production/Stable',
+	'Environment :: Console',
+	'Intended Audience :: Developers',
+	'Topic :: Software Development :: Build Tools',
+	'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
 ]
 
-requires-python = ">=3.7"
+requires-python = '>=3.7'
 dependencies = [
-	"Cerberus",
-	"colorama",
-	"GitPython",
-	"PyYAML"
+	'Cerberus',
+	'colorama',
+	'GitPython',
+	'PyYAML',
 ]
 
 [project.urls]
-Documentation = "https://jmnavarrol.github.io/python-multigit/"
-Source = "https://github.com/jmnavarrol/python-multigit"
-"Bug Tracker" = "https://github.com/jmnavarrol/python-multigit/issues"
+Documentation = 'https://jmnavarrol.github.io/python-multigit/'
+Source = 'https://github.com/jmnavarrol/python-multigit'
+'Bug Tracker' = 'https://github.com/jmnavarrol/python-multigit/issues'
 
 [project.optional-dependencies]
 # Other dependencies for development environment
 # Create a virtualenv with --editable "./[development]" to use them
 development = [
-	"build",
-	"Sphinx",
-	"sphinxcontrib-programoutput",
-	"sphinx-rtd-theme",
-	"twine"
+	'build',
+	'Sphinx',
+	'sphinxcontrib-programoutput',
+	'sphinx-rtd-theme',
+	'twine',
 ]
 
 [project.scripts]
-multigit = "multigit:__main__.main"
+multigit = 'multigit:__main__.main'
 
 [build-system]
 requires = [
-	"hatchling",
-	"build"
+	'hatchling',
+	'build',
 ]
-build-backend = "hatchling.build"
+build-backend = 'hatchling.build'
 
 [tool.hatch.version]
 path = 'src/multigit/__main__.py'
