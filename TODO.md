@@ -8,7 +8,6 @@ Pending actions, general notes, etc. (in no particular order):
 * Find the way to simplify subrepos' format allowing for *gitref* instead of *branch|tag|commit* (the code should find what kind of object *gitref* references).
 * Add a `--check-version` option (or something like that) that looks for updates.
 * Refactor tests so they go into subdirectories by "main" feature.
-* Review how to add LICENSE and subrepos_schema.yaml right from pyproject.toml without the need of a MANIFEST.in file.
 
 ## IN PROGRESS
 * Refactor multigit so it can be used in library mode by other applications.
