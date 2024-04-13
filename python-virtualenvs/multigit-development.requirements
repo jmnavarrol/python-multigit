@@ -1,3 +1,3 @@
 pip>=23
-# $BME_PROJECT_DIR is defined by Bash Magic Enviro
+# $BME_PROJECT_DIR is defined by Bash Magic Enviro to be the root of this repository
 --editable "${BME_PROJECT_DIR}/[development]"

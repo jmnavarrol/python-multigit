@@ -2,7 +2,7 @@
 
 ## Next Release
 * Differences from [previous tag](/../../compare/v0.11.6…main).
-* Code and metadata refactoring for an easier *"librarizing* in the future.
+* Code and metadata refactoring for an easier *"libraryzing"* in the future.
 * Refactoring so Makefile, pyproject.toml are at the repository's root.
 
 ## 0.11.6 (2024-MAR-10)

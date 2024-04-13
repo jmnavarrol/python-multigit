@@ -9,6 +9,7 @@
    :maxdepth: 2
 
    genindex
+   Class Subrepofile <subrepofile>
    Class Subrepos <subrepos>
    Class Gitrepo <gitrepo>
 
@@ -29,5 +30,6 @@ multigit script and module.
 **multigit** can also be used as an imported module.
 
 **Classes:**
+ * :ref:`Subrepofile<subrepofile>`: loads configuration from a subrepofile.
  * :ref:`Subrepos<subrepos>`: processes a full subrepos' configuration.
  * :ref:`Gitrepo<gitrepo>`: manages a single git repository as per the requested configuration.

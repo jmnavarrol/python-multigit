@@ -17,10 +17,6 @@ import argparse
 
 # "local" imports
 from .subrepos import Subrepos, SUBREPOS_FILE
-# Other imports so there's visibility of all classes in the module
-from .gitrepo import Gitrepo
-from .subrepofile import Subrepofile
-
 
 # MAIN entry point
 def main():
