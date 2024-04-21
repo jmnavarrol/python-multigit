@@ -5,6 +5,7 @@
 * Code and metadata refactoring for an easier *"libraryzing"* in the future.
   * Subrepos file's default name is now defined at main() so it can be overwritten when using this code in library mode.
 * Refactoring so Makefile, pyproject.toml are at the repository's root.
+* Tests refactored so they go into subdirectories by "main" feature.
 * Makefile: added 'date' target (shows date in CHANGELOG-compatible format).
 
 ## 0.11.6 (2024-MAR-10)
