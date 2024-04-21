@@ -26,17 +26,22 @@ export C_RED := \033[1;31m
 export C_NC := \033[0m
 
 # Basic targets
-.PHONY: targets test build clean doc
+.PHONY: targets date test build clean doc
 
 targets:
 	@echo -e "${C_BOLD}Main targets are:${C_NC}"
 	@echo -e "\t${C_BOLD}targets:${C_NC} this one (default)."
+	@echo -e "\t$${C_BOLD}date:$${C_NC} shows date in CHANGELOG format."
 	@echo -e "\t${C_BOLD}test:${C_NC} runs unit tests."
 	@echo -e "\t${C_BOLD}build:${C_NC} builds source tarball, binary egg (sdist, wheels) and HTML sphinx docs."
 	@echo -e "\t${C_BOLD}doc:${C_NC} builds HTML sphinx docs."
 	@echo -e "\t${C_BOLD}upload-tmp:${C_NC} uploads version to testing PyPi service."
 	@echo -e "\t${C_BOLD}upload:${C_NC} uploads version to live PyPi service."
 	@echo -e "\t${C_BOLD}clean:${C_NC} deletes temp files."
+
+date:
+	@formated_date=`LC_ALL=C date +"%Y-%^b-%d"` \
+	&& echo -e "$${C_BOLD}Changelog date is:$${C_NC} $${C_GREEN}$${formated_date}$${C_NC}"
 
 test:
 	python -m unittest discover --start-directory ${SOURCE_DIR}tests

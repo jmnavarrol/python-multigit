@@ -4,6 +4,7 @@
 * Differences from [previous tag](/../../compare/v0.11.6…main).
 * Code and metadata refactoring for an easier *"libraryzing"* in the future.
 * Refactoring so Makefile, pyproject.toml are at the repository's root.
+* Makefile: added 'date' target (shows date in CHANGELOG-compatible format).
 
 ## 0.11.6 (2024-MAR-10)
 * Differences from [previous tag](/../../compare/v0.11.5…v0.11.6).
