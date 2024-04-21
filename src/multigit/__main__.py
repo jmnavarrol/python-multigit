@@ -9,14 +9,19 @@
 :source: https://github.com/jmnavarrol/python-multigit
 """
 
+# Globals
 __version__ = '0.11.7-dev2'
+SUBREPOS_FILE = 'subrepos'
+'''
+The *"fixed"* name of the YAML file with subrepo definitions.
+'''  # pylint: disable=W0105
 
 # Import stuff
 import os, sys
 import argparse
 
 # "local" imports
-from .subrepos import Subrepos, SUBREPOS_FILE
+from .subrepos import Subrepos
 
 # MAIN entry point
 def main():
@@ -46,7 +51,11 @@ def main():
 			print("%s %s" % (parser.prog, __version__))
 		else:
 			my_subrepos = Subrepos()
-			my_subrepos.process(os.getcwd(), report_only=args.status)
+			my_subrepos.process(
+				base_path = os.getcwd(),
+				subrepos_filename = SUBREPOS_FILE,
+				report_only = args.status,
+			)
 	else:
 	# Program called with no arguments (shows help)
 		print("%s (%s): arguments required.\n" % (parser.prog, __version__))

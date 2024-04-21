@@ -13,16 +13,6 @@ from colorama import init, Fore, Back, Style
 from .gitrepo import Gitrepo
 from .subrepofile import Subrepofile
 
-# Globals
-SUBREPOS_FILE = 'subrepos'
-'''
-The *"fixed"* name of the YAML file with subrepo definitions.
-
-This file will first be loaded from current dir.
-
-Otherwise, if within a git sandbox, it will be looked for at the git sandbox' root.
-'''  # pylint: disable=W0105
-
 class Subrepos(object):
 	'''Recursively reads subrepos files and runs git commands as per its findings'''
 	
@@ -31,7 +21,12 @@ class Subrepos(object):
 		init(autoreset=True)
 		
 		
-	def process(self, base_path, report_only=True):
+	def process(
+		self,
+		base_path,
+		subrepos_filename = 'subrepos',
+		report_only=True
+	):
 		'''
 		Recursively finds and processes subrepos files.
 		
@@ -39,16 +34,17 @@ class Subrepos(object):
 		
 		If there is **not** a 'subrepos' file at `base_path` **and** `base_path` is within a git repo, it will try to find one at its root.
 		
-		:param str base_path: the absolute path to the directory where subrepos file will be searched and processed.
+		:param str base_path: the absolute path to the directory where subrepos file will be searched for and processed.
+		:param str subrepos_filename: 'subrepos'. Name of file holding subrepos' definitions.
 		:param bool report_only: `True`, just shows dirtree status; `False`, updates dirtree.
 		'''
 		
-		if os.path.isfile(os.path.join(base_path + "/" + SUBREPOS_FILE)):
-			subrepos_file = os.path.join(base_path + "/" + SUBREPOS_FILE)
+		if os.path.isfile(os.path.join(base_path + "/" + subrepos_filename)):
+			subrepos_file = os.path.join(base_path + "/" + subrepos_filename)
 		else:
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
 			print("no valid ", end=' ')
-			print(Style.BRIGHT + "'" + SUBREPOS_FILE + "'", end=' found at ')
+			print(Style.BRIGHT + "'" + subrepos_filename + "'", end=' found at ')
 			print(Style.BRIGHT + "'" + base_path + "'", end='.\n')
 			# No subrepos file found at current path. Let's check if we are within a git sandbox
 			try:
@@ -59,8 +55,8 @@ class Subrepos(object):
 				print("processing git repository rooted at", end=' ')
 				print(Style.BRIGHT + "'" + root_dir + "'", end=':\n')
 				
-				if os.path.isfile(os.path.join(base_path + "/" + SUBREPOS_FILE)):
-					subrepos_file = os.path.join(base_path + "/" + SUBREPOS_FILE)
+				if os.path.isfile(os.path.join(base_path + "/" + subrepos_filename)):
+					subrepos_file = os.path.join(base_path + "/" + subrepos_filename)
 			except git_exception.InvalidGitRepositoryError as e:
 				# Not a git repo: no more options left
 				print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
@@ -73,7 +69,7 @@ class Subrepos(object):
 		except NameError:
 			print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
 			print("Couldn't find any", end=' ')
-			print(Style.BRIGHT + "'" + SUBREPOS_FILE + "'", end=' ')
+			print(Style.BRIGHT + "'" + subrepos_filename + "'", end=' ')
 			print("file... exiting.")
 			sys.exit(errno.ENOENT)
 		
@@ -82,7 +78,7 @@ class Subrepos(object):
 		if not subrepos:
 			print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
 			print("Couldn't find any", end=' ')
-			print(Style.BRIGHT + "'" + SUBREPOS_FILE + "'", end=' ')
+			print(Style.BRIGHT + "'" + subrepos_filename + "'", end=' ')
 			print("file... exiting.")
 			sys.exit(errno.ENOENT)
 			
@@ -103,7 +99,7 @@ class Subrepos(object):
 			# Let's see if new subrepos appeared and (eventually) append them to the queue
 			try:
 				new_subrepos = subrepo.load(
-					os.path.join(current_subrepo['path'], SUBREPOS_FILE)
+					os.path.join(current_subrepo['path'], subrepos_filename)
 				)
 			except FileNotFoundError as e:
 				# It's acceptable not to find new subrepos at this location
