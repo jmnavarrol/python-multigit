@@ -7,6 +7,7 @@
 * Refactoring so Makefile, pyproject.toml are at the repository's root.
 * Tests refactored so they go into subdirectories by "main" feature.
 * Makefile: added 'date' target (shows date in CHANGELOG-compatible format).
+* Sphinx docs: GitHub action refactored so documentation is only published on tags.
 
 ## 0.11.6 (2024-MAR-10)
 * Differences from [previous tag](/../../compare/v0.11.5…v0.11.6).
