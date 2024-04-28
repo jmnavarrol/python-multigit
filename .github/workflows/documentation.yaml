@@ -1,12 +1,15 @@
 ---
 name: Publish Sphinx doc to gh-pages
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    tags:
+    - 'v**'
+  workflow_dispatch:  # this allows manual triggering for testing
 permissions:
   contents: write
 jobs:
   sphinx_doc:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -22,9 +25,10 @@ jobs:
           source ./env/bin/activate
           cd "${GITHUB_WORKSPACE}" && make doc
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: "${GITHUB_WORKSPACE}/build/sphinx-doc/html/"
+          publish_dir: build/sphinx-doc/html
+          allow_empty_commit: false
           force_orphan: true
