@@ -97,17 +97,18 @@ class Subrepos(object):
 			self.__print_subrepo_status(current_subrepo)
 			
 			# Let's see if new subrepos appeared and (eventually) append them to the queue
-			try:
-				new_subrepos = subrepo.load(
-					os.path.join(current_subrepo['path'], subrepos_filename)
-				)
-			except FileNotFoundError as e:
-				# It's acceptable not to find new subrepos at this location
-				new_subrepos = []
-			
-			if new_subrepos:
-				subrepos.extend(new_subrepos)
-				del new_subrepos
+			if os.path.join(current_subrepo['path'], subrepos_filename) != subrepos_file:
+				try:
+					new_subrepos = subrepo.load(
+						os.path.join(current_subrepo['path'], subrepos_filename)
+					)
+				except FileNotFoundError as e:
+					# It's acceptable not to find new subrepos at this location
+					new_subrepos = []
+					
+				if new_subrepos:
+					subrepos.extend(new_subrepos)
+					del new_subrepos
 			
 			# done with this subrepo entry
 			subrepos.remove(current_subrepo)
