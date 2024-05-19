@@ -39,8 +39,10 @@ class Subrepos(object):
 		:param bool report_only: `True`, just shows dirtree status; `False`, updates dirtree.
 		'''
 		
-		if os.path.isfile(os.path.join(base_path + "/" + subrepos_filename)):
-			subrepos_file = os.path.join(base_path + "/" + subrepos_filename)
+		if os.path.isfile(os.path.join(base_path, subrepos_filename)):
+			subrepos_file = os.path.realpath(
+				os.path.join(base_path, subrepos_filename)
+			)
 		else:
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
 			print("no valid ", end=' ')
@@ -55,8 +57,10 @@ class Subrepos(object):
 				print("processing git repository rooted at", end=' ')
 				print(Style.BRIGHT + "'" + root_dir + "'", end=':\n')
 				
-				if os.path.isfile(os.path.join(base_path + "/" + subrepos_filename)):
-					subrepos_file = os.path.join(base_path + "/" + subrepos_filename)
+				if os.path.isfile(os.path.join(root_dir, subrepos_filename)):
+					subrepos_file = os.path.realpath(
+						os.path.join(root_dir, subrepos_filename)
+					)
 			except git_exception.InvalidGitRepositoryError as e:
 				# Not a git repo: no more options left
 				print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
@@ -97,7 +101,10 @@ class Subrepos(object):
 			self.__print_subrepo_status(current_subrepo)
 			
 			# Let's see if new subrepos appeared and (eventually) append them to the queue
-			if os.path.join(current_subrepo['path'], subrepos_filename) != subrepos_file:
+			if (
+				os.path.realpath(os.path.join(current_subrepo['path'], subrepos_filename))
+				!= subrepos_file
+			):
 				try:
 					new_subrepos = subrepo.load(
 						os.path.join(current_subrepo['path'], subrepos_filename)
