@@ -91,9 +91,11 @@ class Subrepofile(object):
 				# "Normalize" the validated contents
 				for subrepo in subrepo_list:
 					# Let's set the repo's local path to its absolute location for easy tracking
-					subrepo['path'] = os.path.join(
-						os.path.dirname(os.path.realpath(subrepos_file)),
-						subrepo['path']
+					subrepo['path'] = os.path.realpath(
+						os.path.join(
+							os.path.dirname(subrepos_file),
+							subrepo['path']
+						)
 					)
 					
 					# Sets the type of the requested gitref to ease processing

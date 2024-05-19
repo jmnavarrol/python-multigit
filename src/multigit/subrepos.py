@@ -39,8 +39,10 @@ class Subrepos(object):
 		:param bool report_only: `True`, just shows dirtree status; `False`, updates dirtree.
 		'''
 		
-		if os.path.isfile(os.path.join(base_path + "/" + subrepos_filename)):
-			subrepos_file = os.path.join(base_path + "/" + subrepos_filename)
+		if os.path.isfile(os.path.join(base_path, subrepos_filename)):
+			subrepos_file = os.path.realpath(
+				os.path.join(base_path, subrepos_filename)
+			)
 		else:
 			print(Style.BRIGHT + Fore.GREEN + "INFO:", end=' ')
 			print("no valid ", end=' ')
@@ -55,8 +57,10 @@ class Subrepos(object):
 				print("processing git repository rooted at", end=' ')
 				print(Style.BRIGHT + "'" + root_dir + "'", end=':\n')
 				
-				if os.path.isfile(os.path.join(base_path + "/" + subrepos_filename)):
-					subrepos_file = os.path.join(base_path + "/" + subrepos_filename)
+				if os.path.isfile(os.path.join(root_dir, subrepos_filename)):
+					subrepos_file = os.path.realpath(
+						os.path.join(root_dir, subrepos_filename)
+					)
 			except git_exception.InvalidGitRepositoryError as e:
 				# Not a git repo: no more options left
 				print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
@@ -104,9 +108,16 @@ class Subrepos(object):
 			except FileNotFoundError as e:
 				# It's acceptable not to find new subrepos at this location
 				new_subrepos = []
-			
+				
 			if new_subrepos:
-				subrepos.extend(new_subrepos)
+				# add NEW subrepos to the list (already defined subrepos take precedence)
+				subrepo_paths = set(
+					path['path'] for path in subrepos
+				)
+				subrepos.extend(
+					new_subrepo for new_subrepo in new_subrepos
+					if new_subrepo['path'] not in subrepo_paths
+				)
 				del new_subrepos
 			
 			# done with this subrepo entry
