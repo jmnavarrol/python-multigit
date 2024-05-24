@@ -1,6 +1,9 @@
 # CHANGELOG
 
 ## Next Release
+* Differences from [previous tag](/../../compare/v0.11.7…main).
+
+## 0.11.7 (2024-MAY-24)
 * Differences from [previous tag](/../../compare/v0.11.6…main).
 * Code and metadata refactoring for an easier *"libraryzing"* in the future.
   * Subrepos file's default name is now defined at main() so it can be overwritten when using this code in library mode.
