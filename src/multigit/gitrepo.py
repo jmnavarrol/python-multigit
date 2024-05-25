@@ -148,6 +148,7 @@ class Gitrepo(object):
 		
 		# First, let's check the repository's current status
 		repostatus = self.status(repoconf)
+		# print(repostatus)
 		
 		# Then, let's operate on the repository depending on its status
 		if (
@@ -161,21 +162,35 @@ class Gitrepo(object):
 			pass
 		elif repostatus['status'] == 'NOT_CLONED':
 			# Let's try to clone it
+			if (
+				'gitref_type' in repostatus
+				and repostatus['gitref_type'] is not None
+			):
+				gitref_type = repostatus['gitref_type']
+			else:
+				gitref_type = None
+			
 			try:
 				if (
-					'gitref_type' in repostatus
-					and repostatus['gitref_type'] is not None
+					gitref_type == 'branch'
+					or gitref_type == 'tag'
 				):
-					gitref_type = repostatus['gitref_type']
 					repo = Repo.clone_from(
-						repostatus['repo'],
-						repostatus['path'],
-						branch=repostatus[gitref_type]
+						url     = repostatus['repo'],
+						to_path = repostatus['path'],
+						branch  = repostatus[gitref_type],
 					)
+				elif gitref_type == 'commit':
+					# this is two steps: first clone, then "move" to the requested commit
+					repo = Repo.clone_from(
+						url     = repostatus['repo'],
+						to_path = repostatus['path'],
+					)
+					repo.git.checkout(repostatus['commit'])
 				else:
 					repo = Repo.clone_from(
-						repostatus['repo'],
-						repostatus['path']
+						url     = repostatus['repo'],
+						to_path = repostatus['path'],
 					)
 				
 				repostatus['status'] = 'CLONED'

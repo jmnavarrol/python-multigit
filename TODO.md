@@ -10,3 +10,5 @@ Pending actions, general notes, etc. (in no particular order):
 
 ## IN PROGRESS
 * Refactor multigit so it can be used in library mode by other applications.
+* **BUGS:**
+  * [#13](/../../issues/11): multigit properly checks out commits.
