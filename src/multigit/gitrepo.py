@@ -161,38 +161,28 @@ class Gitrepo(object):
 		):
 			pass
 		elif repostatus['status'] == 'NOT_CLONED':
-			# Let's try to clone it
-			if (
-				'gitref_type' in repostatus
-				and repostatus['gitref_type'] is not None
-			):
-				gitref_type = repostatus['gitref_type']
-			else:
-				gitref_type = None
-			
+			# Let's try to clone it:
+			# you can `git clone` or `git clone --branch` (which can take either branch or tag but **not** a commit)
+			# in case a specific commit is requested, first "bare" clone, then move to the requested commit.
 			try:
 				if (
-					gitref_type == 'branch'
-					or gitref_type == 'tag'
+					repostatus['gitref_type'] == 'branch'
+					or repostatus['gitref_type'] == 'tag'
 				):
+					gitref_type = repostatus['gitref_type']
 					repo = Repo.clone_from(
 						url     = repostatus['repo'],
 						to_path = repostatus['path'],
 						branch  = repostatus[gitref_type],
 					)
-				elif gitref_type == 'commit':
-					# this is two steps: first clone, then "move" to the requested commit
-					repo = Repo.clone_from(
-						url     = repostatus['repo'],
-						to_path = repostatus['path'],
-					)
-					repo.git.checkout(repostatus['commit'])
 				else:
 					repo = Repo.clone_from(
 						url     = repostatus['repo'],
 						to_path = repostatus['path'],
 					)
-				
+					if repostatus['gitref_type'] == 'commit':
+						repo.git.checkout(repostatus['commit'])
+						
 				repostatus['status'] = 'CLONED'
 			except git_exception.GitCommandError as e:
 				if e.status == 128:
