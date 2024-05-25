@@ -79,12 +79,17 @@ class Gitrepo(object):
 				
 		# is the proper gitref already checked out?
 		if repostatus['status'] == 'UNPROCESSED':
+			# print(str(repo))
 			if (
 				'gitref_type' in repostatus
 				and repostatus['gitref_type'] is not None
 			):
 				if repostatus['gitref_type'] == 'branch':
-					if repo.head.ref.name != repostatus['branch']:
+					if repo.head.is_detached:
+						repostatus['status'] = 'PENDING_UPDATE'
+						repostatus['from'] = repo.commit().hexsha
+						repostatus['to'] = repostatus['branch']
+					elif repo.head.ref.name != repostatus['branch']:
 						repostatus['status'] = 'PENDING_UPDATE'
 						repostatus['from'] = repo.head.ref.name
 						repostatus['to'] = repostatus['branch']
@@ -94,7 +99,11 @@ class Gitrepo(object):
 				remote_head = next(ref for ref in repo.remotes.origin.refs if '/HEAD' in ref.name).ref.name
 				# ...and convert to a proper local name (i.e. 'master')
 				default_branch = remote_head.split('/', 1)[-1]
-				if default_branch != repo.head.ref.name:
+				if repo.head.is_detached:
+					repostatus['status'] = 'PENDING_UPDATE'
+					repostatus['from'] = repo.commit().hexsha
+					repostatus['to'] = default_branch
+				elif default_branch != repo.head.ref.name:
 					repostatus['status'] = 'PENDING_UPDATE'
 					repostatus['from'] = repo.head.ref.name
 					repostatus['to'] = default_branch
