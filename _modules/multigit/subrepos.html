@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>multigit.subrepos &mdash; multigit 0.11.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=d0205c15"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            multigit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../genindex.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subrepofile.html">Class Subrepofile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subrepos.html">Class Subrepos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gitrepo.html">Class Gitrepo</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">multigit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">multigit.subrepos</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for multigit.subrepos</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Import stuff</span>
+<span class="kn">import</span> <span class="nn">errno</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">git</span> <span class="kn">import</span> <span class="n">Repo</span><span class="p">,</span> <span class="n">exc</span> <span class="k">as</span> <span class="n">git_exception</span>
+
+<span class="kn">from</span> <span class="nn">colorama</span> <span class="kn">import</span> <span class="n">init</span><span class="p">,</span> <span class="n">Fore</span><span class="p">,</span> <span class="n">Back</span><span class="p">,</span> <span class="n">Style</span>
+<span class="c1">#Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.</span>
+<span class="c1">#Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.</span>
+<span class="c1">#Style: DIM, NORMAL, BRIGHT, RESET_ALL</span>
+
+<span class="c1"># &quot;local&quot; imports</span>
+<span class="kn">from</span> <span class="nn">.gitrepo</span> <span class="kn">import</span> <span class="n">Gitrepo</span>
+<span class="kn">from</span> <span class="nn">.subrepofile</span> <span class="kn">import</span> <span class="n">Subrepofile</span>
+
+<div class="viewcode-block" id="Subrepos">
+<a class="viewcode-back" href="../../subrepos.html#multigit.Subrepos">[docs]</a>
+<span class="k">class</span> <span class="nc">Subrepos</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&#39;&#39;&#39;Recursively reads subrepos files and runs git commands as per its findings&#39;&#39;&#39;</span>
+	
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;Activates colored output&#39;&#39;&#39;</span>
+		<span class="n">init</span><span class="p">(</span><span class="n">autoreset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+		
+		
+<div class="viewcode-block" id="Subrepos.process">
+<a class="viewcode-back" href="../../subrepos.html#multigit.Subrepos.process">[docs]</a>
+	<span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
+		<span class="bp">self</span><span class="p">,</span>
+		<span class="n">base_path</span><span class="p">,</span>
+		<span class="n">subrepos_filename</span> <span class="o">=</span> <span class="s1">&#39;subrepos&#39;</span><span class="p">,</span>
+		<span class="n">report_only</span><span class="o">=</span><span class="kc">True</span>
+	<span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Recursively finds and processes subrepos files.</span>
+<span class="sd">		</span>
+<span class="sd">		If there&#39;s a &#39;subrepos&#39; file right a `base_path`, it will be processed.</span>
+<span class="sd">		</span>
+<span class="sd">		If there is **not** a &#39;subrepos&#39; file at `base_path` **and** `base_path` is within a git repo, it will try to find one at its root.</span>
+<span class="sd">		</span>
+<span class="sd">		:param str base_path: the absolute path to the directory where subrepos file will be searched for and processed.</span>
+<span class="sd">		:param str subrepos_filename: &#39;subrepos&#39;. Name of file holding subrepos&#39; definitions.</span>
+<span class="sd">		:param bool report_only: `True`, just shows dirtree status; `False`, updates dirtree.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		
+		<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="n">subrepos_filename</span><span class="p">)):</span>
+			<span class="n">subrepos_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span>
+				<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="n">subrepos_filename</span><span class="p">)</span>
+			<span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">GREEN</span> <span class="o">+</span> <span class="s2">&quot;INFO:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;no valid &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">subrepos_filename</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; found at &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">base_path</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+			<span class="c1"># No subrepos file found at current path. Let&#39;s check if we are within a git sandbox</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="n">repo</span> <span class="o">=</span> <span class="n">Repo</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="n">search_parent_directories</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+				<span class="c1"># we are in a git sandbox: get its &quot;root&quot;</span>
+				<span class="n">root_dir</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">working_tree_dir</span>
+				<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">GREEN</span> <span class="o">+</span> <span class="s2">&quot;INFO:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+				<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;processing git repository rooted at&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+				<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">root_dir</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+				
+				<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">subrepos_filename</span><span class="p">)):</span>
+					<span class="n">subrepos_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span>
+						<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">subrepos_filename</span><span class="p">)</span>
+					<span class="p">)</span>
+			<span class="k">except</span> <span class="n">git_exception</span><span class="o">.</span><span class="n">InvalidGitRepositoryError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+				<span class="c1"># Not a git repo: no more options left</span>
+				<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s2">&quot;WARNING:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+				<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Current dir &quot;</span> <span class="o">+</span> <span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">base_path</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+				<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;is not within a valid git sandbox.&quot;</span><span class="p">)</span>
+			
+		<span class="c1"># Let&#39;s see if we found a valid subrepos &#39;entry point&#39;</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">subrepos_file</span>
+		<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">RED</span> <span class="o">+</span> <span class="s2">&quot;ERROR:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t find any&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">subrepos_filename</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;file... exiting.&quot;</span><span class="p">)</span>
+			<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">)</span>
+		
+		<span class="n">subrepo</span> <span class="o">=</span> <span class="n">Subrepofile</span><span class="p">()</span>
+		<span class="n">subrepos</span> <span class="o">=</span> <span class="n">subrepo</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">subrepos_file</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">subrepos</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s2">&quot;WARNING:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t find any&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">subrepos_filename</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;file... exiting.&quot;</span><span class="p">)</span>
+			<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">)</span>
+			
+		<span class="c1"># Recursively work on subrepos&#39; contents</span>
+		<span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">subrepos</span><span class="p">):</span>
+			<span class="n">current_subrepo</span> <span class="o">=</span> <span class="n">subrepos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+			
+			<span class="c1"># Operates on the current subrepo as requested</span>
+			<span class="n">git_subrepo</span> <span class="o">=</span> <span class="n">Gitrepo</span><span class="p">()</span>
+			<span class="k">if</span> <span class="n">report_only</span><span class="p">:</span>
+				<span class="n">current_subrepo</span> <span class="o">=</span> <span class="n">git_subrepo</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="n">current_subrepo</span><span class="p">)</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">current_subrepo</span> <span class="o">=</span> <span class="n">git_subrepo</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">current_subrepo</span><span class="p">)</span>
+				
+			<span class="c1"># Prints subrepo status</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">__print_subrepo_status</span><span class="p">(</span><span class="n">current_subrepo</span><span class="p">)</span>
+			
+			<span class="c1"># Let&#39;s see if new subrepos appeared and (eventually) append them to the queue</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="n">new_subrepos</span> <span class="o">=</span> <span class="n">subrepo</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+					<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_subrepo</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span> <span class="n">subrepos_filename</span><span class="p">)</span>
+				<span class="p">)</span>
+			<span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+				<span class="c1"># It&#39;s acceptable not to find new subrepos at this location</span>
+				<span class="n">new_subrepos</span> <span class="o">=</span> <span class="p">[]</span>
+				
+			<span class="k">if</span> <span class="n">new_subrepos</span><span class="p">:</span>
+				<span class="c1"># add NEW subrepos to the list (already defined subrepos take precedence)</span>
+				<span class="n">subrepo_paths</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+					<span class="n">path</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">subrepos</span>
+				<span class="p">)</span>
+				<span class="n">subrepos</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+					<span class="n">new_subrepo</span> <span class="k">for</span> <span class="n">new_subrepo</span> <span class="ow">in</span> <span class="n">new_subrepos</span>
+					<span class="k">if</span> <span class="n">new_subrepo</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">subrepo_paths</span>
+				<span class="p">)</span>
+				<span class="k">del</span> <span class="n">new_subrepos</span>
+			
+			<span class="c1"># done with this subrepo entry</span>
+			<span class="n">subrepos</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">current_subrepo</span><span class="p">)</span></div>
+
+		
+		
+	<span class="k">def</span> <span class="nf">__print_subrepo_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subrepo</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;prints a report on the repo info provided as param.</span>
+<span class="sd">		</span>
+<span class="sd">		:param dict subrepo: a dictionary in the enhanced form returned by __process_subrepo()</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		
+		<span class="c1"># Header</span>
+		<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;:&quot;</span><span class="p">)</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">repository:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+		<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;repo&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]:</span>
+			<span class="n">gitref_type</span> <span class="o">=</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">requested &quot;</span> <span class="o">+</span> <span class="n">gitref_type</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">subrepo</span><span class="p">[</span><span class="n">gitref_type</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">no gitref requested (working on default repo branch)&quot;</span><span class="p">)</span>
+			
+		<span class="c1"># Details depending on refered status</span>
+		<span class="k">if</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ERROR&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">status:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">RED</span> <span class="o">+</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">)</span>
+			<span class="k">if</span> <span class="s1">&#39;extra_info&#39;</span> <span class="ow">in</span> <span class="n">subrepo</span><span class="p">:</span>
+				<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">extra info:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+				<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;extra_info&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n\t\t</span><span class="s1">&#39;</span><span class="p">))</span>
+			
+		<span class="k">elif</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;WRONG_REMOTE&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">status: &quot;</span> <span class="o">+</span> <span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s2">&quot;REPO POINTS TO A WRONG REMOTE&quot;</span><span class="p">)</span>
+			<span class="k">if</span> <span class="s1">&#39;extra_info&#39;</span> <span class="ow">in</span> <span class="n">subrepo</span><span class="p">:</span>
+				<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">extra info:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+				<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;extra_info&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n\t\t</span><span class="s1">&#39;</span><span class="p">))</span>
+			
+		<span class="k">elif</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NOT_CLONED&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">status: &quot;</span> <span class="o">+</span> <span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s2">&quot;NOT YET CLONED&quot;</span><span class="p">)</span>
+			
+		<span class="k">elif</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;CLONED&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">status:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">GREEN</span> <span class="o">+</span> <span class="s2">&quot;CLONED&quot;</span><span class="p">)</span>
+			
+		<span class="k">elif</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;EMPTY&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">status:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s2">&quot;REMOTE REPO NOT YET INITIALIZED&quot;</span><span class="p">)</span>
+			
+		<span class="k">elif</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;UP_TO_DATE&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">status:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">GREEN</span> <span class="o">+</span> <span class="s2">&quot;UP TO DATE&quot;</span><span class="p">)</span>
+			
+		<span class="k">elif</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;PENDING_UPDATE&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">status:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s2">&quot;PENDING UPDATES&quot;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">pending updates:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; -&gt; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+			
+		<span class="k">elif</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;UPDATED&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">updated from&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; -&gt; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+			
+		<span class="k">elif</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DIRTY&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">status:&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">Fore</span><span class="o">.</span><span class="n">YELLOW</span> <span class="o">+</span> <span class="s2">&quot;DIRTY&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;(won&#39;t try to update)&quot;</span><span class="p">)</span>
+			
+		<span class="k">else</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">status: &quot;</span> <span class="o">+</span> <span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span> <span class="o">+</span> <span class="n">subrepo</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span></div>
+
+		
+		
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+	<span class="c1"># execute only if run as a script</span>
+	<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span>
+		<span class="n">main</span><span class="p">()</span>
+	<span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2024, Jesús M. Navarro.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

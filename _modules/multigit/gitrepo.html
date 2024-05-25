@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>multigit.gitrepo &mdash; multigit 0.11.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=d0205c15"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            multigit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../genindex.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subrepofile.html">Class Subrepofile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subrepos.html">Class Subrepos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gitrepo.html">Class Gitrepo</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">multigit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">multigit.gitrepo</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for multigit.gitrepo</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Import stuff</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">git</span> <span class="kn">import</span> <span class="n">Repo</span><span class="p">,</span> <span class="n">exc</span> <span class="k">as</span> <span class="n">git_exception</span>
+
+
+<div class="viewcode-block" id="Gitrepo">
+<a class="viewcode-back" href="../../gitrepo.html#multigit.Gitrepo">[docs]</a>
+<span class="k">class</span> <span class="nc">Gitrepo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&#39;&#39;&#39;Processes a single git repo entity as defined by multigit.&#39;&#39;&#39;</span>
+	
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">pass</span>
+		
+		
+<div class="viewcode-block" id="Gitrepo.status">
+<a class="viewcode-back" href="../../gitrepo.html#multigit.Gitrepo.status">[docs]</a>
+	<span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repoconf</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Finds the status of the repo configuration that gets as param.</span>
+<span class="sd">		</span>
+<span class="sd">		:param repoconf: the configuration dictionary of the git repository to be processed.</span>
+<span class="sd">		:return: returns the same repoconf dictionary provided as parameter with a new &#39;status&#39; key populated and, optionally a &#39;extra_info&#39; key.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		
+		<span class="c1">#print(str(repoconf))</span>
+		<span class="n">repostatus</span> <span class="o">=</span> <span class="n">repoconf</span>
+		<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;UNPROCESSED&#39;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;gitref_type&#39;</span> <span class="ow">in</span> <span class="n">repostatus</span><span class="p">:</span>
+			<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+		
+		<span class="c1"># Let&#39;s check if it&#39;s at least cloned</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">repo</span> <span class="o">=</span> <span class="n">Repo</span><span class="p">(</span><span class="n">repoconf</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+		<span class="k">except</span> <span class="n">git_exception</span><span class="o">.</span><span class="n">NoSuchPathError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+			<span class="c1"># repo not yet cloned</span>
+			<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NOT_CLONED&#39;</span>
+		<span class="k">except</span> <span class="n">git_exception</span><span class="o">.</span><span class="n">InvalidGitRepositoryError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+			<span class="c1"># directory exists but, for whatever reason, is not a valid repo</span>
+			<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ERROR&#39;</span>
+			<span class="n">my_error_msg</span> <span class="o">=</span>  <span class="s2">&quot;directory &#39;&quot;</span> <span class="o">+</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39; exists, but it&#39;s not a valid git sandbox.&quot;</span>
+			<span class="n">my_error_msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">Please, review its contents.&quot;</span>
+			<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;extra_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_error_msg</span>
+			
+		<span class="c1"># if still unprocessed it&#39;s because the repo is there</span>
+		<span class="c1"># Check remotes</span>
+		<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;UNPROCESSED&#39;</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;repo&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">repo</span><span class="o">.</span><span class="n">remotes</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
+				<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;WRONG_REMOTE&#39;</span>
+				<span class="n">my_error_msg</span> <span class="o">=</span> <span class="s2">&quot;Requested remote is &#39;&quot;</span> <span class="o">+</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;repo&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39; &quot;</span>
+				<span class="n">my_error_msg</span> <span class="o">+=</span> <span class="s2">&quot;but current origin is &#39;&quot;</span> <span class="o">+</span> <span class="n">repo</span><span class="o">.</span><span class="n">remotes</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;&#39;.&quot;</span>
+				<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;extra_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_error_msg</span>
+			
+		<span class="c1"># if still unprocessed it&#39;s because the repo is there and the remote is right</span>
+		<span class="c1"># Let&#39;s try to update its status</span>
+		<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;UNPROCESSED&#39;</span><span class="p">:</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">prune</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+			<span class="k">except</span> <span class="n">git_exception</span><span class="o">.</span><span class="n">GitCommandError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">128</span><span class="p">:</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ERROR&#39;</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;extra_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;stderr: &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="k">raise</span>
+			
+		<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;UNPROCESSED&#39;</span><span class="p">:</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="n">local_commit</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span><span class="o">.</span><span class="n">hexsha</span>
+			<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+				<span class="k">if</span> <span class="p">(</span>
+					<span class="s2">&quot;Reference at &#39;refs/heads/master&#39; does not exist&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+					<span class="ow">or</span> <span class="s2">&quot;Reference at &#39;refs/heads/main&#39; does not exist&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+				<span class="p">):</span>
+					<span class="c1"># Remote repo exists, but it&#39;s still &quot;un-initialized&quot; (lacks its first commit)</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;EMPTY&#39;</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="k">raise</span> <span class="n">e</span>
+				
+		<span class="c1"># if still unprocessed, it&#39;s a good repo.</span>
+		<span class="c1"># can it be updated?</span>
+		<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;UNPROCESSED&#39;</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">is_dirty</span><span class="p">():</span>
+				<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DIRTY&#39;</span>
+				
+		<span class="c1"># is the proper gitref already checked out?</span>
+		<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;UNPROCESSED&#39;</span><span class="p">:</span>
+			<span class="c1"># print(str(repo))</span>
+			<span class="k">if</span> <span class="p">(</span>
+				<span class="s1">&#39;gitref_type&#39;</span> <span class="ow">in</span> <span class="n">repostatus</span>
+				<span class="ow">and</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+			<span class="p">):</span>
+				<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;branch&#39;</span><span class="p">:</span>
+					<span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">is_detached</span><span class="p">:</span>
+						<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PENDING_UPDATE&#39;</span>
+						<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span><span class="o">.</span><span class="n">hexsha</span>
+						<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;branch&#39;</span><span class="p">]</span>
+					<span class="k">elif</span> <span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;branch&#39;</span><span class="p">]:</span>
+						<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PENDING_UPDATE&#39;</span>
+						<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">name</span>
+						<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;branch&#39;</span><span class="p">]</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="c1"># default branch requested</span>
+				<span class="c1"># find its remote name (i.e. &#39;origin/master&#39;)</span>
+				<span class="n">remote_head</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ref</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">remotes</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">refs</span> <span class="k">if</span> <span class="s1">&#39;/HEAD&#39;</span> <span class="ow">in</span> <span class="n">ref</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">name</span>
+				<span class="c1"># ...and convert to a proper local name (i.e. &#39;master&#39;)</span>
+				<span class="n">default_branch</span> <span class="o">=</span> <span class="n">remote_head</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+				<span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">is_detached</span><span class="p">:</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PENDING_UPDATE&#39;</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span><span class="o">.</span><span class="n">hexsha</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_branch</span>
+				<span class="k">elif</span> <span class="n">default_branch</span> <span class="o">!=</span> <span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PENDING_UPDATE&#39;</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">name</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_branch</span>
+					
+		<span class="c1"># Let&#39;s check its current commit vs the remote one</span>
+		<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;UNPROCESSED&#39;</span><span class="p">:</span>
+			<span class="k">if</span> <span class="p">(</span>
+				<span class="s1">&#39;gitref_type&#39;</span> <span class="ow">in</span> <span class="n">repostatus</span>
+				<span class="ow">and</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+			<span class="p">):</span>
+				<span class="n">gitref_type</span> <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span>
+				<span class="n">desired_gitref</span> <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="n">gitref_type</span><span class="p">]</span>
+				<span class="k">if</span> <span class="n">gitref_type</span> <span class="o">==</span> <span class="s1">&#39;branch&#39;</span><span class="p">:</span>
+					<span class="n">remote_ref</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;origin/&#39;</span> <span class="o">+</span> <span class="n">repostatus</span><span class="p">[</span><span class="n">gitref_type</span><span class="p">])</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">remote_ref</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">repostatus</span><span class="p">[</span><span class="n">gitref_type</span><span class="p">])</span>
+				<span class="k">try</span><span class="p">:</span>
+					<span class="n">desired_commit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">commit</span><span class="p">(</span><span class="n">remote_ref</span><span class="p">))</span>
+				<span class="k">except</span> <span class="n">git_exception</span><span class="o">.</span><span class="n">BadName</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+					<span class="k">if</span> <span class="p">(</span><span class="s2">&quot;Ref &#39;&quot;</span> <span class="o">+</span> <span class="n">remote_ref</span> <span class="o">+</span> <span class="s2">&quot;&#39; did not resolve to an object&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)):</span>
+						<span class="c1"># The requested gitref doesn&#39;t exist at the remote end (for whatever reason)</span>
+						<span class="n">desired_commit</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># ...so no desired commit possible</span>
+						<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;WRONG_REMOTE&#39;</span>
+						<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;extra_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;It seems you requested a gitref that can&#39;t be found on remote.</span><span class="se">\n</span><span class="s2">&quot;</span>
+						<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;extra_info&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+					<span class="k">else</span><span class="p">:</span>
+						<span class="k">raise</span> <span class="n">e</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">desired_commit</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">remotes</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">refs</span><span class="o">.</span><span class="n">HEAD</span><span class="o">.</span><span class="n">commit</span><span class="o">.</span><span class="n">hexsha</span>
+				<span class="n">desired_gitref</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">symbolic_ref</span><span class="p">(</span><span class="s1">&#39;refs/remotes/origin/HEAD&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;refs/remotes/origin/&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+				
+			<span class="k">if</span> <span class="p">(</span><span class="n">desired_commit</span> <span class="ow">and</span> <span class="n">local_commit</span> <span class="o">!=</span> <span class="n">desired_commit</span><span class="p">):</span>
+				<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PENDING_UPDATE&#39;</span>
+				<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_commit</span>
+				<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desired_commit</span>
+				
+		<span class="c1"># if still unprocessed, it&#39;s up to date</span>
+		<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;UNPROCESSED&#39;</span><span class="p">:</span>
+			<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;UP_TO_DATE&#39;</span>
+			
+		<span class="k">return</span> <span class="n">repostatus</span></div>
+
+	
+	
+<div class="viewcode-block" id="Gitrepo.update">
+<a class="viewcode-back" href="../../gitrepo.html#multigit.Gitrepo.update">[docs]</a>
+	<span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repoconf</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Updates a repo entry as per its current state.</span>
+<span class="sd">		</span>
+<span class="sd">		:param repoconf: the configuration dictionary of the git repository to be processed.</span>
+<span class="sd">		:return: returns the same repoconf dictionary provided as parameter with a new &#39;status&#39; key populated after update process and, optionally, a &#39;extra_info&#39; key.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		
+		<span class="c1"># First, let&#39;s check the repository&#39;s current status</span>
+		<span class="n">repostatus</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="n">repoconf</span><span class="p">)</span>
+		<span class="c1"># print(repostatus)</span>
+		
+		<span class="c1"># Then, let&#39;s operate on the repository depending on its status</span>
+		<span class="k">if</span> <span class="p">(</span>
+			<span class="c1"># all these are statuses we can&#39;t deal with here</span>
+			<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ERROR&#39;</span>
+			<span class="ow">or</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;UP_TO_DATE&#39;</span>
+			<span class="ow">or</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;EMPTY&#39;</span>
+			<span class="ow">or</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DIRTY&#39;</span>
+			<span class="ow">or</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;WRONG_REMOTE&#39;</span>
+		<span class="p">):</span>
+			<span class="k">pass</span>
+		<span class="k">elif</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NOT_CLONED&#39;</span><span class="p">:</span>
+			<span class="c1"># Let&#39;s try to clone it:</span>
+			<span class="c1"># you can `git clone` or `git clone --branch` (which can take either branch or tag but **not** a commit)</span>
+			<span class="c1"># in case a specific commit is requested, first &quot;bare&quot; clone, then move to the requested commit.</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="k">if</span> <span class="p">(</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;branch&#39;</span>
+					<span class="ow">or</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;tag&#39;</span>
+				<span class="p">):</span>
+					<span class="n">gitref_type</span> <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span>
+					<span class="n">repo</span> <span class="o">=</span> <span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span>
+						<span class="n">url</span>     <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;repo&#39;</span><span class="p">],</span>
+						<span class="n">to_path</span> <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span>
+						<span class="n">branch</span>  <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="n">gitref_type</span><span class="p">],</span>
+					<span class="p">)</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">repo</span> <span class="o">=</span> <span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span>
+						<span class="n">url</span>     <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;repo&#39;</span><span class="p">],</span>
+						<span class="n">to_path</span> <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span>
+					<span class="p">)</span>
+					<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;commit&#39;</span><span class="p">:</span>
+						<span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">checkout</span><span class="p">(</span><span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;commit&#39;</span><span class="p">])</span>
+						
+				<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;CLONED&#39;</span>
+			<span class="k">except</span> <span class="n">git_exception</span><span class="o">.</span><span class="n">GitCommandError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">128</span><span class="p">:</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ERROR&#39;</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;extra_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;stderr: &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="k">raise</span>
+		<span class="k">elif</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;PENDING_UPDATE&#39;</span><span class="p">:</span>
+			<span class="n">repo</span> <span class="o">=</span> <span class="n">Repo</span><span class="p">(</span><span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+			<span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">prune</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+			
+			<span class="k">if</span> <span class="p">(</span>
+				<span class="s1">&#39;gitref_type&#39;</span> <span class="ow">in</span> <span class="n">repostatus</span>
+				<span class="ow">and</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+			<span class="p">):</span>
+				<span class="n">gitref_type</span> <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;gitref_type&#39;</span><span class="p">]</span>
+				<span class="n">desired_gitref</span> <span class="o">=</span> <span class="n">repostatus</span><span class="p">[</span><span class="n">gitref_type</span><span class="p">]</span>
+				
+				<span class="k">if</span> <span class="n">gitref_type</span> <span class="o">==</span> <span class="s1">&#39;branch&#39;</span><span class="p">:</span>
+					<span class="n">remote_ref</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;origin/&#39;</span> <span class="o">+</span> <span class="n">repostatus</span><span class="p">[</span><span class="n">gitref_type</span><span class="p">])</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">remote_ref</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">repostatus</span><span class="p">[</span><span class="n">gitref_type</span><span class="p">])</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">desired_gitref</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">symbolic_ref</span><span class="p">(</span><span class="s1">&#39;refs/remotes/origin/HEAD&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;refs/remotes/origin/&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+				
+			<span class="k">try</span><span class="p">:</span>
+				<span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">checkout</span><span class="p">(</span><span class="n">desired_gitref</span><span class="p">)</span>
+			<span class="k">except</span> <span class="n">git_exception</span><span class="o">.</span><span class="n">GitCommandError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+				<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ERROR&#39;</span>
+				<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;extra_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+				
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">is_detached</span><span class="p">:</span>
+				<span class="k">try</span><span class="p">:</span>
+					<span class="n">repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">pull</span><span class="p">()</span>
+				<span class="k">except</span> <span class="n">git_exception</span><span class="o">.</span><span class="n">GitCommandError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ERROR&#39;</span>
+					<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;extra_info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;stderr: &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+				
+			<span class="k">if</span> <span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ERROR&#39;</span><span class="p">:</span>
+				<span class="n">repostatus</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;UPDATED&#39;</span>
+			
+		<span class="k">return</span> <span class="n">repostatus</span></div>
+</div>
+
+	
+	
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+	<span class="c1"># execute only if run as a script</span>
+	<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span>
+		<span class="n">main</span><span class="p">()</span>
+	<span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2024, Jesús M. Navarro.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
