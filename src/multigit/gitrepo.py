@@ -20,9 +20,11 @@ class Gitrepo(object):
 		:return: returns the same repoconf dictionary provided as parameter with a new 'status' key populated and, optionally a 'extra_info' key.
 		'''
 		
+		#print(str(repoconf))
 		repostatus = repoconf
 		repostatus['status'] = 'UNPROCESSED'
-		#print(str(repoconf))
+		if not 'gitref_type' in repostatus:
+			repostatus['gitref_type'] = None
 		
 		# Let's check if it's at least cloned
 		try:

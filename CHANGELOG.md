@@ -2,6 +2,8 @@
 
 ## Next Release
 * Differences from [previous tag](/../../compare/v0.11.7…main).
+* **BUGS:**
+  * [#13](/../../issues/13): multigit properly checks out commits.
 
 ## 0.11.7 (2024-MAY-24)
 * Differences from [previous tag](/../../compare/v0.11.6…main).
