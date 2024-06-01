@@ -13,6 +13,7 @@ class TestGitrepoRemote(TestGitrepo):
 # https://github.com/jmnavarrol/python-multigit/issues/11
 # multigit should return to the default branch
 # even if current checkout happens to be on same commit
+# NOTE: Since this test checks into a remote repo, you need commit permission, else it will fail.
 	def test_different_branches_same_commit(self):
 		print("TEST: 'test_different_branches_same_commit'")
 		# prepares a suitable configuration

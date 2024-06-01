@@ -1,8 +1,6 @@
 # Makefile for python-multigit
 SHELL := /bin/bash
 
-PYTOOL = python -m build
-
 SOURCE_DIR = $(CURDIR)/src/
 BUILD_DIR = $(CURDIR)/build/
 
@@ -26,7 +24,7 @@ export C_RED := \033[1;31m
 export C_NC := \033[0m
 
 # Basic targets
-.PHONY: targets date test build clean doc
+.PHONY: targets date test clean doc
 
 targets:
 	@echo -e "${C_BOLD}Main targets are:${C_NC}"
@@ -49,10 +47,10 @@ test:
 build: test $(SDIST_FILES) $(WHEELS) doc
 
 $(SDIST_FILES): $(PYTHON_FILES) $(OTHER_INCLUDES)
-	python -m build --outdir $(BUILD_DIR)dist --sdist
+	hatch build --target sdist
 
 $(WHEELS): $(PYTHON_FILES) $(OTHER_INCLUDES)
-	python -m build --outdir $(BUILD_DIR)dist --wheel
+	hatch build --target wheel
 
 doc:
 	$(MAKE) BUILDDIR=${SPHINX_OUTPUT} html --directory=$(SPHINXDIR)
@@ -66,7 +64,7 @@ upload: clean build
 
 clean:
 	@$(MAKE) clean --directory=$(SPHINXDIR)
-	rm -rf ${BUILD_DIR}
+	rm -rf ${BUILD_DIR} dist/
 	find -type f -name '*.pyc' -exec rm -f '{}' \;
 	find -type d -name '__pycache__' | xargs rm -rf
 	rm -rf tests/scenarios

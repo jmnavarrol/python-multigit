@@ -2,6 +2,7 @@
 
 ## Next Release
 * Differences from [previous tag](/../../compare/v0.11.8…main).
+* Build system refactored so it's hacht-only now.
 
 ## 0.11.8 (2024-MAY-25)
 * Differences from [previous tag](/../../compare/v0.11.7…main).

@@ -5,6 +5,7 @@ example/*
 # Python development
 __pycache__/
 build/
+dist/
 src/tests/scenarios/
 
 # Bash Magic Enviro requirement

@@ -34,24 +34,23 @@ Documentation = 'https://jmnavarrol.github.io/python-multigit/'
 Source = 'https://github.com/jmnavarrol/python-multigit'
 'Bug Tracker' = 'https://github.com/jmnavarrol/python-multigit/issues'
 
+[project.scripts]
+multigit = 'multigit:__main__.main'
+
 [project.optional-dependencies]
 # Other dependencies for development environment
 # Create a virtualenv with --editable "./[development]" to use them
 development = [
-	'build',
+	'hatch',
 	'Sphinx',
 	'sphinxcontrib-programoutput',
 	'sphinx-rtd-theme',
 	'twine',
 ]
 
-[project.scripts]
-multigit = 'multigit:__main__.main'
-
 [build-system]
 requires = [
-	'hatchling',
-	'build',
+	'hatch',
 ]
 build-backend = 'hatchling.build'
 

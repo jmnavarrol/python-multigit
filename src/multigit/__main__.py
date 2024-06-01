@@ -10,7 +10,7 @@
 """
 
 # Globals
-__version__ = '0.11.8'
+__version__ = '0.11.9-dev.1'
 SUBREPOS_FILE = 'subrepos'
 '''
 The *"fixed"* name of the YAML file with subrepo definitions.
