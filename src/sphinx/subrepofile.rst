@@ -7,3 +7,11 @@ Class Subrepofile
    :members:
    :private-members:
    :member-order: bysource
+
+Class SubrepofileError
+======================
+
+.. autoclass:: multigit::SubrepofileError
+   :members:
+   :private-members:
+   :member-order: bysource

@@ -11,7 +11,7 @@ from colorama import init, Fore, Back, Style
 
 # "local" imports
 from .gitrepo import Gitrepo
-from .subrepofile import Subrepofile
+from .subrepofile import Subrepofile, SubrepofileError
 
 class Subrepos(object):
 	'''Recursively reads subrepos files and runs git commands as per its findings'''
@@ -78,7 +78,14 @@ class Subrepos(object):
 			sys.exit(errno.ENOENT)
 		
 		subrepo = Subrepofile()
-		subrepos = subrepo.load(subrepos_file)
+		try:
+			subrepos = subrepo.load(subrepos_file)
+		except SubrepofileError as e:
+			err_msg = f"{Style.BRIGHT}{Fore.RED}ERROR:{Style.RESET_ALL} ({os.strerror(e.errno)}) "
+			err_msg += f"{e}"
+			print(err_msg)
+			sys.exit(e.errno)
+				
 		if not subrepos:
 			print(Style.BRIGHT + Fore.YELLOW + "WARNING:", end=' ')
 			print("Couldn't find any", end=' ')

@@ -71,11 +71,14 @@ class Subrepofile(object):
 			with open(subrepos_file, 'r') as f_config:
 				try:
 					configMap = yaml.safe_load(f_config)
-				except yaml.parser.ParserError as e:
-					print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-					print(Style.BRIGHT + "Malformed YAML file", end=' - ')
-					print(e)
-					sys.exit(errno.EINVAL)
+				except (
+					yaml.scanner.ScannerError,
+					yaml.parser.ParserError,
+				) as e:
+					raise SubrepofileError(
+						f"malformed YAML in subrepos file '{subrepos_file}':\n{e}",
+						errno = errno.EINVAL,
+					)
 		except PermissionError as e:
 			print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
 			print('trying to load', end=' ')
@@ -118,6 +121,19 @@ class Subrepofile(object):
 		return subrepo_list
 	
 	
+class SubrepofileError(Exception):
+	'''
+	Custom Subrepofile Error Exception
+	
+	:param str msg: absolute path to subrepos file
+	:param errno errno: suggested sys.exit errno
+	'''
+	
+	def __init__(self, msg='error in subrepo file', errno=errno.EINVAL, *args, **kwargs):
+		super().__init__(msg, *args, **kwargs)
+		self.errno = errno
+		
+
 if __name__ == '__main__':
 	# execute only if run as a script
 	main()

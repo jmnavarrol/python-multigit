@@ -7,11 +7,11 @@
    :caption: Contents:
    :hidden:
    :maxdepth: 2
-
+   
    genindex
-   Class Subrepofile <subrepofile>
-   Class Subrepos <subrepos>
-   Class Gitrepo <gitrepo>
+   subrepofile
+   subrepos
+   gitrepo
 
 multigit documentation
 ======================
@@ -31,5 +31,6 @@ multigit script and module.
 
 **Classes:**
  * :ref:`Subrepofile<subrepofile>`: loads configuration from a subrepofile.
+ * :ref:`SubrepofileError<subrepofile>`: Subrepofile's custom Exception.
  * :ref:`Subrepos<subrepos>`: processes a full subrepos' configuration.
  * :ref:`Gitrepo<gitrepo>`: manages a single git repository as per the requested configuration.
