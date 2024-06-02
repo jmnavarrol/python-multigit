@@ -31,6 +31,6 @@ multigit script and module.
 
 **Classes:**
  * :ref:`Subrepofile<subrepofile>`: loads configuration from a subrepofile.
- * :ref:`SubrepofileError<subrepofile>`: Subrepofile's custom Exception.
+ * :ref:`SubrepofileError<subrepofile_error>`: Subrepofile's custom Exception.
  * :ref:`Subrepos<subrepos>`: processes a full subrepos' configuration.
  * :ref:`Gitrepo<gitrepo>`: manages a single git repository as per the requested configuration.

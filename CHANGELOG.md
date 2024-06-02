@@ -3,6 +3,7 @@
 ## Next Release
 * Differences from [previous tag](/../../compare/v0.11.8…main).
 * Build system refactored so it's hatch-only now.
+* Subrepofile class doesn't print to STDOUT anymore; it rises exceptions instead.
 
 ## 0.11.8 (2024-MAY-25)
 * Differences from [previous tag](/../../compare/v0.11.7…main).

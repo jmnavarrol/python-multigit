@@ -8,6 +8,8 @@ Class Subrepofile
    :private-members:
    :member-order: bysource
 
+.. _subrepofile_error:
+
 Class SubrepofileError
 ======================
 

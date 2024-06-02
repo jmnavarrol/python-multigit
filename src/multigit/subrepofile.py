@@ -28,29 +28,23 @@ class Subrepofile(object):
 					try:
 						yaml_rules = yaml.safe_load(f_yaml_rules)
 					except yaml.parser.ParserError as e:
-						print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-						print(Style.BRIGHT + "Malformed YAML file", end=' - ')
-						print(e)
-						sys.exit(errno.EINVAL)
+						raise SubrepofileError(
+							f"Malformed schema file 'subrepos_schema.yaml' - {e}",
+							errno = errno.EINVAL,
+						)
 		except FileNotFoundError as e:
-			print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-			print(e)
-			sys.exit(errno.ENOENT)
+			raise SubrepofileError(
+				f"trying to access subrepos file '{subrepos_file}':\n{e}",
+				errno = errno.ENOENT,
+			)
 			
 		try:
 			self.yaml_validator = Validator(yaml_rules)
-		except Exception as e:
-			print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-			print("In YAML schema validator at ", end=' ')
-			print(Style.BRIGHT + "'" + str(validator_resource) + "'", end='.\n')
-			if (
-				type(e) is schema.SchemaError
-				or type(e) is TypeError
-			):
-				print("\t" + str(e))
-				sys.exit(errno.EINVAL)
-			else:
-				raise
+		except (schema.SchemaError, TypeError) as e:
+			raise SubrepofileError(
+				f"in YAML schema validator at '{validator_resource}'.\n\t{e}",
+				errno = errno.EINVAL
+			)
 	
 	
 	def load(self, subrepos_file):
@@ -80,11 +74,10 @@ class Subrepofile(object):
 						errno = errno.EINVAL,
 					)
 		except PermissionError as e:
-			print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-			print('trying to load', end=' ')
-			print(Style.BRIGHT + "'" + subrepos_file + "'", end=':\n')
-			print("\t" + str(e))
-			sys.exit(errno.EPERM)
+			raise SubrepofileError(
+				f"trying to load '{subrepos_file}'\n\t{e}",
+				errno = errno.EPERM
+			)
 				
 		# Operates on the subrepos found
 		if configMap:
@@ -111,10 +104,12 @@ class Subrepofile(object):
 					else:
 						subrepo['gitref_type'] = None
 			else:
-				print(Style.BRIGHT + Fore.RED + "ERROR:", end=' ')
-				print("Malformed YAML file at " + Style.BRIGHT + "'" + subrepos_file + "'", end='.\n')
-				print("\t" + str(self.yaml_validator.errors))
-				sys.exit(errno.EINVAL)
+				err_msg = f"malformed YAML in subrepos file '{subrepos_file}':\n"
+				err_msg += f"\t{self.yaml_validator.errors}"
+				raise SubrepofileError(
+					err_msg,
+					errno = errno.EINVAL,
+				)
 		else:
 			subrepo_list = None
 			
@@ -129,7 +124,7 @@ class SubrepofileError(Exception):
 	:param errno errno: suggested sys.exit errno
 	'''
 	
-	def __init__(self, msg='error in subrepo file', errno=errno.EINVAL, *args, **kwargs):
+	def __init__(self, msg='error while operating subrepo file', errno=errno.EINVAL, *args, **kwargs):
 		super().__init__(msg, *args, **kwargs)
 		self.errno = errno
 		
