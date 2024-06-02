@@ -52,9 +52,9 @@ def main():
 		else:
 			my_subrepos = Subrepos()
 			my_subrepos.process(
-				base_path = os.getcwd(),
-				subrepos_filename = SUBREPOS_FILE,
-				report_only = args.status,
+				base_path=os.getcwd(),
+				subrepos_filename=SUBREPOS_FILE,
+				report_only=args.status,
 			)
 	else:
 	# Program called with no arguments (shows help)

@@ -24,7 +24,7 @@ class Subrepos(object):
 	def process(
 		self,
 		base_path,
-		subrepos_filename = 'subrepos',
+		subrepos_filename='subrepos',
 		report_only=True
 	):
 		'''
