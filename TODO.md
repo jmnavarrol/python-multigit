@@ -7,6 +7,9 @@ Pending actions, general notes, etc. (in no particular order):
 * Find the way to simplify subrepos' format allowing for *gitref* instead of *branch|tag|commit* (the code should find what kind of object *gitref* references).
 * Add a `--check-version` option (or something like that) that looks for updates.
 * Unit tests: full review and refactoring.
+* Refactor multigit into library plus cmd in different package distributions:
+  * Review https://github.com/effigies/hatch-monorepo for a single repo / multiple packages example.
+  * https://packaging.python.org/en/latest/guides/packaging-namespace-packages/
 
 ## IN PROGRESS
 * Refactoring multigit so it can be used in library mode by other applications.
