@@ -10,6 +10,7 @@ Pending actions, general notes, etc. (in no particular order):
 * Refactor multigit into library plus cmd in different package distributions:
   * Review https://github.com/effigies/hatch-monorepo for a single repo / multiple packages example.
   * https://packaging.python.org/en/latest/guides/packaging-namespace-packages/
+* Review https://github.com/fboender/multi-git-status for ideas on what `multigit --status` could do.
 
 ## IN PROGRESS
 * Refactoring multigit so it can be used in library mode by other applications.
