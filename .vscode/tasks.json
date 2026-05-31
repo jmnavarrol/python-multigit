@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "AI: Check docs language",
+      "type": "shell",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/tools/ai/check_docs_language.py"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "AI: Check docs references",
+      "type": "shell",
+      "command": "grep",
+      "args": [
+        "-RInE",
+        "tools/ai/check_docs_language.py|AI: Check docs language",
+        "${workspaceFolder}/AGENTS.md",
+        "${workspaceFolder}/docs/AI_DEVELOPMENT_PLAYBOOK.md",
+        "${workspaceFolder}/docs/AI_DOCS_LANGUAGE_POLICY.md"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "AI: Post-edit checks",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "AI: Check docs language",
+        "AI: Check docs references"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

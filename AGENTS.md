@@ -1,27 +1,27 @@
-# AGENTS.md - Guía rápida para agentes IA
+# AGENTS.md - Quick Guide for AI Agents
 
-Este archivo define cómo trabajar en `python-multigit` de forma segura, útil y consistente.
+This file defines how to work on python-multigit safely, usefully, and consistently.
 
-## 1) Objetivo del proyecto
-`multigit` gestiona múltiples repositorios Git declarados en un archivo YAML llamado `subrepos`, procesándolos de forma recursiva desde un directorio base.
+## 1) Project Goal
+multigit manages multiple Git repositories declared in a YAML file named subrepos, processing them recursively from a base directory.
 
-Piezas clave:
-- CLI: `src/multigit/__main__.py`
-- Orquestación recursiva: `src/multigit/subrepos.py`
-- Operaciones Git por repositorio: `src/multigit/gitrepo.py`
-- Carga/validación YAML: `src/multigit/subrepofile.py`
+Key components:
+- CLI: src/multigit/__main__.py
+- Recursive orchestration: src/multigit/subrepos.py
+- Per-repository Git operations: src/multigit/gitrepo.py
+- YAML load/validation: src/multigit/subrepofile.py
 
-## 2) Fuente de verdad funcional
-Antes de cambiar comportamiento, alinear siempre con:
-- `README.md` para experiencia de usuario, semántica de `subrepos` y expectativas de uso.
-- `Makefile` para flujo oficial de desarrollo (`test`, `build`, `doc`, `clean`, `upload*`).
-- `pyproject.toml` para empaquetado, dependencias, script de entrada y build backend.
+## 2) Functional Source of Truth
+Before changing behavior, always align with:
+- README.md for user experience, subrepos semantics, and usage expectations.
+- Makefile for the official development workflow (test, build, doc, clean, upload*).
+- pyproject.toml for packaging, dependencies, entry script, and build backend.
 
-Requisito explícito de construcción:
-- El backend de build es `hatchling.build` (vía Hatch). No introducir cambios que lo sustituyan o desalineen sin requerimiento explícito.
+Explicit build requirement:
+- The build backend is hatchling.build (via Hatch). Do not replace or diverge from it unless explicitly required.
 
-## 3) Comandos oficiales de desarrollo
-Desde la raíz del repositorio:
+## 3) Official Development Commands
+From the repository root:
 
 ```bash
 make test
@@ -30,50 +30,62 @@ make doc
 make clean
 ```
 
-Notas:
-- `make test` usa `unittest discover` sobre `src/tests`.
-- `make test` es la suite por defecto y debe mantenerse en modo offline.
-- `make build` depende de `test`.
-- `make clean` elimina también rutas potencialmente sensibles; revisa bien su impacto antes de ejecutarlo en contextos no aislados.
+Notes:
+- make test runs unittest discover over src/tests.
+- make test is the default suite and must remain offline.
+- make build depends on test.
+- make clean also removes potentially sensitive paths; review impact carefully before running it in non-isolated environments.
 
-Scaffolding local de tests:
-- La suite construye remotos Git locales efímeros para simular `clone/fetch/pull`, ramas y estados de repositorio sin red.
-- El módulo de soporte es `src/tests/git_scaffold.py`.
-- Los tests de `gitrepo` y `subrepos` consumen estos remotos locales en sus `setUp`.
+Local test scaffolding:
+- The suite builds temporary local Git remotes to simulate clone/fetch/pull, branches, and repository states without network access.
+- The support module is src/tests/git_scaffold.py.
+- gitrepo and subrepos tests consume those local remotes in setUp.
 
-## 4) Restricciones que el agente debe respetar
-- No romper la interfaz de línea de comandos (`multigit --run`, `multigit --status`, `-V`, `-h`).
-- Mantener compatibilidad con la estructura YAML de `subrepos`.
-- No introducir frameworks de test nuevos sin necesidad clara (hoy se usa `unittest`).
-- No convertir rutas relativas de configuración en rutas con semántica distinta a la actual.
-- Evitar cambios masivos de estilo no funcionales.
-- Mantener la documentación Sphinx como parte del entregable cuando un cambio lo requiera.
-- Respetar la estructura de documentación bajo `src/sphinx` y su flujo de generación/publicación.
-- Al añadir o editar comentarios/docstrings en Python, usar sintaxis compatible con Sphinx (estilo reStructuredText cuando aplique).
+## 4) Constraints Agents Must Respect
+- Do not break CLI behavior (multigit --run, multigit --status, -V, -h).
+- Preserve compatibility with the subrepos YAML structure.
+- Do not introduce new test frameworks without clear necessity (current framework is unittest).
+- Do not change the semantics of relative configuration paths.
+- Avoid broad non-functional style-only rewrites.
+- Keep Sphinx documentation as part of the deliverable when a change requires it.
+- Respect the documentation structure under src/sphinx and its generation/publication workflow.
+- When adding or editing Python comments/docstrings, use Sphinx-compatible syntax (reStructuredText style when applicable).
 
-## 5) Riesgos reales observados en la suite
-La suite en `src/tests` sigue siendo de tipo integración en varios casos, pero su ejecución por defecto está diseñada para ser offline.
+## 5) Real Risks Seen in the Suite
+The suite in src/tests remains integration-like in several places, but its default execution is designed to be offline.
 
-Riesgos a vigilar:
-- Diferencias de comportamiento entre versiones locales de Git.
-- Fragilidad por estado residual si no se limpia correctamente el árbol `src/tests/*/scenarios`.
-- Dependencias implícitas de filesystem/permissions del sistema operativo.
+Risks to monitor:
+- Behavior differences between local Git versions.
+- Fragility from leftover state if src/tests/*/scenarios is not cleaned correctly.
+- Implicit filesystem/permissions dependencies from the host OS.
 
-Al reportar resultados de test, distinguir siempre:
-1. Fallo lógico del código.
-2. Fallo de entorno local (filesystem, permisos o herramientas Git).
+When reporting test results, always distinguish:
+1. Logical code failures.
+2. Local environment failures (filesystem, permissions, or Git tooling).
 
-## 6) Checklist mínimo antes de dar un cambio por bueno
-1. Ejecutar `make test` y registrar resultado.
-2. Revisar que el flujo CLI siga funcionando con `--help` y `--version`.
-3. Confirmar que no se alteró involuntariamente el contrato del archivo `subrepos`.
-4. Si hay cambios en build o dependencias, validar consistencia con `pyproject.toml` y `Makefile`.
-5. Documentar brevemente impacto funcional y riesgos residuales.
-6. Si el cambio afecta documentación o API pública, actualizar contenidos en `src/sphinx` y validar `make doc`.
+## 6) Minimum Checklist Before Calling a Change Complete
+1. Run make test and record results.
+2. Verify CLI flow still works with --help and --version.
+3. Confirm the subrepos contract was not unintentionally altered.
+4. If build/dependencies changed, validate consistency with pyproject.toml and Makefile.
+5. Briefly document functional impact and residual risks.
+6. If documentation or public API is affected, update src/sphinx content and validate make doc.
 
-## 7) Qué debe incluir una entrega del agente
-- Resumen corto de cambios funcionales.
-- Archivos modificados y razón de cada cambio.
-- Resultado de pruebas ejecutadas.
-- Riesgos/limitaciones pendientes.
-- Siguientes pasos concretos, si aplica.
+## 7) Language Policy for AI Support Documents
+All AI-mediated development support Markdown files must be written in English.
+
+Scope includes, at minimum:
+- AGENTS.md
+- docs/AI_DEVELOPMENT_PLAYBOOK.md
+- docs/AI_DOCS_LANGUAGE_POLICY.md
+
+Enforcement:
+- Run the VS Code task AI: Check docs language (or execute python3 tools/ai/check_docs_language.py).
+- Keep text, headings, and change notes in English when editing or adding files in this scope.
+
+## 8) What an Agent Delivery Must Include
+- Short summary of functional changes.
+- Modified files and reason for each change.
+- Executed test results.
+- Pending risks/limitations.
+- Concrete next steps, if applicable.

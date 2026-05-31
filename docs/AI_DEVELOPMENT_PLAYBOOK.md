@@ -1,167 +1,175 @@
 # AI Development Playbook for python-multigit
 
-## Propósito
-Este documento está pensado para agentes de IA que vayan a modificar el repositorio `python-multigit` en futuras iteraciones. Su objetivo es reducir errores de contexto y acelerar cambios seguros.
+## Purpose
+This document is intended for AI agents that modify the python-multigit repository in future iterations. Its goal is to reduce context errors and accelerate safe changes.
 
-## 1. Contexto técnico esencial
+## 1. Essential Technical Context
 
-### 1.1 Entrada principal de la aplicación
+### 1.1 Application Entry Point
 - Script CLI: `src/multigit/__main__.py`
-- Comportamientos principales:
-  - `--run`: procesa subrepositorios y aplica cambios.
-  - `--status`: solo reporta estado.
-  - `--version` y `--help`: utilidades de CLI.
+- Main behaviors:
+  - `--run`: processes subrepositories and applies changes.
+  - `--status`: reports status only.
+  - `--version` and `--help`: CLI utilities.
 
-### 1.2 Núcleo de negocio
+### 1.2 Business Core
 - `src/multigit/subrepos.py`
-  - Localiza archivo `subrepos` en `base_path` o en el root del repo Git padre.
-  - Carga definiciones con `Subrepofile`.
-  - Recorre recursivamente subrepos y aplica `status()` o `update()` por cada uno.
-  - Imprime estados enriquecidos para cada subrepo.
+  - Locates the `subrepos` file in `base_path` or in the parent Git repository root.
+  - Loads definitions with `Subrepofile`.
+  - Walks subrepos recursively and applies `status()` or `update()` to each one.
+  - Prints enriched status output for each subrepo.
 
 - `src/multigit/gitrepo.py`
-  - `status(repoconf)`: clasifica cada sandbox en estados como:
+  - `status(repoconf)`: classifies each sandbox into statuses such as:
     - `NOT_CLONED`, `ERROR`, `WRONG_REMOTE`, `EMPTY`, `DIRTY`, `PENDING_UPDATE`, `UP_TO_DATE`.
-  - `update(repoconf)`: actúa según estado:
-    - Clona (`CLONED`) si no existe.
-    - Hace checkout/pull cuando hay `PENDING_UPDATE`.
-    - Evita tocar repos con `DIRTY`, `WRONG_REMOTE`, `ERROR`, etc.
+  - `update(repoconf)`: acts according to status:
+    - Clones (`CLONED`) if missing.
+    - Performs checkout/pull when `PENDING_UPDATE` is detected.
+    - Avoids touching repos with `DIRTY`, `WRONG_REMOTE`, `ERROR`, and similar states.
 
 - `src/multigit/subrepofile.py`
-  - Carga YAML con `yaml.safe_load`.
-  - Valida con Cerberus usando `subrepos_schema.yaml`.
-  - Normaliza:
-    - `path` a ruta absoluta.
-    - `gitref_type` en `branch|tag|commit|None`.
+  - Loads YAML with `yaml.safe_load`.
+  - Validates with Cerberus using `subrepos_schema.yaml`.
+  - Normalizes:
+    - `path` to an absolute path.
+    - `gitref_type` to `branch|tag|commit|None`.
 
-## 2. Archivo subrepos: contrato funcional
+## 2. subrepos File: Functional Contract
 
-Tomando como referencia `README.md`:
-- Clave raíz: `subrepos` (lista).
-- Cada entrada requiere:
+According to `README.md`:
+- Root key: `subrepos` (list).
+- Each entry requires:
   - `repo`
   - `path`
-- Opcionalmente, uno de:
+- Optionally, one of:
   - `branch`
   - `tag`
   - `commit`
 
-La semántica de orden importa: la lista se procesa en orden y eso habilita layouts jerárquicos.
+Ordering semantics matter: the list is processed in order, which enables hierarchical layouts.
 
-## 3. Flujo de desarrollo oficial (derivado de Makefile)
+## 3. Official Development Workflow (Derived from Makefile)
 
-Objetivos relevantes:
+Relevant targets:
 - `test`: `python -m unittest discover --start-directory ${SOURCE_DIR}tests`
-- `build`: ejecuta `test`, luego construye `sdist` y `wheel` con Hatch, y documentación Sphinx.
-- `doc`: genera docs HTML y linkcheck.
-- `clean`: limpia artefactos de build y caches Python.
+- `build`: runs `test`, then builds `sdist` and `wheel` with Hatch, plus Sphinx documentation.
+- `doc`: builds HTML docs and linkcheck output.
+- `clean`: removes build artifacts and Python caches.
 
-Implicaciones para agentes:
-- Si cambias comportamiento, ejecuta siempre `make test`.
-- Si cambias empaquetado, valida también `make build`.
-- Revisa con cuidado `clean` porque borra rutas fuera de artefactos típicos.
-- Si tocas documentación o contratos públicos, ejecuta también `make doc`.
+Implications for agents:
+- If you change behavior, always run `make test`.
+- If you change packaging, also validate with `make build`.
+- Review `clean` carefully because it removes paths outside typical build artifacts.
+- If you touch documentation or public contracts, also run `make doc`.
 
-Regla de ejecución por defecto:
-- La suite ejecutada por `make test` debe mantenerse en modo offline para evitar dependencia de red y credenciales externas.
+Default execution rule:
+- The suite run by `make test` must remain offline to avoid dependence on network access and external credentials.
 
-Publicación/documentación:
-- La documentación del proyecto se construye con Sphinx y se publica a partir de esos artefactos.
-- Cualquier cambio funcional relevante debe evaluarse también desde su impacto en `src/sphinx`.
+Publication/documentation:
+- Project documentation is built with Sphinx and published from those artifacts.
+- Any relevant functional change should also be evaluated for impact on `src/sphinx`.
 
-## 4. Packaging y dependencias (pyproject.toml)
+## 4. Packaging and Dependencies (pyproject.toml)
 
-- Proyecto: `multigit`
-- Requiere Python `>=3.7`.
-- Dependencias runtime:
+- Project: `multigit`
+- Requires Python `>=3.7`.
+- Runtime dependencies:
   - `Cerberus`, `colorama`, `GitPython`, `PyYAML`
-- Script instalado:
+- Installed script:
   - `multigit = multigit:__main__.main`
 - Build backend:
   - `hatchling.build`
-- Fuente de versión:
+- Version source:
   - `tool.hatch.version.path = src/multigit/__main__.py`
 
-Regla de seguridad para cambios:
-- Si tocas versión, coherencia con changelog y proceso de publicación.
-- Si tocas dependencias, justificar impacto en runtime o dev workflow.
-- Si tocas build/packaging, mantener explícitamente el backend `hatchling.build` salvo requerimiento formal de migración.
+Change-safety rule:
+- If you touch versioning, keep consistency with changelog and release process.
+- If you change dependencies, justify runtime or development workflow impact.
+- If you modify build/packaging, keep `hatchling.build` unless a formal migration is requested.
 
-## 4.1 Reglas de documentación Sphinx para agentes
+## 4.1 Sphinx Documentation Rules for Agents
 
-- Estructurar y mantener contenidos bajo `src/sphinx` (índices, páginas y referencias) sin romper navegación existente.
-- Mantener consistencia de estilo con reStructuredText en los archivos de documentación.
-- Cuando se modifiquen docstrings/comentarios en código fuente Python y estos formen parte de documentación técnica, usar sintaxis compatible con Sphinx.
-- Evitar comentarios ambiguos o de bajo valor; preferir descripciones técnicas claras, orientadas a API, parámetros, retornos y efectos colaterales.
+- Structure and maintain content under `src/sphinx` (indexes, pages, and references) without breaking current navigation.
+- Keep style consistent with reStructuredText in documentation files.
+- When modifying Python docstrings/comments that are part of technical documentation, use Sphinx-compatible syntax.
+- Avoid ambiguous or low-value comments; prefer clear technical descriptions focused on APIs, parameters, returns, and side effects.
 
-## 5. Pruebas: cómo interpretarlas correctamente
+## 5. Tests: How to Interpret Them Correctly
 
-Ubicación: `src/tests`
+Location: `src/tests`
 
-Características importantes:
-- Framework actual: `unittest` (descubrimiento automático).
-- Naturaleza: mezcla de unit/integration.
-- Suite por defecto: offline (sin conexión de red).
-- Simulación de remotos: mediante scaffolding local de repositorios Git efímeros.
+Important characteristics:
+- Current framework: `unittest` (automatic discovery).
+- Nature: mixed unit/integration.
+- Default suite: offline (no network access).
+- Remote simulation: local scaffolding of temporary Git repositories.
 
-Scaffolding local (resumen):
-- Módulo principal: `src/tests/git_scaffold.py`.
-- Crea remotos bare locales y repos de trabajo temporales para poblar commits/ramas.
-- Expone utilidades para generar escenarios equivalentes a los casos previos remotos.
-- Se integra en `setUp` de tests para que cada ejecución sea aislada y reproducible.
+Local scaffolding (summary):
+- Main module: `src/tests/git_scaffold.py`.
+- Creates local bare remotes and temporary working repositories to populate commits/branches.
+- Exposes utilities to generate scenarios equivalent to previous remote-based cases.
+- Integrates into test `setUp` so each run is isolated and reproducible.
 
-Lectura de resultados:
-- Si falla por `Permission denied`, `Repository not found` local, o errores de git CLI, probablemente es entorno local.
-- Si falla en comparación de estados esperados (`UP_TO_DATE`, `DIRTY`, etc.), probablemente es regresión funcional.
+Reading results:
+- If it fails with `Permission denied`, local `Repository not found`, or Git CLI errors, it is likely a local environment issue.
+- If it fails on expected-state comparisons (`UP_TO_DATE`, `DIRTY`, etc.), it is likely a functional regression.
 
-## 6. Guía de cambios por tipo de tarea
+## 6. Change Guide by Task Type
 
-### 6.1 Cambios de CLI
-1. Modificar `__main__.py`.
-2. Verificar opciones excluyentes y mensajes de ayuda.
-3. Ejecutar `make test`.
-4. Actualizar README si cambia UX.
-5. Evaluar impacto en documentación Sphinx (`src/sphinx`) y actualizar si aplica.
+### 6.1 CLI Changes
+1. Modify `__main__.py`.
+2. Verify mutually exclusive options and help messages.
+3. Run `make test`.
+4. Update README if UX changes.
+5. Evaluate impact on Sphinx documentation (`src/sphinx`) and update when applicable.
 
-### 6.2 Cambios de parsing/validación YAML
-1. Modificar `subrepofile.py` y, si aplica, `subrepos_schema.yaml`.
-2. Asegurar que se conserva normalización de `path` y `gitref_type`.
-3. Ejecutar `make test`.
-4. Añadir/ajustar fixtures en `src/tests/helperfiles` si cambia contrato.
-5. Actualizar documentación Sphinx y ejemplos si cambia el contrato de `subrepos`.
+### 6.2 YAML Parsing/Validation Changes
+1. Modify `subrepofile.py` and, when needed, `subrepos_schema.yaml`.
+2. Ensure normalization of `path` and `gitref_type` is preserved.
+3. Run `make test`.
+4. Extend or adjust scenario generation in `src/tests/git_scaffold.py` when the contract changes.
+5. Update Sphinx documentation and examples if the `subrepos` contract changes.
 
-### 6.3 Cambios de lógica Git
-1. Modificar `gitrepo.py` o `subrepos.py`.
-2. Respetar estados existentes y su semántica.
-3. Ejecutar `make test`.
-4. Reportar explícitamente qué estados cambian y por qué.
-5. Revisar docstrings/comentarios tocados para mantener compatibilidad con Sphinx.
+### 6.3 Git Logic Changes
+1. Modify `gitrepo.py` or `subrepos.py`.
+2. Preserve existing statuses and semantics.
+3. Run `make test`.
+4. Explicitly report which statuses changed and why.
+5. Review touched docstrings/comments to keep Sphinx compatibility.
 
-## 7. Convenciones recomendadas para agentes IA
+## 7. Recommended Conventions for AI Agents
 
-- Priorizar cambios mínimos y localizados.
-- Preservar nombres de estados y comportamiento observable salvo requerimiento explícito.
-- Evitar refactors de estilo junto a cambios funcionales.
-- Documentar en el reporte final:
-  1. Qué cambió.
-  2. Por qué.
-  3. Cómo se verificó.
-  4. Qué queda pendiente.
+- Prioritize minimal, localized changes.
+- Preserve status names and observable behavior unless explicitly requested.
+- Avoid style refactors mixed with functional changes.
+- Document in the final report:
+  1. What changed.
+  2. Why.
+  3. How it was verified.
+  4. What remains pending.
 
-## 8. Plantillas de prompt reutilizables para agentes
+## 8. Reusable Prompt Templates for Agents
 
-### 8.1 Fix funcional puntual
-"Analiza el fallo en [archivo/test], aplica el cambio mínimo en `src/multigit`, ejecuta `make test`, y devuelve resumen con causa raíz, diff lógico y riesgos residuales."
+### 8.1 Targeted Functional Fix
+"Analyze the failure in [file/test], apply the smallest change in `src/multigit`, run `make test`, and return a summary with root cause, logical diff, and residual risks."
 
-### 8.2 Evolución de contrato subrepos
-"Extiende el contrato de `subrepos` para soportar [nuevo campo], actualiza validación Cerberus y tests/fixtures asociados, manteniendo compatibilidad hacia atrás y reportando impacto en README y CLI."
+### 8.2 subrepos Contract Evolution
+"Extend the `subrepos` contract to support [new field], update Cerberus validation and associated tests/fixtures, preserve backward compatibility, and report impact on README and CLI."
 
-### 8.3 Hardening de errores Git
-"Refuerza manejo de errores en `gitrepo.py` para [caso], preserva semántica de estados existentes y añade cobertura de test sin introducir nuevas dependencias."
+### 8.3 Git Error Hardening
+"Harden error handling in `gitrepo.py` for [case], preserve existing status semantics, and add test coverage without introducing new dependencies."
 
-## 9. Observaciones de mantenimiento para backlog técnico
+## 9. Maintenance Notes for Technical Backlog
 
-- Hay código de guardia `if __name__ == '__main__'` en algunos módulos no-CLI que referencia `main()` no definido; no suele afectar como librería, pero conviene saneamiento futuro.
-- Mantener explícitamente el principio "offline por defecto" en cualquier nuevo test agregado a `make test`.
-- Si se añaden casos nuevos, reutilizar `git_scaffold.py` antes de introducir mocks o dependencias externas.
-- Verificar y acotar el alcance real de `clean` si se usa en entornos con carpetas adyacentes relevantes.
+- There is guard code `if __name__ == '__main__'` in some non-CLI modules that references an undefined `main()`; it usually does not affect library use, but it should be cleaned up in the future.
+- Keep the "offline by default" principle explicit in any new test added to `make test`.
+- If new scenarios are added, reuse `git_scaffold.py` before introducing mocks or external dependencies.
+- Verify and constrain the real scope of `clean` when used in environments with relevant adjacent folders.
+
+## 10. Language Rule for AI Support Files
+
+All AI-mediated development support Markdown files must be written in English.
+
+Enforcement:
+- Run the VS Code task `AI: Check docs language` (or execute `python3 tools/ai/check_docs_language.py`).
+- If new AI support Markdown files are added, include them in the checker's file list.
