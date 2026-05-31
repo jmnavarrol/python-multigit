@@ -4,6 +4,8 @@
 * Differences from [previous tag](/../../compare/v0.11.8…main).
 * Build system refactored so it's hatch-only now.
 * Subrepofile class doesn't print to STDOUT anymore; it rises exceptions instead.
+* copilot: added basic support for copilot-aided development.
+* tests framework: tests requiring on-line access to remote repositories updated to use off-line mockups.
 
 ## 0.11.8 (2024-MAY-25)
 * Differences from [previous tag](/../../compare/v0.11.7…main).

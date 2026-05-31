@@ -25,7 +25,7 @@ class TestGitrepoOther(TestGitrepo):
 		print("TEST: 'test_nonexitent_branch'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['repo'] = self.remotes['simplest_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
 		repoconf['branch'] = 'nonexistent'
 		repoconf['gitref_type'] = 'branch'
@@ -39,7 +39,7 @@ class TestGitrepoOther(TestGitrepo):
 		print("TEST: 'test_local_not_in_remote_same_branch'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['repo'] = self.remotes['simplest_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
 		
 		# First, let's clone the repo
@@ -61,7 +61,7 @@ class TestGitrepoOther(TestGitrepo):
 		print("TEST: 'test_local_not_in_remote_different_branch'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['repo'] = self.remotes['simplest_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
 		
 		# First, let's clone the repo
@@ -93,7 +93,7 @@ class TestGitrepoOther(TestGitrepo):
 		print("TEST: 'test_status_unitialized'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/python-multigit-empty-repo.git'
+		repoconf['repo'] = self.remotes['empty_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/empty-repo')
 		
 		# First, let's clone an unitialized repo
@@ -108,7 +108,7 @@ class TestGitrepoOther(TestGitrepo):
 		print("TEST: 'test_wrong_repo'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/doesnt-exist.git'
+		repoconf['repo'] = self.remotes['missing_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/empty-repo')
 		
 		result = self.gitrepo.update(repoconf)
@@ -120,14 +120,14 @@ class TestGitrepoOther(TestGitrepo):
 		print("TEST: 'test_wrong_remote_status'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/python-multigit-empty-repo.git'
+		repoconf['repo'] = self.remotes['empty_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/empty-repo')
 		
 		# First, let's clone an unitialized repo
 		result = self.gitrepo.update(repoconf)
 		
 		# Then, let's change its remote and check
-		repoconf['repo'] = 'git@github.com:jmnavarrol/different-remote.git'
+		repoconf['repo'] = self.remotes['different_remote']
 		result = self.gitrepo.status(repoconf)
 		print(str(result))
 		self.assertEqual(result['status'], 'WRONG_REMOTE')
@@ -137,7 +137,7 @@ class TestGitrepoOther(TestGitrepo):
 		print("TEST: 'test_pending_updates'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['repo'] = self.remotes['simplest_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
 		
 		# First, let's clone a standard repo
@@ -155,7 +155,7 @@ class TestGitrepoOther(TestGitrepo):
 		print("TEST: 'test_dirty'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['repo'] = self.remotes['simplest_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
 		
 		# First, let's clone a standard repo
@@ -180,7 +180,7 @@ class TestGitrepoOther(TestGitrepo):
 		print("TEST: 'test_updated'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['repo'] = self.remotes['simplest_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
 		
 		# First, let's clone a standard repo
@@ -198,7 +198,7 @@ class TestGitrepoOther(TestGitrepo):
 		print("TEST: 'test_up_to_date'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/simplest-git-subrepos.git'
+		repoconf['repo'] = self.remotes['simplest_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/simplest-git-subrepos')
 		
 		# First, let's clone a standard repo

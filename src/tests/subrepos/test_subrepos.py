@@ -4,6 +4,7 @@ import unittest
 import os, shutil, errno
 
 from . import TESTS_PATH, PROJECT_PATH
+from git_scaffold import build_test_remotes, write_subrepos_file
 import multigit
 
 class TestSubrepos(unittest.TestCase):
@@ -11,24 +12,48 @@ class TestSubrepos(unittest.TestCase):
 	@classmethod
 	def setUp(self):
 		self.scenarios_path = os.path.join(TESTS_PATH, 'scenarios')
+		self.remotes_path = os.path.join(self.scenarios_path, '_remotes')
 		self.test_scenarios = [
 			'standard',
 			'nonexistent-branch',
 		]
+		os.makedirs(self.scenarios_path, exist_ok=True)
+		self.remotes = build_test_remotes(self.remotes_path)
 		
 		for test_item in self.test_scenarios:
 			current_scenario_path = os.path.join(self.scenarios_path, test_item)
 			if not os.path.exists(current_scenario_path):
 				os.makedirs(current_scenario_path)
-				
-			shutil.copy(
-				TESTS_PATH + '/../helperfiles/subrepos.' + test_item,
-				os.path.join(current_scenario_path, 'subrepos')
-			)
-			
+
+		write_subrepos_file(
+			os.path.join(self.scenarios_path, 'standard', 'subrepos'),
+			[
+				{
+					'path': 'empty-repo',
+					'repo': self.remotes['empty_repo'],
+				},
+				{
+					'path': 'standard-repo',
+					'repo': self.remotes['standard_repo'],
+					'branch': 'a-branch',
+				},
+			],
+		)
+
+		write_subrepos_file(
+			os.path.join(self.scenarios_path, 'nonexistent-branch', 'subrepos'),
+			[
+				{
+					'path': 'standard-repo',
+					'repo': self.remotes['standard_repo'],
+					'branch': 'non-existant',
+				},
+			],
+		)
+
 		# And a scenario with no subrepos file
-			if not os.path.exists(os.path.join(self.scenarios_path, 'nosubrepos')):
-				os.makedirs(os.path.join(self.scenarios_path, 'nosubrepos'))
+		if not os.path.exists(os.path.join(self.scenarios_path, 'nosubrepos')):
+			os.makedirs(os.path.join(self.scenarios_path, 'nosubrepos'))
 			
 		self.my_subrepos = multigit.Subrepos()
 	
@@ -93,7 +118,8 @@ class TestSubrepos(unittest.TestCase):
 	@classmethod
 	def tearDown(self):
 		# clean up after the test
-		shutil.rmtree(self.scenarios_path)
+		if os.path.exists(self.scenarios_path):
+			shutil.rmtree(self.scenarios_path)
 		
 		
 if __name__ == '__main__':

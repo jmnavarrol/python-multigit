@@ -9,16 +9,15 @@ from git import Repo
 
 # Subclasses so it gets parent's setUp and tearDown
 class TestGitrepoRemote(TestGitrepo):
-
-# https://github.com/jmnavarrol/python-multigit/issues/11
-# multigit should return to the default branch
-# even if current checkout happens to be on same commit
-# NOTE: Since this test checks into a remote repo, you need commit permission, else it will fail.
+	# https://github.com/jmnavarrol/python-multigit/issues/11
+	# Regression check for branch restoration behavior.
+	# Multigit should return to the default branch even when
+	# the current checkout is on a different branch at the same commit.
 	def test_different_branches_same_commit(self):
 		print("TEST: 'test_different_branches_same_commit'")
 		# prepares a suitable configuration
 		repoconf = {}
-		repoconf['repo'] = 'git@github.com:jmnavarrol/python-multigit-standard-repo.git'
+		repoconf['repo'] = self.remotes['standard_repo']
 		repoconf['path'] = os.path.join(self.scenarios_path, 'standard/standard-repo')
 		
 		# First, let's clone the repo
