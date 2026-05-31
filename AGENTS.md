@@ -80,7 +80,8 @@ Scope includes, at minimum:
 - docs/AI_DOCS_LANGUAGE_POLICY.md
 
 Enforcement:
-- Run the VS Code task AI: Check docs language (or execute python3 tools/ai/check_docs_language.py).
+- Run the VS Code task AI: Check docs language (or execute python3 tools/ai/check_docs_language.py $(python3 tools/ai/list_policy_ai_docs.py)).
+- File scope is resolved from the policy Scope section via tools/ai/list_policy_ai_docs.py.
 - Keep text, headings, and change notes in English when editing or adding files in this scope.
 
 ## 8) What an Agent Delivery Must Include

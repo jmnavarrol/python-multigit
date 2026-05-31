@@ -171,5 +171,6 @@ Reading results:
 All AI-mediated development support Markdown files must be written in English.
 
 Enforcement:
-- Run the VS Code task `AI: Check docs language` (or execute `python3 tools/ai/check_docs_language.py`).
-- If new AI support Markdown files are added, include them in the checker's file list.
+- Run the VS Code task `AI: Check docs language` (or execute `python3 tools/ai/check_docs_language.py $(python3 tools/ai/list_policy_ai_docs.py)`).
+- Scope is discovered from the policy Scope section via `tools/ai/list_policy_ai_docs.py`.
+- If new AI support Markdown files are added, include them in the policy Scope section.

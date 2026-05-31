@@ -4,9 +4,10 @@
     {
       "label": "AI: Check docs language",
       "type": "shell",
-      "command": "python3",
+      "command": "bash",
       "args": [
-        "${workspaceFolder}/tools/ai/check_docs_language.py"
+        "-lc",
+        "python3 \"${workspaceFolder}/tools/ai/check_docs_language.py\" $(python3 \"${workspaceFolder}/tools/ai/list_policy_ai_docs.py\")"
       ],
       "problemMatcher": []
     },
@@ -16,10 +17,11 @@
       "command": "grep",
       "args": [
         "-RInE",
-        "tools/ai/check_docs_language.py|AI: Check docs language",
+        "tools/ai/check_docs_language.py|tools/ai/list_policy_ai_docs.py|AI: Check docs language|## Scope",
         "${workspaceFolder}/AGENTS.md",
         "${workspaceFolder}/docs/AI_DEVELOPMENT_PLAYBOOK.md",
-        "${workspaceFolder}/docs/AI_DOCS_LANGUAGE_POLICY.md"
+        "${workspaceFolder}/docs/AI_DOCS_LANGUAGE_POLICY.md",
+        "${workspaceFolder}/.vscode/tasks.json"
       ],
       "problemMatcher": []
     },
