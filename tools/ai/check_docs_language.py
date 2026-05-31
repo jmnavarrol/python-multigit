@@ -4,8 +4,11 @@
 from __future__ import annotations
 
 import pathlib
-import re
 import sys
+
+from langdetect import DetectorFactory
+from langdetect import LangDetectException
+from langdetect import detect_langs
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
@@ -16,51 +19,8 @@ AI_DOC_FILES = [
     ROOT / "docs" / "AI_DOCS_LANGUAGE_POLICY.md",
 ]
 
-# Distinctive Spanish markers. A few hits are enough to flag likely non-English text.
-SPANISH_MARKERS = {
-    "agentes",
-    "archivo",
-    "archivos",
-    "asegurar",
-    "cambios",
-    "carga",
-    "contrato",
-    "desarrollo",
-    "debe",
-    "deben",
-    "documentacion",
-    "ejecutar",
-    "entorno",
-    "errores",
-    "flujo",
-    "fuente",
-    "mantener",
-    "objetivo",
-    "predeterminado",
-    "pruebas",
-    "regla",
-    "repositorio",
-    "riesgos",
-    "siempre",
-    "siguiente",
-    "validacion",
-}
-
-TOKEN_RE = re.compile(r"[A-Za-zÀ-ÿ']+")
-
-
-def find_suspicious_tokens(text: str) -> list[str]:
-    lowered = text.lower()
-    normalized = (
-        lowered.replace("á", "a")
-        .replace("é", "e")
-        .replace("í", "i")
-        .replace("ó", "o")
-        .replace("ú", "u")
-        .replace("ñ", "n")
-    )
-    tokens = TOKEN_RE.findall(normalized)
-    return [token for token in tokens if token in SPANISH_MARKERS]
+# Keep detection deterministic across runs.
+DetectorFactory.seed = 0
 
 
 def main() -> int:
@@ -72,17 +32,24 @@ def main() -> int:
             continue
 
         text = file_path.read_text(encoding="utf-8")
-        suspicious_tokens = find_suspicious_tokens(text)
-
-        if "¿" in text or "¡" in text:
+        try:
+            ranked_langs = detect_langs(text)
+        except LangDetectException as exc:
             errors.append(
-                f"{file_path.relative_to(ROOT)}: found Spanish punctuation (¿ or ¡)."
+                f"{file_path.relative_to(ROOT)}: language detection failed ({exc})."
             )
+            continue
 
-        if len(suspicious_tokens) >= 3:
-            sample = ", ".join(sorted(set(suspicious_tokens))[:8])
+        if not ranked_langs:
             errors.append(
-                f"{file_path.relative_to(ROOT)}: found likely Spanish text markers ({sample})."
+                f"{file_path.relative_to(ROOT)}: language detection returned no result."
+            )
+            continue
+
+        top_match = ranked_langs[0]
+        if top_match.lang != "en":
+            errors.append(
+                f"{file_path.relative_to(ROOT)}: detected '{top_match.lang}' (confidence {top_match.prob:.3f}), expected 'en'."
             )
 
     if errors:

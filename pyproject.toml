@@ -46,6 +46,8 @@ development = [
 	'sphinxcontrib-programoutput',
 	'sphinx-rtd-theme',
 	'twine',
+	# helper to check proper language on docs
+	'langdetect',
 ]
 
 [build-system]
