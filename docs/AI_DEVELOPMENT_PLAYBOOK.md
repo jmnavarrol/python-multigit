@@ -62,6 +62,9 @@ Implicaciones para agentes:
 - Revisa con cuidado `clean` porque borra rutas fuera de artefactos típicos.
 - Si tocas documentación o contratos públicos, ejecuta también `make doc`.
 
+Regla de ejecución por defecto:
+- La suite ejecutada por `make test` debe mantenerse en modo offline para evitar dependencia de red y credenciales externas.
+
 Publicación/documentación:
 - La documentación del proyecto se construye con Sphinx y se publica a partir de esos artefactos.
 - Cualquier cambio funcional relevante debe evaluarse también desde su impacto en `src/sphinx`.
@@ -98,12 +101,17 @@ Ubicación: `src/tests`
 Características importantes:
 - Framework actual: `unittest` (descubrimiento automático).
 - Naturaleza: mezcla de unit/integration.
-- Dependencias externas:
-  - Varios tests dependen de repos reales en GitHub por SSH.
-  - `test_remote_operations.py` incluye push/delete de rama remota, por lo que exige permisos en remoto.
+- Suite por defecto: offline (sin conexión de red).
+- Simulación de remotos: mediante scaffolding local de repositorios Git efímeros.
+
+Scaffolding local (resumen):
+- Módulo principal: `src/tests/git_scaffold.py`.
+- Crea remotos bare locales y repos de trabajo temporales para poblar commits/ramas.
+- Expone utilidades para generar escenarios equivalentes a los casos previos remotos.
+- Se integra en `setUp` de tests para que cada ejecución sea aislada y reproducible.
 
 Lectura de resultados:
-- Si falla por `Permission denied`, `Repository not found`, timeout de red o SSH, probablemente es entorno.
+- Si falla por `Permission denied`, `Repository not found` local, o errores de git CLI, probablemente es entorno local.
 - Si falla en comparación de estados esperados (`UP_TO_DATE`, `DIRTY`, etc.), probablemente es regresión funcional.
 
 ## 6. Guía de cambios por tipo de tarea
@@ -154,5 +162,6 @@ Lectura de resultados:
 ## 9. Observaciones de mantenimiento para backlog técnico
 
 - Hay código de guardia `if __name__ == '__main__'` en algunos módulos no-CLI que referencia `main()` no definido; no suele afectar como librería, pero conviene saneamiento futuro.
-- La suite depende de recursos remotos reales; considerar separar pruebas online/offline para CI robusta.
+- Mantener explícitamente el principio "offline por defecto" en cualquier nuevo test agregado a `make test`.
+- Si se añaden casos nuevos, reutilizar `git_scaffold.py` antes de introducir mocks o dependencias externas.
 - Verificar y acotar el alcance real de `clean` si se usa en entornos con carpetas adyacentes relevantes.

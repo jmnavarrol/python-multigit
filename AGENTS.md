@@ -32,8 +32,14 @@ make clean
 
 Notas:
 - `make test` usa `unittest discover` sobre `src/tests`.
+- `make test` es la suite por defecto y debe mantenerse en modo offline.
 - `make build` depende de `test`.
 - `make clean` elimina también rutas potencialmente sensibles; revisa bien su impacto antes de ejecutarlo en contextos no aislados.
+
+Scaffolding local de tests:
+- La suite construye remotos Git locales efímeros para simular `clone/fetch/pull`, ramas y estados de repositorio sin red.
+- El módulo de soporte es `src/tests/git_scaffold.py`.
+- Los tests de `gitrepo` y `subrepos` consumen estos remotos locales en sus `setUp`.
 
 ## 4) Restricciones que el agente debe respetar
 - No romper la interfaz de línea de comandos (`multigit --run`, `multigit --status`, `-V`, `-h`).
@@ -46,14 +52,16 @@ Notas:
 - Al añadir o editar comentarios/docstrings en Python, usar sintaxis compatible con Sphinx (estilo reStructuredText cuando aplique).
 
 ## 5) Riesgos reales observados en la suite
-La suite en `src/tests` es de tipo integración en varios casos:
-- Usa repos remotos reales (`git@github.com:...`).
-- Requiere conectividad y claves SSH válidas para varios tests.
-- Un test hace `push`/`delete` de rama remota (`test_remote_operations.py`), por lo que puede fallar por permisos.
+La suite en `src/tests` sigue siendo de tipo integración en varios casos, pero su ejecución por defecto está diseñada para ser offline.
+
+Riesgos a vigilar:
+- Diferencias de comportamiento entre versiones locales de Git.
+- Fragilidad por estado residual si no se limpia correctamente el árbol `src/tests/*/scenarios`.
+- Dependencias implícitas de filesystem/permissions del sistema operativo.
 
 Al reportar resultados de test, distinguir siempre:
 1. Fallo lógico del código.
-2. Fallo de entorno/red/permisos remotos.
+2. Fallo de entorno local (filesystem, permisos o herramientas Git).
 
 ## 6) Checklist mínimo antes de dar un cambio por bueno
 1. Ejecutar `make test` y registrar resultado.

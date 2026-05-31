@@ -10,6 +10,7 @@ The general idea is to offer a simple way of managing *"workspaces"* integrating
 1. [usage](#usage)
    1. [subrepos' file format](#subrepos-format)
 1. [development](#development)
+   1. [tests](#tests)
    1. [code documentation](#sphinx)
    1. [build](#build)
    1. [publish](#publish)
@@ -83,6 +84,14 @@ This project uses the help of [Bash Magic Enviro](https://github.com/jmnavarrol/
 It creates a Python 3 *virtualenv* using [the companion requirements file](./python-virtualenvs/multigit-development.requirements).
 
 Once the *virtualenv* is (automatically) activated, you can run this code just invoking its main script, i.e.: `multigit`.
+
+<sub>[back to top](#top).</sub>
+
+### tests<a name="tests"></a>
+When adding or modifying tests, preserve these rules:
+* keep `make test` runnable offline,
+* prefer local scaffolding over external remotes,
+* use mocks only when a condition cannot be reproduced reliably with local Git state.
 
 <sub>[back to top](#top).</sub>
 
