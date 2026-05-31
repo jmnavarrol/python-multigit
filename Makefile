@@ -57,10 +57,10 @@ doc:
 	$(MAKE) BUILDDIR=${SPHINX_OUTPUT} linkcheck --directory=$(SPHINXDIR)
 
 upload-tmp: clean build
-	$(UPTOOL) --repository testpypi $(BUILD_DIR)dist/*
+	$(UPTOOL) --repository testpypi $(CURDIR)/dist/*
 
 upload: clean build
-	$(UPTOOL) --repository pypi $(BUILD_DIR)dist/*
+	$(UPTOOL) --repository pypi $(CURDIR)/dist/*
 
 clean:
 	@$(MAKE) clean --directory=$(SPHINXDIR)
