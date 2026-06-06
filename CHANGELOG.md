@@ -2,6 +2,7 @@
 
 ## Next Release
 * Differences from [previous tag](/../../compare/v0.11.9…main).
+* copilot: AI-related configuration refined.
 
 
 ## 0.11.9 (2026-MAY-31)

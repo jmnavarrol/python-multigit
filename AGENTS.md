@@ -71,19 +71,6 @@ When reporting test results, always distinguish:
 5. Briefly document functional impact and residual risks.
 6. If documentation or public API is affected, update src/sphinx content and validate make doc.
 
-## 7) Language Policy for AI Support Documents
-All AI-mediated development support Markdown files must be written in English.
-
-Scope includes, at minimum:
-- AGENTS.md
-- docs/AI_DEVELOPMENT_PLAYBOOK.md
-- docs/AI_DOCS_LANGUAGE_POLICY.md
-
-Enforcement:
-- Run the VS Code task AI: Check docs language (or execute python3 tools/ai/check_docs_language.py $(python3 tools/ai/list_policy_ai_docs.py)).
-- File scope is resolved from the policy Scope section via tools/ai/list_policy_ai_docs.py.
-- Keep text, headings, and change notes in English when editing or adding files in this scope.
-
 ## 8) What an Agent Delivery Must Include
 - Short summary of functional changes.
 - Modified files and reason for each change.
