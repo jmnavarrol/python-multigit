@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
 """
-**multigit** script is a Python implementation of `simplest-git-subrepos <https://github.com/jmnavarrol/simplest-git-subrepos>`_.
+**multigit** command-line interface for managing Git repositories within Git repositories.
 
-:package: multigit |release|
+Implementation of `simplest-git-subrepos <https://github.com/jmnavarrol/simplest-git-subrepos>`_.
+
+:package: multigit (CLI)
 :author: `Jesús M. Navarro <mailto:jesusmnavarrolopez@gmail.com>`_
 :license: `GNU General Public License v3.0 <https://github.com/jmnavarrol/python-multigit/blob/main/LICENSE>`_
 :source: https://github.com/jmnavarrol/python-multigit
 """
 
 # Globals
-__version__ = '0.11.10-dev1'
 SUBREPOS_FILE = 'subrepos'
 '''
 The *"fixed"* name of the YAML file with subrepo definitions.
@@ -20,7 +21,8 @@ The *"fixed"* name of the YAML file with subrepo definitions.
 import os, sys
 import argparse
 
-# "local" imports
+# Local imports
+from .__about__ import __version__
 from .subrepos import Subrepos
 
 # MAIN entry point

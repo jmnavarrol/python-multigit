@@ -1,33 +1,28 @@
 # -*- coding: utf-8 -*-
 # https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
-# This is the CLI distribution of the multigit project
 
 [project]
-name = 'multigit'
+name = 'multigit-lib'
 authors = [
     { name  = 'Jesús M. Navarro', email = 'jesusmnavarrolopez@gmail.com' },
 ]
 
-description = 'Command-line interface for managing git repos within git repos.'
+description = 'Reusable library for managing git repositories within git repositories.'
 readme = 'README.md'
-keywords = ['Python', 'git-utilities', 'CLI']
+keywords = ['Python', 'git-utilities', 'library']
 license = { text = 'GPL-3.0' }
 dynamic = ['version']
 classifiers = [
 	'Programming Language :: Python :: 3',
 	'Development Status :: 5 - Production/Stable',
-	'Environment :: Console',
 	'Intended Audience :: Developers',
-	'Topic :: Software Development :: Build Tools',
+	'Topic :: Software Development :: Libraries',
 	'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
 ]
 
 requires-python = '>=3.7'
 dependencies = [
-	'multigit-lib>=1.0,<2',
-	'Cerberus',
-	'colorama',
-	'PyYAML',
+	'GitPython',
 ]
 
 [project.urls]
@@ -35,20 +30,9 @@ Documentation = 'https://jmnavarrol.github.io/python-multigit/'
 Source = 'https://github.com/jmnavarrol/python-multigit'
 'Bug Tracker' = 'https://github.com/jmnavarrol/python-multigit/issues'
 
-[project.scripts]
-multigit = 'multigit_cli:__main__.main'
-
 [project.optional-dependencies]
-# Other dependencies for development environment
-# Create a virtualenv with --editable "./[development]" to use them
 development = [
 	'hatch',
-	'Sphinx',
-	'sphinxcontrib-programoutput',
-	'sphinx-rtd-theme',
-	'twine',
-	# helper to check proper language on docs
-	'langdetect',
 ]
 
 [build-system]
@@ -58,11 +42,11 @@ requires = [
 build-backend = 'hatchling.build'
 
 [tool.hatch.version]
-path = 'src/multigit_cli/__about__.py'
+path = 'src/multigit/__about__.py'
 
 [tool.hatch.build]
 packages = [
-	'src/multigit_cli',
+	'src/multigit',
 ]
 # This strips 'src/' from the result (so package/module works as expected)
 sources = ['src']

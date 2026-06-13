@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
-# Import stuff
+"""YAML subrepos file loader for multigit CLI."""
+
 import errno, os, sys
 import importlib.resources as pkg_resources
 import yaml
 from cerberus import Validator, schema
 
-from colorama import init, Fore, Back, Style
-#Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
-#Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
-#Style: DIM, NORMAL, BRIGHT, RESET_ALL
+# Import SubrepofileError from library
+from multigit import SubrepofileError
 
 
 class Subrepofile(object):
@@ -17,9 +16,6 @@ class Subrepofile(object):
 	
 	def __init__(self):
 		'''Loads the YAML schema validator'''
-		
-		# Activates colored output
-		init(autoreset=True)
 		
 		# Loads the YAML schema validator
 		try:
@@ -30,12 +26,12 @@ class Subrepofile(object):
 					except yaml.parser.ParserError as e:
 						raise SubrepofileError(
 							f"Malformed schema file 'subrepos_schema.yaml' - {e}",
-							errno = errno.EINVAL,
+							errno_val = errno.EINVAL,
 						)
 		except FileNotFoundError as e:
 			raise SubrepofileError(
 				f"trying to access subrepos file '{subrepos_file}':\n{e}",
-				errno = errno.ENOENT,
+				errno_val = errno.ENOENT,
 			)
 			
 		try:
@@ -43,7 +39,7 @@ class Subrepofile(object):
 		except (schema.SchemaError, TypeError) as e:
 			raise SubrepofileError(
 				f"in YAML schema validator at '{validator_resource}'.\n\t{e}",
-				errno = errno.EINVAL
+				errno_val = errno.EINVAL
 			)
 	
 	
@@ -108,27 +104,14 @@ class Subrepofile(object):
 				err_msg += f"\t{self.yaml_validator.errors}"
 				raise SubrepofileError(
 					err_msg,
-					errno = errno.EINVAL,
+					errno_val = errno.EINVAL,
 				)
 		else:
 			subrepo_list = None
 			
 		return subrepo_list
-	
-	
-class SubrepofileError(Exception):
-	'''
-	Custom Subrepofile Error Exception
-	
-	:param str msg: absolute path to subrepos file
-	:param errno errno: suggested sys.exit errno
-	'''
-	
-	def __init__(self, msg='error while operating subrepo file', errno=errno.EINVAL, *args, **kwargs):
-		super().__init__(msg, *args, **kwargs)
-		self.errno = errno
-		
+
 
 if __name__ == '__main__':
 	# execute only if run as a script
-	main()
+	sys.exit(0)

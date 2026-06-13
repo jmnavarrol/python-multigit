@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Prepares environment for CLI gitrepo tests."""
+"""Prepares environment for gitrepo tests."""
 
 import os, sys
 

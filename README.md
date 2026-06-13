@@ -1,28 +1,57 @@
-# Python Multigit<a name="top"></a>
+# python-multigit<a name="top"></a>
 
-A Python version of the [multigit Bash script](https://github.com/jmnavarrol/simplest-git-subrepos).
+A Python implementation of the [simplest-git-subrepos](https://github.com/jmnavarrol/simplest-git-subrepos) shell script, providing tools for managing multiple Git repositories declaratively.
 
-While the multigit Bash script at [simplest-git-subrepos](https://github.com/jmnavarrol/simplest-git-subrepos) was created for illustration purposes, this one is intended to be a full-fledged implementation.
+This project is organised as a **single repository with two independent distributions**:
 
-The general idea is to offer a simple way of managing *"workspaces"* integrating multiple git repos starting from a top one, and without the need of difficult *"arcanes"* like *git submodules*, *git-subtree*, etc.: you only need to declare your intended *layout* in a YAML file, and let this script (**multigit**) do its job.  See the [simplest-git-subrepos README](https://github.com/jmnavarrol/simplest-git-subrepos#readme) for a long-wired explanation.
+1. **multigit-lib** – A reusable library for Git repository operations
+2. **multigit** – A command-line tool for managing subrepos (depends on multigit-lib)
+
+The general idea is to provide a simple way of managing *"workspaces"* integrating multiple Git repositories starting from a top-level one, without needing complex Git patterns like *git submodules* or *git-subtree*. You declare your intended layout in a YAML file and let **multigit** do its job. See the [simplest-git-subrepos README](https://github.com/jmnavarrol/simplest-git-subrepos#readme) for detailed background.
 
 **Contents:**<a name="contents"></a>
-1. [usage](#usage)
-   1. [subrepos' file format](#subrepos-format)
-1. [development](#development)
+1. [distributions](#distributions)
+2. [usage](#usage)
+   1. [installation](#installation)
+   2. [subrepos' file format](#subrepos-format)
+3. [development](#development)
    1. [tests](#tests)
    1. [code documentation](#sphinx)
    1. [build](#build)
    1. [publish](#publish)
    1. [CHANGELOG](./CHANGELOG.md)
-1. [license](#license)
+4. [licence](#licence)
 
 ----
 
-## usage<a name="usage"></a>
-This project [is published to the PyPI index](https://pypi.org/project/multigit/) so, in order to install it you just need to run `pip install multigit`.
+## distributions<a name="distributions"></a>
 
-*multigit* expects a YAML file named **subrepos** in the current dir (see [example](./example/subrepos)).  Optionally, if there's no *subrepos* file in the current dir **and** the current directory is within a git sandbox, *multigit* will try to find a *subrepos* file at the git sandbox's root.
+### multigit (CLI)
+The command-line tool for managing subrepos. Install with:
+```bash
+pip install multigit
+```
+
+This provides the `multigit` command and includes all necessary functionality for typical use cases.
+
+### multigit-lib (Library)
+A reusable Python library for Git repository operations, suitable for embedding in other applications. Install with:
+```bash
+pip install multigit-lib
+```
+
+For library usage details, see [lib/README.md](./lib/README.md).
+
+<sub>[back to top](#top).</sub>
+
+## usage<a name="usage"></a>
+
+### installation<a name="installation"></a>
+This project is published to PyPI:
+- CLI tool: `pip install multigit`
+- Library: `pip install multigit-lib`
+
+<sub>[back to top](#top).</sub>
 
 For each defined *subrepo* within the *subrepos* file, it will clone/checkout it to the defined relative path.  Optionally, it will *checkout* the given *gitref* (either *commit*, *branch* or *tag*), provided the repo's local sandbox is *"clean"* (i.e. no pending modifications).  
   **NOTE:** pay attention to the fact that if the *gitref* you record is a specific *commit* or *tag*, the related sandbox will be in disconnected state.

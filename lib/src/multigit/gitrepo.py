@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Import stuff
+"""
+Git repository operations for multigit library.
+
+Provides core functionality for checking repository status and performing updates.
+"""
+
 import sys
 from git import Repo, exc as git_exception
 
@@ -236,10 +241,8 @@ class Gitrepo(object):
 				repostatus['status'] = 'UPDATED'
 			
 		return repostatus
-	
-	
+
+
 if __name__ == '__main__':
 	# execute only if run as a script
-	sys.exit(
-		main()
-	)
+	sys.exit(0)
