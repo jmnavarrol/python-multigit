@@ -1,0 +1,21 @@
+# -*- coding: utf-8 -*-
+# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+
+[project]
+name = 'multigit-lib'
+authors = [
+    { name  = 'Jesús M. Navarro', email = 'jesusmnavarrolopez@gmail.com' },
+]
+
+version = '0.0.1.dev1'
+description = 'Minimal library PoC for packaging flow validation.'
+readme = 'README.md'
+requires-python = '>=3.7'
+
+[build-system]
+requires = ['hatchling']
+build-backend = 'hatchling.build'
+
+[tool.hatch.build]
+packages = ['src/multigit_lib']
+sources = ['src']
