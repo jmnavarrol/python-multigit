@@ -260,6 +260,36 @@ Clarification:
 10. Refactor both cmd and library components to fully honor the final design goals once split completion is achieved.
 11. Normalize root recursive orchestration, component docs/test ownership, and future extraction seams for cmd/lib/lifecycle.
 
+## Current Refactoring Status (2026-JUN-27)
+
+This snapshot records the currently completed point of the split effort so later sessions can resume safely without reconstructing the PoC milestone from scratch.
+
+### Completed in the current milestone
+
+1. A new `lib/` subtree exists as an isolated PoC component for the future `multigit-lib` distribution.
+2. The transitional import package name is `multigit_lib`, with version sourced dynamically from `lib/src/multigit_lib/__init__.py`.
+3. The component includes its own `pyproject.toml`, `Makefile`, `README.md`, `CHANGELOG.md`, `tests/`, and `docs/`.
+4. Component-local Makefile targets exist for `test`, `build`, `doc`, `upload-tmp`, and `clean`, with real source-to-target dependency modeling.
+5. Offline smoke tests for `multigit_lib` import and version exposure are in place and passing.
+6. Component-local Sphinx documentation is in place and builds successfully.
+7. Local build validation is complete: sdist and wheel are produced successfully for the PoC component.
+8. Isolated installability validation is complete: installing the PoC library does not expose the `multigit` shell command.
+9. Coexistence validation is complete: the PoC `multigit_lib` package does not shadow the production `multigit` package when both are installed in the same virtualenv.
+10. Root-level documentation now warns that `lib/` is a PoC incubation area and not the current production runtime source.
+
+### Explicitly not done yet
+
+1. No publication to TestPyPI or PyPI has been executed in this milestone.
+2. No business logic has been migrated yet from `src/multigit` into the new library package.
+3. No CLI adaptation work has started yet; the current CLI still runs from the legacy production implementation.
+4. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
+
+### Safe resume point after this snapshot
+
+1. If publication is approved, the next pending PoC action is to publish the prepared `0.0.1.dev1` library artifact to TestPyPI and validate fresh installation from that index.
+2. If publication is still deferred, the next substantive engineering phase is no longer packaging scaffolding but incremental migration of real library-owned logic from `src/multigit` into `lib/src/multigit_lib`, while preserving offline parity gates and keeping CLI behavior unchanged.
+3. CLI adaptation must remain deferred until a published and validated library release is available.
+
 ## Future 3-Repository Extraction Invariants
 
 To keep a future split into three repositories low-friction, the following must remain true:
