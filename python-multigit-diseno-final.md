@@ -36,6 +36,14 @@ Important rollout constraint:
 
 1. multigit: command exposed by the CLI distribution.
 
+### Transitional naming (PoC and parallel development phase)
+
+During the PoC and the parallel library development phase, the library must use names that do not collide with the currently published `multigit` package. The final target names (`multigit` import namespace) are applied only once the library reaches feature parity with the current implementation and the CLI is ready to be migrated to consume it.
+
+1. Transitional PyPI distribution name: multigit-lib (unchanged from final target — no collision).
+2. Transitional import package name: multigit_lib (avoids shadowing the currently installed `multigit` namespace).
+3. Rename gate: the import package is renamed from `multigit_lib` to `multigit` only after the offline parity gate passes, the CLI migration has started, and the legacy `src/multigit` path is retired.
+
 ## Architecture Boundaries
 
 ### Library responsibilities (multigit-lib)
@@ -109,7 +117,7 @@ Root repository acts as control surface only. It contains shared top-level guida
 				pyproject.toml
 				Makefile
 				src/
-					multigit/
+					multigit_lib/  # transitional name; renamed to multigit/ after rename gate
 				tests/
 				docs/  # sphinx stack owned by lib
 
@@ -126,7 +134,8 @@ Ownership rules:
 1. project.name = multigit-lib
 2. Build backend: hatchling
 3. Version source independent from CLI
-4. Package to build: lib/src/multigit
+4. Package to build during transitional phase: lib/src/multigit_lib
+5. Package to build after rename gate: lib/src/multigit
 
 ### CLI
 1. project.name = multigit
