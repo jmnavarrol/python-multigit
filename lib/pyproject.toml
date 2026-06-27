@@ -12,6 +12,13 @@ readme = 'README.md'
 requires-python = '>=3.7'
 dynamic = ['version']
 
+[project.optional-dependencies]
+development = [
+    'hatch',
+    'Sphinx',
+    'twine',
+]
+
 [build-system]
 requires = ['hatchling']
 build-backend = 'hatchling.build'
