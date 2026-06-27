@@ -10,6 +10,7 @@ The general idea is to offer a simple way of managing *"workspaces"* integrating
 1. [usage](#usage)
    1. [subrepos' file format](#subrepos-format)
 1. [development](#development)
+   1. [PoC incubation](#poc-incubation)
    1. [tests](#tests)
    1. [code documentation](#sphinx)
    1. [build](#build)
@@ -84,6 +85,14 @@ This project uses the help of [Bash Magic Enviro](https://github.com/jmnavarrol/
 It creates a Python 3 *virtualenv* using [the companion requirements file](./python-virtualenvs/multigit-development.requirements).
 
 Once the *virtualenv* is (automatically) activated, you can run this code just invoking its main script, i.e.: `multigit`.
+
+<sub>[back to top](#top).</sub>
+
+### PoC incubation<a name="poc-incubation"></a>
+
+**WARNING:** The [lib/](./lib/) subtree is currently a packaging and workflow PoC for a future library split. It is **not** the current production runtime source.
+
+The current production implementation remains under [src/multigit/](./src/multigit/). Do not treat the PoC package layout under [lib/](./lib/) as the authoritative runtime code path during this incubation phase.
 
 <sub>[back to top](#top).</sub>
 
