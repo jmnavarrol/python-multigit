@@ -18,6 +18,7 @@ WHEEL_FILE = $(DIST_DIR)/multigit_lib-$(VERSION)-py3-none-any.whl
 BUILD_INPUTS = $(PYPROJECT_FILE) $(README_FILE) $(PYTHON_FILES)
 TEST_INPUTS = $(PYTHON_FILES) $(TEST_FILES)
 DOC_INPUTS = $(DOC_FILES) $(PYTHON_FILES)
+UPLOADER = python3 -m twine upload
 
 # Style table
 export C_BOLD := \033[1m
@@ -25,7 +26,7 @@ export C_GREEN := \033[1;32m
 export C_NC := \033[0m
 
 # Basic targets
-.PHONY: help targets test build doc clean
+.PHONY: help targets test build doc upload-tmp clean
 
 help: targets
 
@@ -35,6 +36,7 @@ targets:
 	@echo -e "\t${C_BOLD}test:${C_NC} run offline unittest smoke tests when inputs change."
 	@echo -e "\t${C_BOLD}build:${C_NC} build sdist and wheel for lib."
 	@echo -e "\t${C_BOLD}doc:${C_NC} build HTML Sphinx docs recursively from docs/."
+	@echo -e "\t${C_BOLD}upload-tmp:${C_NC} upload lib artifacts to TestPyPI."
 	@echo -e "\t${C_BOLD}clean:${C_NC} remove local build artifacts."
 
 test: $(TEST_LOG)
@@ -55,6 +57,9 @@ doc: $(DOC_INDEX)
 
 $(DOC_INDEX): $(DOC_INPUTS)
 	$(MAKE) BUILDDIR=$(SPHINX_OUTPUT) html --directory=$(SPHINXDIR)
+
+upload-tmp: build
+	$(UPLOADER) --repository testpypi $(DIST_DIR)/*
 
 clean:
 	rm -rf $(DIST_DIR)/ $(BUILD_DIR)/
