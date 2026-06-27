@@ -46,7 +46,7 @@ Phase B — isolated venv, no network required (steps 4–5 require a fresh venv
 5. Installing the lib artifact alongside production multigit does not shadow or break imports of production multigit.
 
 Phase C — network, TestPyPI credentials required (steps 6–7 require TWINE_USERNAME and TWINE_PASSWORD):
-6. make -C lib upload-tmp publishes 0.0.1.dev1 to TestPyPI successfully. The upload-tmp Makefile target must use twine upload --repository testpypi. Document in lib/Makefile or lib/README that TWINE_USERNAME and TWINE_PASSWORD (or a [testpypi] entry in ~/.pypirc) must be set before invoking this target. The upload-tmp target must include a Makefile guard: check that TWINE_USERNAME and TWINE_PASSWORD are non-empty shell variables and, if not, print "Error: TWINE_USERNAME and TWINE_PASSWORD must be set before running upload-tmp" and exit 1 before invoking twine.
+6. make -C lib upload-tmp publishes 0.0.1.dev1 to TestPyPI successfully. The upload-tmp Makefile target must use twine upload --repository testpypi. Document in lib/Makefile or lib/README that a [testpypi] entry in ~/.pypirc must be configured before invoking this target.
 7. Fresh install from TestPyPI resolves and imports multigit-lib==0.0.1.dev1.
 
 **Decisions**
