@@ -50,6 +50,10 @@ Local test scaffolding:
 - Keep Sphinx documentation as part of the deliverable when a change requires it.
 - Respect the documentation structure under src/sphinx and its generation/publication workflow.
 - When adding or editing Python comments/docstrings, use Sphinx-compatible syntax (reStructuredText style when applicable).
+- Execute work in small, reviewable increments and stop after each increment for user approval before continuing.
+- Do not run publication commands (TestPyPI/PyPI uploads) unless the user explicitly asks for that specific step.
+- When adding or editing Makefile targets, model real source-to-target dependencies (inputs and concrete outputs), not stamp-only shortcuts.
+- Component-level build targets should depend on test and doc targets so packaging happens only after quality gates pass.
 
 ## 5) Real Risks Seen in the Suite
 The suite in src/tests remains integration-like in several places, but its default execution is designed to be offline.

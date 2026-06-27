@@ -9,11 +9,11 @@ Create a very small, non-functional library-only PoC release track to validate f
 4. Treat this milestone as packaging/process validation only, including installability and runtime coexistence checks (not feature completeness). Runtime coexistence checks (isolated venv, import shadowing) are explicitly in scope as they validate packaging correctness, not feature parity.
 5. Phase 1: Create isolated library PoC skeleton
 6. Add a new library workspace subtree (lib/) with minimal package structure:
-7. lib/pyproject.toml with project.name = multigit-lib and project.version = 0.0.1.dev1.
+7. lib/pyproject.toml with project.name = multigit-lib and dynamic version sourced from lib/src/multigit_lib/__init__.py (value 0.0.1.dev1).
 8. lib/src/multigit_lib/ with exactly one module: lib/src/multigit_lib/__init__.py exposing only __version__ = "0.0.1.dev1".
 9. lib/tests/ with basic unittest-based smoke tests (import and version assertions), fully offline.
 10. lib/docs/ with minimal Sphinx setup: conf.py with extensions = ["sphinx.ext.autodoc"], docs/index.rst with a toctree and at least one automodule:: multigit_lib directive, and a docs/Makefile so that make -C lib doc invokes sphinx-build -b html and exits 0.
-11. lib/Makefile with minimal targets: test, build, doc, upload-tmp, clean.
+11. lib/Makefile with minimal targets: test, build, doc, upload-tmp, clean; model source-to-target dependencies for each target and ensure build depends on successful test and doc targets.
 12. Phase 2: Packaging and release process PoC
 13. Build sdist/wheel for lib only.
 14. Validate artifact installability in isolated venv, verify no multigit shell command is installed by the library package, and confirm coexistence with production multigit without import shadowing or breakage.
@@ -62,3 +62,4 @@ Phase C — network, TestPyPI credentials required (steps 6–7 require TWINE_US
 1. Versioning note: this PoC uses 0.0.1.dev1 intentionally as a pre-release process checkpoint before any stable compatibility-drop-in release.
 2. Dependency note: CLI dependency constraints should remain unchanged until a later migration milestone actually consumes published lib.
 3. Tagging note: Create a Git tag named v0.0.1.dev1 on the commit that produced the published artifact, immediately after successful TestPyPI publication, using: git tag v0.0.1.dev1 && git push origin v0.0.1.dev1.
+4. Execution note for this implementation session: do not execute any publication step (including upload-tmp/TestPyPI) unless explicitly approved by the user at that moment.

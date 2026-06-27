@@ -92,6 +92,7 @@ All implementation decisions for this split must satisfy the following constrain
 11. Test migration policy: legacy tests are explicitly migrated by responsibility (library vs CLI) before legacy deletions.
 12. Legacy retirement policy: command/code removals are allowed only after replacement coverage and zero-reference checks pass.
 13. CI policy: component lanes are mandatory release gates; root smoke lane is optional and non-blocking.
+14. Makefile dependency policy: component Makefile targets must declare real source-to-target dependencies with concrete outputs; build/package targets must depend on test and doc quality gates.
 
 ## Target Repository Layout
 
