@@ -19,6 +19,7 @@ Important rollout constraint:
 
 1. The first released `multigit-lib` version is a compatibility-focused drop-in for current behavior and contracts.
 2. Full alignment with the final cmd/lib architecture goals is deferred until the split and migration process is fully completed.
+3. During split-parity stages, implementation prioritizes easiest safe split progression and behavior preservation over early architectural purity refactors.
 
 ## Final Naming Decisions
 
@@ -68,6 +69,15 @@ During the PoC and the parallel library development phase, the library must use 
 4. Call library services.
 5. Render output and decide exit codes.
 
+### Transitional execution mode (current split stages)
+
+Until split completion is declared, the execution policy is intentionally compatibility-first:
+
+1. Prefer copy-as-is of legacy implementation into `lib/` with minimal behavior changes.
+2. Preserve current printing/status/exception behaviors unless a change is strictly required to make packaging, tests, or docs pass.
+3. Defer architecture-purity refactors (strict rendering separation, exception-model redesign, boundary cleanup) to post-split hardening phases.
+4. Keep legacy root distribution buildable and publishable throughout these stages for urgent bugfix releases.
+
 ## Data Flow Contract
 
 1. Input adapters live in CLI (for example YAML loader).
@@ -93,6 +103,10 @@ All implementation decisions for this split must satisfy the following constrain
 12. Legacy retirement policy: command/code removals are allowed only after replacement coverage and zero-reference checks pass.
 13. CI policy: component lanes are mandatory release gates; root smoke lane is optional and non-blocking.
 14. Makefile dependency policy: component Makefile targets must declare real source-to-target dependencies with concrete outputs; build/package targets must depend on test and doc quality gates.
+15. Copy-first migration policy: during parity stages, code/tests/docs are copied into `lib/` and validated there; legacy sources remain in place until explicit retirement gates are met.
+16. Legacy releaseability policy: throughout parity stages, the current root/legacy distribution must remain buildable and publishable so urgent bugfix releases can be produced without waiting for split completion.
+17. Split-first pragmatism policy: during parity stages, prefer the direct implementation path that preserves current runtime behavior and avoids unnecessary redesign.
+18. Deferred-refactor policy: enforce final architecture boundaries strictly only after split completion; before that, boundary violations inherited from legacy code may be tolerated when needed for low-risk parity.
 
 ## Target Repository Layout
 
@@ -249,7 +263,7 @@ Clarification:
 ## Implementation Sequence (Approved)
 
 1. Incubate a new library track in parallel, without moving current production files from their existing locations.
-2. Build the first library package, tests, and docs as a compatibility-focused drop-in until behavior parity is reached against the current implementation.
+2. Build the first library package, tests, and docs as a compatibility-focused drop-in until behavior parity is reached against the current implementation, using copy-first and minimal-change principles.
 3. Publish a first stable `multigit-lib` release only after offline parity and compatibility checks pass.
 4. Keep current CLI releaseability unchanged while the new library matures.
 5. Adapt the current CLI in place to consume published `multigit-lib` through explicit adapter boundaries.
@@ -262,7 +276,7 @@ Clarification:
 
 ## Current Refactoring Status (2026-JUN-27)
 
-This snapshot records the currently completed point of the split effort so later sessions can resume safely without reconstructing the PoC milestone from scratch.
+This snapshot records the currently completed point of the split effort so later sessions can resume safely without reconstructing the PoC milestone from scratch. The 0.0.1.dev2 parity stage is tracked step-by-step, and this section is updated after each completed step.
 
 ### Completed in the current milestone
 
@@ -276,19 +290,24 @@ This snapshot records the currently completed point of the split effort so later
 8. Isolated installability validation is complete: installing the PoC library does not expose the `multigit` shell command.
 9. Coexistence validation is complete: the PoC `multigit_lib` package does not shadow the production `multigit` package when both are installed in the same virtualenv.
 10. Root-level documentation now warns that `lib/` is a PoC incubation area and not the current production runtime source.
+11. Publication to TestPyPI is complete for `multigit-lib` version `0.0.1.dev1`.
+12. TestPyPI artifact availability has been externally validated at `https://test.pypi.org/project/multigit-lib/0.0.1.dev1/`.
+13. Fresh-install smoke validation from TestPyPI is complete in a clean temporary virtualenv: `multigit_lib` imports successfully, `__version__` resolves to `0.0.1.dev1`, and no `multigit` CLI command is exposed.
+14. Stage `0.0.1.dev2` implementation has started with Phase 0 Step 1 completed: scope lock and baseline references are established in `plan-multigitLibDev2ParityStage.prompt.md`.
 
 ### Explicitly not done yet
 
-1. No publication to TestPyPI or PyPI has been executed in this milestone.
+1. No publication to production PyPI has been executed in this milestone.
 2. No business logic has been migrated yet from `src/multigit` into the new library package.
 3. No CLI adaptation work has started yet; the current CLI still runs from the legacy production implementation.
 4. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
 
 ### Safe resume point after this snapshot
 
-1. If publication is approved, the next pending PoC action is to publish the prepared `0.0.1.dev1` library artifact to TestPyPI and validate fresh installation from that index.
-2. If publication is still deferred, the next substantive engineering phase is no longer packaging scaffolding but incremental migration of real library-owned logic from `src/multigit` into `lib/src/multigit_lib`, while preserving offline parity gates and keeping CLI behavior unchanged.
-3. CLI adaptation must remain deferred until a published and validated library release is available.
+1. TestPyPI publication and clean-virtualenv fresh-install smoke validation are already completed for `0.0.1.dev1`.
+2. Stage `0.0.1.dev2` is in progress with Step 1 complete (scope lock and baseline references).
+3. The next immediate step is Phase 0 Step 2: confirm this stage ends at "ready to start main-code migration to consume library" and explicitly excludes CLI entrypoint migration itself.
+4. CLI adaptation may start only against a published and validated library release, with dependency range and compatibility checks gated by the documented publish policy.
 
 ## Future 3-Repository Extraction Invariants
 
