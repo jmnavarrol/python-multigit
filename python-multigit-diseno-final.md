@@ -294,6 +294,10 @@ This snapshot records the currently completed point of the split effort so later
 12. TestPyPI artifact availability has been externally validated at `https://test.pypi.org/project/multigit-lib/0.0.1.dev1/`.
 13. Fresh-install smoke validation from TestPyPI is complete in a clean temporary virtualenv: `multigit_lib` imports successfully, `__version__` resolves to `0.0.1.dev1`, and no `multigit` CLI command is exposed.
 14. Stage `0.0.1.dev2` implementation has started with Phase 0 Step 1 completed: scope lock and baseline references are established in `plan-multigitLibDev2ParityStage.prompt.md`.
+15. Phase 0 Step 2 is completed and explicitly confirmed: this stage ends at "ready to start main-code migration to consume library" and excludes CLI entrypoint migration itself.
+16. Phase 0 Step 3 is completed with legacy parity baseline captured from `src/multigit`: `Gitrepo.status` status semantics, `Gitrepo.update` transition outcomes, `Subrepofile.load` normalization behavior, and current error semantics are now fixed as parity reference for dev2.
+17. Phase 0 Step 4 is completed with copy-first guardrail enforced: legacy code/tests/docs remain in place and this stage preserves root build/test/release workflow operability while publication execution remains out of scope.
+18. Phase 0 Step 5 is completed: `multigit-lib` release target is now `0.0.1.dev2` in `lib/src/multigit_lib/__init__.py`, and `lib/CHANGELOG.md` Next Release draft was updated accordingly.
 
 ### Explicitly not done yet
 
@@ -305,8 +309,8 @@ This snapshot records the currently completed point of the split effort so later
 ### Safe resume point after this snapshot
 
 1. TestPyPI publication and clean-virtualenv fresh-install smoke validation are already completed for `0.0.1.dev1`.
-2. Stage `0.0.1.dev2` is in progress with Step 1 complete (scope lock and baseline references).
-3. The next immediate step is Phase 0 Step 2: confirm this stage ends at "ready to start main-code migration to consume library" and explicitly excludes CLI entrypoint migration itself.
+2. Stage `0.0.1.dev2` is in progress with Steps 1-5 complete (scope lock, stage-end boundary confirmation, legacy baseline capture, copy-first guardrail enforcement, and release-target update).
+3. The next immediate step is Phase 1 Step 7: define only the minimal public surface needed in `lib/src/multigit_lib/__init__.py` so copied code is importable/testable without redesigning behavior.
 4. CLI adaptation may start only against a published and validated library release, with dependency range and compatibility checks gated by the documented publish policy.
 
 ## Future 3-Repository Extraction Invariants

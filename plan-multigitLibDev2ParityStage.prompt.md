@@ -4,10 +4,10 @@ Evolve multigit-lib from PoC packaging-only status to offline feature parity for
 
 **Steps**
 1. Phase 0 - Scope lock and baseline references.
-2. Confirm this stage ends at "ready to start main-code migration to consume library" and excludes CLI entrypoint migration itself.
-3. Baseline legacy behavior from src/multigit as parity source, especially Gitrepo.status, Gitrepo.update, Subrepofile.load, and current status/error semantics.
-4. Enforce copy-first guardrail for this stage: do not move or delete legacy code/tests/docs; keep current root build/test/release workflows operational so urgent bugfix publication remains possible outside this stage, while this stage does not execute publication.
-5. Update lib release target to 0.0.1.dev2 in lib/src/multigit_lib/__init__.py and changelog draft for this stage. Depends on 2.
+2. Confirmed: this stage ends at "ready to start main-code migration to consume library" and excludes CLI entrypoint migration itself.
+3. Completed: baseline legacy behavior from src/multigit as parity source, especially Gitrepo.status, Gitrepo.update, Subrepofile.load, and current status/error semantics. Baseline captured: Gitrepo.status statuses are NOT_CLONED, ERROR, WRONG_REMOTE, EMPTY, DIRTY, PENDING_UPDATE, UP_TO_DATE; Gitrepo.update outcomes are CLONED, UPDATED, or passthrough terminal/error states; Subrepofile.load returns normalized absolute paths plus gitref_type in {branch, tag, commit, None} and raises SubrepofileError for YAML/schema/permission issues.
+4. Completed: copy-first guardrail is enforced for this stage: do not move or delete legacy code/tests/docs; keep current root build/test/release workflows operational so urgent bugfix publication remains possible outside this stage, while this stage does not execute publication.
+5. Completed: lib release target is updated to 0.0.1.dev2 in lib/src/multigit_lib/__init__.py and changelog draft for this stage. Depends on 2.
 6. Phase 1 - Compatibility-first copy preparation (before large copy operations).
 7. Define only the minimal public surface needed for this stage in lib/src/multigit_lib/__init__.py so copied code is importable/testable without redesigning behavior. Depends on 3.
 8. Preserve legacy status strings, exception handling, and printing behavior in copied code unless a change is strictly required for packaging/tests in this stage. Depends on 7.
