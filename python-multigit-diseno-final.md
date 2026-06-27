@@ -298,6 +298,9 @@ This snapshot records the currently completed point of the split effort so later
 16. Phase 0 Step 3 is completed with legacy parity baseline captured from `src/multigit`: `Gitrepo.status` status semantics, `Gitrepo.update` transition outcomes, `Subrepofile.load` normalization behavior, and current error semantics are now fixed as parity reference for dev2.
 17. Phase 0 Step 4 is completed with copy-first guardrail enforced: legacy code/tests/docs remain in place and this stage preserves root build/test/release workflow operability while publication execution remains out of scope.
 18. Phase 0 Step 5 is completed: `multigit-lib` release target is now `0.0.1.dev2` in `lib/src/multigit_lib/__init__.py`, and `lib/CHANGELOG.md` Next Release draft was updated accordingly.
+19. Phase 1 Step 7 is completed: a minimal stable package surface is now defined in `lib/src/multigit_lib/__init__.py` (`__version__`, `Gitrepo`, `Subrepofile`, `SubrepofileError`) using deferred imports so copied modules remain importable/testable without redesigning behavior.
+20. Phase 1 Step 8 is completed: compatibility-preservation policy for copied modules is explicitly locked for this stage (keep legacy status strings, exception handling, and printing behavior; allow only packaging/test-unblocking changes; document any unavoidable delta before proceeding).
+21. Phase 1 Step 9 is completed: cmd/lib boundary-purity refactors are explicitly deferred to post-split phases, so this stage remains focused on copy-first parity progression without rendering/exception-model/data-contract redesign.
 
 ### Explicitly not done yet
 
@@ -309,8 +312,8 @@ This snapshot records the currently completed point of the split effort so later
 ### Safe resume point after this snapshot
 
 1. TestPyPI publication and clean-virtualenv fresh-install smoke validation are already completed for `0.0.1.dev1`.
-2. Stage `0.0.1.dev2` is in progress with Steps 1-5 complete (scope lock, stage-end boundary confirmation, legacy baseline capture, copy-first guardrail enforcement, and release-target update).
-3. The next immediate step is Phase 1 Step 7: define only the minimal public surface needed in `lib/src/multigit_lib/__init__.py` so copied code is importable/testable without redesigning behavior.
+2. Stage `0.0.1.dev2` is in progress with Steps 1-5, 7, 8, and 9 complete (scope lock, stage-end boundary confirmation, legacy baseline capture, copy-first guardrail enforcement, release-target update, minimal package surface definition, compatibility-preservation policy lock, and deferred-refactor lock).
+3. The next immediate step is Phase 2 Step 11: copy domain modules from src/multigit into lib/src/multigit_lib in the defined order (gitrepo.py, subrepofile.py, subrepos_schema.yaml, then controlled library-safe subrepos orchestration).
 4. CLI adaptation may start only against a published and validated library release, with dependency range and compatibility checks gated by the documented publish policy.
 
 ## Future 3-Repository Extraction Invariants
