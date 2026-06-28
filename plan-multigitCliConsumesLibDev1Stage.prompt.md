@@ -57,6 +57,20 @@ If any lock constraint conflicts with a migration step, the lock constraint take
 41. Gate checkpoint C10: all checkpoints green and documented.
 If any gate checkpoint fails validation: (1) Do not proceed to the next step. (2) Document the failure and its evidence in the checkpoint subsection. (3) Attempt one remediation pass limited to the current phase. (4) If the checkpoint still fails after remediation, record it as a blocker in the Session Handoff Template and stop. Do not skip checkpoints.
 
+**Stage checkpoint subsection**
+- C0 (`GREEN`, 2026-06-28 14:59:25 +0200): scope locks are explicitly documented (readiness-only stage, target CLI version `0.12.0.dev1`, hybrid dependency mode with editable-local default in Phases 0-4 and dedicated TestPyPI lane in Phase 5, no-deletion rollback guardrail).
+- C1 (`GREEN`, 2026-06-28): baseline green gate passed via `make test` (root smoke lane, 17 tests OK), `make -C lib test` (25 tests OK), and `make -C lib doc` (Sphinx HTML + linkcheck succeeded).
+- C2 (`GREEN`, 2026-06-28): baseline command/exit signatures were captured twice for `-h`, `-V`, `--status`, `--run` plus negative paths (missing `subrepos`, malformed YAML, bad remote) in isolated fixtures. Evidence files: `build/evidence/c2/baseline_run1.json`, `build/evidence/c2/baseline_run2.json`, `build/evidence/c2/summary_semantic.json`. Raw output diff is path-dependent only; semantic signatures are stable.
+- C3 (`GREEN`, 2026-06-28): adapter seam was inserted in `src/multigit/__main__.py` through `_process_subrepos_*` boundary functions while preserving legacy default execution behavior. No behavior drift detected versus C2 baseline (see `build/evidence/c3/summary.json` and `build/evidence/c3/drift.json`), and root regression suite remains green via `make test`.
+- C4 (`GREEN`, 2026-06-28): version path is routed through migration-ready adapter boundary (`_get_cli_version_*`) and CLI metadata was synchronized to target version `0.12.0.dev1` (`src/multigit/__main__.py`, `CHANGELOG.md`). Gate checks passed: `-V == 0.12.0.dev1`, help output parity retained (excluding expected version literal change), and root regression suite remains green via `make test`. Evidence file: `build/evidence/c4/summary.json`.
+- C5 (`GREEN`, 2026-06-28): `--status` path is migrated to `multigit_lib` orchestration through adapter boundary in `src/multigit/__main__.py`, while CLI rendering and exit mapping are preserved through legacy-compatible output handling. Status golden scenario parity (labels/order/semantics) and run-path non-regression checks passed versus C2 baseline (see `build/evidence/c5/summary.json` and `build/evidence/c5/drift.json`), and root regression suite remains green via `make test`.
+- C6 (`GREEN`, 2026-06-28): `--run` path is now migrated to `multigit_lib` orchestration through the same adapter boundary in `src/multigit/__main__.py`, preserving CLI rendering and exit mapping. Run/status parity checks passed versus C2 baseline (`build/evidence/c6/summary.json`, `build/evidence/c6/drift.json`) and root regression suite remains green via `make test`.
+- C7 (`GREEN`, 2026-06-28): exception translation contract between `multigit_lib` orchestration errors and CLI-facing messages/exit codes is hardened, including legacy-compatible missing-subrepos context lines. Negative-path matrix parity (`missing subrepos`, `malformed YAML`, `bad remote`) now matches C2 baseline (`build/evidence/c7/summary.json`, `build/evidence/c7/drift.json`) and root regression suite remains green via `make test`.
+- C8 (`GREEN`, 2026-06-28): CLI dependency declaration is wired to `multigit-lib>=0.0.1.dev2,<1` in `pyproject.toml` (also reflected in `CHANGELOG.md`). Editable-local lane full offline suite is green (`make test`, `make -C lib test`, `make -C lib doc`), with evidence captured in `build/evidence/c8/summary.json`.
+- C9 (`GREEN`, 2026-06-28): clean-venv TestPyPI lane verification completed. Initial lane parity attempt failed due missing CLI runtime dependencies in the clean venv (`build/evidence/c9/drift.json`), then one remediation pass was applied in-phase (install CLI runtime dependencies in the clean venv) and parity succeeded (`build/evidence/c9/summary_remediation.json`, `build/evidence/c9/drift_remediation.json`).
+- C10 (`GREEN`, 2026-06-28 15:15:23 +0200): closeout synchronized across stage docs/changelog/evidence references; no legacy retirement detected (`git diff --name-status` contains only `M` entries, no deletions in `src/multigit` or `src/tests`).
+- Next checkpoint: none (stage complete, all checkpoints green and documented).
+
 **Relevant files**
 All paths are relative to repository root (`python-multigit/`).
 
@@ -100,6 +114,14 @@ Use this block at the end of each work session:
 - Open blockers: `<none | list>`
 - Rollback point: `<commit/tag/patch reference>`
 - Evidence artifacts updated: `<files/paths>`
+
+**Current Handoff Packet (C10 closeout)**
+- Last completed checkpoint: `C10`
+- Last successful command matrix run: `2026-06-28 15:15:23 +0200 + lanes editable-local/TestPyPI remediated parity`
+- Next checkpoint to execute: `None (stage complete)`
+- Open blockers: `none`
+- Rollback point: `working tree changes in CHANGELOG.md, pyproject.toml, src/multigit/__main__.py, python-multigit-diseno-final.md, plan-multigitCliConsumesLibDev1Stage.prompt.md`
+- Evidence artifacts updated: `build/evidence/c2/, build/evidence/c3/, build/evidence/c4/, build/evidence/c5/, build/evidence/c6/, build/evidence/c7/, build/evidence/c8/, build/evidence/c9/`
 
 **Further Considerations**
 1. Set the `multigit-lib` dependency range in `pyproject.toml` to `>=0.0.1.dev2,<1` for this stage. This range must also appear verbatim in the stage governance doc and changelog.

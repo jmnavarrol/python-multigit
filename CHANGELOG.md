@@ -2,6 +2,8 @@
 
 ## Next Release
 * Differences from [previous tag](/../../compare/v0.11.9…main).
+* CLI migration stage C4: version path/metadata synced to `0.12.0.dev1`.
+* CLI migration stage C8: runtime dependency range now declares `multigit-lib>=0.0.1.dev2,<1`.
 * copilot: AI-related configuration refined.
 
 

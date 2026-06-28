@@ -4,7 +4,7 @@
 [project]
 name = 'multigit'
 authors = [
-    { name  = 'Jesús M. Navarro', email = 'jesusmnavarrolopez@gmail.com' },
+	{ name = 'Jesús M. Navarro', email = 'jesusmnavarrolopez@gmail.com' },
 ]
 
 description = 'Manages git repos within git repos.'
@@ -23,6 +23,7 @@ classifiers = [
 
 requires-python = '>=3.7'
 dependencies = [
+	'multigit-lib>=0.0.1.dev2,<1',
 	'Cerberus',
 	'colorama',
 	'GitPython',

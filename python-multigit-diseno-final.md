@@ -287,12 +287,20 @@ This snapshot records the currently completed point of the split effort so later
 5. Migration-start declaration gate is closed: root smoke remains passing, legacy trees are intact, and there are no open blockers for starting CLI consumption of the library.
 6. CLI migration planning package is prepared with checkpoint-first execution policy, target CLI version `0.12.0.dev1`, hybrid dependency mode (editable-local default execution lane for Phases 0-4 + dedicated TestPyPI verification lane in Phase 5), and cross-session handoff guidance.
 7. Detailed phase-by-phase history for the completed library parity stage remains available in `plan-multigitLibDev2ParityStage.prompt.md` to avoid losing forensic context while keeping this status summary compact.
+8. CLI migration execution has started through baseline gates: C0/C1/C2 are completed and documented in `plan-multigitCliConsumesLibDev1Stage.prompt.md`, with baseline evidence artifacts stored under `build/evidence/c2/`.
+9. C3 is completed: a no-drift adapter seam boundary was introduced in `src/multigit/__main__.py` and validated against baseline signatures (`build/evidence/c3/summary.json`) with root tests still green.
+10. C4 is completed: version path/metadata migration now reports target CLI version `0.12.0.dev1` through adapter boundary functions in `src/multigit/__main__.py`, with changelog synchronized and validation evidence recorded in `build/evidence/c4/summary.json`.
+11. C5 is completed: `--status` path migration now routes through `multigit_lib` orchestration with CLI rendering/exit compatibility preserved, parity evidence recorded in `build/evidence/c5/summary.json`, and root tests still green.
+12. C6 is completed: `--run` path migration now routes through `multigit_lib` orchestration with parity evidence recorded in `build/evidence/c6/summary.json`, and root tests remain green.
+13. C7 is completed: exception translation is hardened to preserve legacy CLI-facing messages/exit mapping, and negative-path parity evidence is recorded in `build/evidence/c7/summary.json`.
+14. C8 is completed: CLI dependency declaration now includes `multigit-lib>=0.0.1.dev2,<1`, and editable-local full offline suite validation is recorded in `build/evidence/c8/summary.json`.
+15. C9 is completed: clean-venv TestPyPI lane parity is green after one in-phase remediation pass to install missing CLI runtime dependencies in the verification venv (`build/evidence/c9/summary_remediation.json`).
+16. C10 closeout is completed: all checkpoints C0-C10 are green and documented; no legacy-retirement deletions were introduced in this stage.
 
 ### Explicitly not done yet
 
 1. No publication to production PyPI has been executed in this milestone.
-2. No CLI adaptation work has started yet; the current CLI still runs from the legacy production implementation.
-3. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
+2. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
 
 ### Remaining blockers for CLI migration start gate
 
@@ -302,8 +310,8 @@ This snapshot records the currently completed point of the split effort so later
 
 1. TestPyPI publication and clean-virtualenv fresh-install smoke validation are completed for `multigit-lib==0.0.1.dev2`.
 2. Stage `0.0.1.dev2` is closed for parity objectives and is now the baseline for CLI migration start.
-3. The next immediate step is to execute the CLI migration checklist below with target CLI version `0.12.0.dev1`, preserving parity and rollback-safe checkpoints.
-4. Detailed cross-session execution runbook is tracked in `plan-multigitCliConsumesLibDev1Stage.prompt.md`.
+3. CLI migration stage `0.12.0.dev1` checkpoints C0-C10 are now complete and documented in `plan-multigitCliConsumesLibDev1Stage.prompt.md`.
+4. Detailed evidence artifacts are stored under `build/evidence/c2/` through `build/evidence/c9/`.
 
 ## CLI Migration Stage (0.12.0.dev1) Execution Checklist
 
