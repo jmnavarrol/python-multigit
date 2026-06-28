@@ -1,10 +1,10 @@
 # CHANGELOG
 
 ## Next Release
-* Differences from [0.0.2.dev1 publication commit](/../../compare/8d53bf5c0e9303841a6e514ee5291d6452f92338...splitting-plan).
+* Differences from [0.0.2.dev1 publication commit](/../../compare/fbb7409d848f1a2278eb05ad60200cc680aa1ffc...splitting-plan).
 
-## Next Release
-* Differences from [0.0.1.dev1 publication commit](/../../compare/8d53bf5c0e9303841a6e514ee5291d6452f92338...8d53bf5c0e9303841a6e514ee5291d6452f92338).
+## 0.0.1.dev2 (2026-JUN-28)
+* Differences from [0.0.1.dev1 publication commit](/../../compare/8d53bf5c0e9303841a6e514ee5291d6452f92338...fbb7409d848f1a2278eb05ad60200cc680aa1ffc).
 * Library functional parity with legacy behavior is now achieved for the stage scope, including representative status/update/error scenarios validated by copied ownership tests plus explicit legacy-vs-lib parity tests.
 * Release-readiness gates are green in `lib`: expanded offline tests (including parity suite), documentation build, packaging build, and clean local artifact install validation.
 * Migration-start declaration gate is closed: root legacy test lane still passes unchanged, and legacy trees under `src/multigit` and `src/tests` remain intact.
