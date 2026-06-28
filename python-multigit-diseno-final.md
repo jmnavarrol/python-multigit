@@ -181,7 +181,7 @@ Bash Magic Enviro remains rooted at repository top level:
 
 CLI distribution depends on library distribution using a compatible major range:
 
-1. Transitional phase: multigit depends on multigit-lib>=0.1,<1
+1. Transitional phase (current `0.12.0.dev1` stage): multigit depends on multigit-lib>=0.0.1.dev2,<1
 2. Post-split-finalization phase: multigit depends on multigit-lib>=1.0,<2
 
 This allows independent evolution while protecting runtime compatibility.
@@ -274,54 +274,25 @@ Clarification:
 10. Refactor both cmd and library components to fully honor the final design goals once split completion is achieved.
 11. Normalize root recursive orchestration, component docs/test ownership, and future extraction seams for cmd/lib/lifecycle.
 
-## Current Refactoring Status (2026-JUN-27)
+## Current Refactoring Status (2026-JUN-28)
 
 This snapshot records the currently completed point of the split effort so later sessions can resume safely without reconstructing the PoC milestone from scratch. The 0.0.1.dev2 parity stage is tracked step-by-step, and this section is updated after each completed step.
 
 ### Completed in the current milestone
 
-1. A new `lib/` subtree exists as an isolated PoC component for the future `multigit-lib` distribution.
-2. The transitional import package name is `multigit_lib`, with version sourced dynamically from `lib/src/multigit_lib/__init__.py`.
-3. The component includes its own `pyproject.toml`, `Makefile`, `README.md`, `CHANGELOG.md`, `tests/`, and `docs/`.
-4. Component-local Makefile targets exist for `test`, `build`, `doc`, `upload-tmp`, and `clean`, with real source-to-target dependency modeling.
-5. Offline smoke tests for `multigit_lib` import and version exposure are in place and passing.
-6. Component-local Sphinx documentation is in place and builds successfully.
-7. Local build validation is complete: sdist and wheel are produced successfully for the PoC component.
-8. Isolated installability validation is complete: installing the PoC library does not expose the `multigit` shell command.
-9. Coexistence validation is complete: the PoC `multigit_lib` package does not shadow the production `multigit` package when both are installed in the same virtualenv.
-10. Root-level documentation now warns that `lib/` is a PoC incubation area and not the current production runtime source.
-11. Publication to TestPyPI is complete for `multigit-lib` version `0.0.1.dev1`.
-12. TestPyPI artifact availability has been externally validated at `https://test.pypi.org/project/multigit-lib/0.0.1.dev1/`.
-13. Fresh-install smoke validation from TestPyPI is complete in a clean temporary virtualenv: `multigit_lib` imports successfully, `__version__` resolves to `0.0.1.dev1`, and no `multigit` CLI command is exposed.
-14. Stage `0.0.1.dev2` implementation has started with Phase 0 Step 1 completed: scope lock and baseline references are established in `plan-multigitLibDev2ParityStage.prompt.md`.
-15. Phase 0 Step 2 is completed and explicitly confirmed: this stage ends at "ready to start main-code migration to consume library" and excludes CLI entrypoint migration itself.
-16. Phase 0 Step 3 is completed with legacy parity baseline captured from `src/multigit`: `Gitrepo.status` status semantics, `Gitrepo.update` transition outcomes, `Subrepofile.load` normalization behavior, and current error semantics are now fixed as parity reference for dev2.
-17. Phase 0 Step 4 is completed with copy-first guardrail enforced: legacy code/tests/docs remain in place and this stage preserves root build/test/release workflow operability while publication execution remains out of scope.
-18. Phase 0 Step 5 is completed: `multigit-lib` release target is now `0.0.1.dev2` in `lib/src/multigit_lib/__init__.py`, and `lib/CHANGELOG.md` Next Release draft was updated accordingly.
-19. Phase 1 Step 7 is completed: a minimal stable package surface is now defined in `lib/src/multigit_lib/__init__.py` (`__version__`, `Gitrepo`, `Subrepofile`, `SubrepofileError`) using deferred imports so copied modules remain importable/testable without redesigning behavior.
-20. Phase 1 Step 8 is completed: compatibility-preservation policy for copied modules is explicitly locked for this stage (keep legacy status strings, exception handling, and printing behavior; allow only packaging/test-unblocking changes; document any unavoidable delta before proceeding).
-21. Phase 1 Step 9 is completed: cmd/lib boundary-purity refactors are explicitly deferred to post-split phases, so this stage remains focused on copy-first parity progression without rendering/exception-model/data-contract redesign.
-22. Phase 2 Step 11 is completed: copied `gitrepo.py`, `subrepofile.py`, and `subrepos_schema.yaml` from `src/multigit` into `lib/src/multigit_lib`, and added a controlled library-safe orchestration slice in `subrepos_orchestration.py` with no direct stdout/stderr writes, no `sys.exit`, and no `colorama` import.
-23. Phase 2 Step 12 is completed: copied subrepos orchestration was aligned to legacy-style flow (class + process method and recursive queue processing), with only library-safe adjustments retained and parity-oriented status semantics preserved.
-24. Phase 2 Step 13 is completed: lib runtime dependencies were updated in `lib/pyproject.toml` to include `GitPython`, `PyYAML`, and `Cerberus`, while `colorama` remained out of required runtime dependencies by making it optional in copied `subrepofile.py`.
-25. Phase 3 Step 15 is completed: lib test ownership expanded by copying fixtures (`git_scaffold.py`), gitrepo tests, and subrepos domain tests from `src/tests` into `lib/tests` with minimal import and exception-model adaptations for library-safe behavior.
-26. Phase 3 Step 16 is completed: explicit legacy-vs-lib parity tests were added in `lib/tests/parity/test_legacy_parity.py` and validated against offline fixtures for status, update, and Subrepofile load/error parity scenarios.
-27. Phase 3 Step 17 is completed: root/legacy tests remain runnable (`make test` at repository root passes) and legacy trees were kept intact (`src/multigit` and `src/tests` still present with files), satisfying the transition guardrail.
-28. Phase 4 Step 19 is completed: `lib/docs/api.rst` now contains concrete API coverage for copied modules and exceptions (`multigit_lib`, `multigit_lib.gitrepo`, `multigit_lib.subrepofile`, and `multigit_lib.subrepos_orchestration`), and documentation/build gates pass.
-29. Phase 4 Step 20 is completed: `lib/docs/index.rst` was updated from PoC framing to parity-stage framing with explicit boundaries for what is currently in `lib` versus still in CLI/legacy areas.
-30. Phase 4 Step 21 is completed: transitional notes now explicitly state this stage prioritizes split ease and behavior parity, while target architecture refactors are deferred to post-split phases.
-31. Phase 4 Step 22 is completed: top-level design/status tracking remains synchronized after each step, with dev2 progress and remaining CLI-migration-start blockers explicitly documented.
-32. Phase 5 Step 24 is completed: component gates in `lib` are green (`make test`, `make doc`, `make build`) and clean virtualenv smoke install from local wheel artifact was validated (`multigit_lib` import + `__version__ == 0.0.1.dev2`, and no `multigit` CLI exposed).
-33. Phase 5 Step 25 is completed: parity gate checklist is now consolidated as green (offline tests passing, representative behavior parity confirmed, docs/changelog synchronized, and runtime dependencies complete for the copied modules).
-34. Phase 5 Step 26 is completed: TestPyPI publication bundle/checklist for `0.0.1.dev2` was prepared in `lib/docs/testpypi_release_checklist_dev2.rst` (credentials prechecks, commands, post-upload verification bundle, rollback notes), with no publication execution.
-35. Phase 5 Step 27 is completed: migration-start declaration gate is now satisfied (`make test` at repository root passes unchanged with 17 tests, legacy trees remain intact with files under `src/multigit` and `src/tests`, and blocker-owner documentation is explicitly closed for this gate).
+1. Library incubation component `lib/` is established and self-contained (`pyproject.toml`, `Makefile`, `tests/`, `docs/`, `CHANGELOG.md`) under transitional import namespace `multigit_lib`.
+2. Library parity stage for `0.0.1.dev2` is complete: core modules were copied with compatibility-first policy, offline parity tests are in place, and docs were upgraded to real API/boundary coverage.
+3. Quality gates are green for the library component (`make test`, `make doc`, `make build`), and local install smoke confirms `multigit_lib` import/version without exposing the `multigit` CLI.
+4. Publication status is complete for `multigit-lib==0.0.1.dev2` on TestPyPI, with verification and rollback notes recorded in `lib/docs/testpypi_release_checklist_dev2.rst`.
+5. Migration-start declaration gate is closed: root smoke remains passing, legacy trees are intact, and there are no open blockers for starting CLI consumption of the library.
+6. CLI migration planning package is prepared with checkpoint-first execution policy, target CLI version `0.12.0.dev1`, hybrid dependency mode (editable-local default execution lane for Phases 0-4 + dedicated TestPyPI verification lane in Phase 5), and cross-session handoff guidance.
+7. Detailed phase-by-phase history for the completed library parity stage remains available in `plan-multigitLibDev2ParityStage.prompt.md` to avoid losing forensic context while keeping this status summary compact.
 
 ### Explicitly not done yet
 
 1. No publication to production PyPI has been executed in this milestone.
-2. No business logic has been migrated yet from `src/multigit` into the new library package.
-3. No CLI adaptation work has started yet; the current CLI still runs from the legacy production implementation.
-4. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
+2. No CLI adaptation work has started yet; the current CLI still runs from the legacy production implementation.
+3. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
 
 ### Remaining blockers for CLI migration start gate
 
@@ -329,10 +300,52 @@ This snapshot records the currently completed point of the split effort so later
 
 ### Safe resume point after this snapshot
 
-1. TestPyPI publication and clean-virtualenv fresh-install smoke validation are already completed for `0.0.1.dev1`.
-2. Stage `0.0.1.dev2` is in progress with Steps 1-5, 7, 8, 9, 11, 12, 13, 15, 16, 17, 19, 20, 21, 22, 24, 25, 26, and 27 complete (scope lock, stage-end boundary confirmation, legacy baseline capture, copy-first guardrail enforcement, release-target update, minimal package surface definition, compatibility-preservation policy lock, deferred-refactor lock, first core module copy, parity-preserving subrepos alignment, runtime dependency completion, ownership-based test expansion, explicit parity-test validation, root/legacy test-runnability confirmation, API-doc parity coverage, index/boundary update, transitional-note update, top-level status synchronization, release-readiness gate execution, consolidated parity checklist closure, publication-bundle preparation without execution, and migration-start declaration gate closure).
-3. The next immediate step is to begin main code migration so CLI paths consume `multigit_lib` incrementally, preserving parity and keeping rollback-safe checkpoints.
-4. CLI adaptation should continue to honor publish-policy gates for any dependency/version changes tied to public release usage.
+1. TestPyPI publication and clean-virtualenv fresh-install smoke validation are completed for `multigit-lib==0.0.1.dev2`.
+2. Stage `0.0.1.dev2` is closed for parity objectives and is now the baseline for CLI migration start.
+3. The next immediate step is to execute the CLI migration checklist below with target CLI version `0.12.0.dev1`, preserving parity and rollback-safe checkpoints.
+4. Detailed cross-session execution runbook is tracked in `plan-multigitCliConsumesLibDev1Stage.prompt.md`.
+
+## CLI Migration Stage (0.12.0.dev1) Execution Checklist
+
+Mandatory sequence. Do not advance unless the current checkpoint is green.
+
+If any lock constraint conflicts with a migration step, the lock constraint takes precedence and the step must be scoped to avoid the violation. Document the constraint application in checkpoint evidence. Additions to `src/tests/` are permitted; only deletions are prohibited.
+
+If any gate checkpoint fails validation: (1) Do not proceed to the next step. (2) Document the failure and its evidence in the checkpoint subsection. (3) Attempt one remediation pass limited to the current phase. (4) If the checkpoint still fails after remediation, record it as a blocker in the Session Handoff Template and stop. Do not skip checkpoints.
+
+1. C0 Scope lock:
+	- Readiness-only stage (no CLI publish execution), target CLI version `0.12.0.dev1`, hybrid dependency lane (editable-local default for Phases 0-4 + dedicated TestPyPI lane in C9), no-delete legacy guardrail.
+   - Go/No-Go: all constraints explicitly recorded.
+2. C1 Baseline green:
+   - Run root smoke lane + library tests + library docs.
+   - Go/No-Go: all pass, no new regressions/warnings.
+3. C2 Baseline evidence:
+   - Capture signatures and exit codes for `-h`, `-V`, `--status`, `--run`; replay twice.
+   - Go/No-Go: signatures are stable and reproducible.
+4. C3 Adapter seam (no behavior change):
+   - Introduce seam/feature-switch point with unchanged default execution path.
+   - Go/No-Go: baseline signatures unchanged.
+5. C4 Version path migration:
+   - Route version/metadata path via migration-ready adapter and sync changelog/metadata.
+   - Go/No-Go: `-V == 0.12.0.dev1`, help unchanged.
+6. C5 Status path migration:
+   - Route `--status` orchestration/domain path to `multigit_lib`, keep CLI rendering/exit mapping.
+   - Go/No-Go: status golden scenarios match baseline labels/order/signatures.
+7. C6 Run path migration:
+   - Route `--run` orchestration/domain path to `multigit_lib`, keep CLI rendering/exit mapping.
+   - Go/No-Go: run fixtures match baseline transitions/side effects/terminal statuses.
+8. C7 Exception contract hardening:
+   - Finalize `multigit_lib` exception translation to CLI messages + exit codes.
+   - Go/No-Go: negative-path matrix matches baseline behavior.
+9. C8 Dependency wiring:
+	- Apply CLI/runtime dependency declaration for `multigit-lib>=0.0.1.dev2,<1`; keep hybrid dependency mode.
+   - Go/No-Go: full offline suite passes in editable-local lane.
+10. C9 External lane verification:
+	- Switch to the dedicated TestPyPI verification lane: clean venv, install `multigit-lib==0.0.1.dev2` from TestPyPI, run smoke/integration matrix.
+   - Go/No-Go: outcomes/exit codes match editable-local lane.
+11. C10 Closeout:
+   - Update status docs/changelog/evidence, confirm no legacy retirements, produce handoff packet.
+   - Go/No-Go: C0-C9 all green and documented.
 
 ## Future 3-Repository Extraction Invariants
 
