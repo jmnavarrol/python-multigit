@@ -64,7 +64,7 @@ Out of scope in this stage (still in CLI/legacy)
   * strict rendering separation
   * exception-model redesign
   * boundary/data-contract cleanup
-* Publication execution (TestPyPI/PyPI) in this stage.
+* Further publication iterations (new versions and PyPI promotion) remain gated.
 
 Transitional Notes
 ==================
@@ -80,3 +80,4 @@ Current Status Summary
 * API documentation now reflects copied modules and exceptions.
 * Root and legacy tests remain runnable during transition.
 * Legacy source and tests remain in place until explicit retirement gates.
+* TestPyPI publication completed for ``multigit-lib==0.0.1.dev2``.

@@ -4,7 +4,9 @@ TestPyPI publication checklist for 0.0.1.dev2
 Status
 ------
 
-Prepared only. Publication is intentionally not executed in this stage.
+Published on TestPyPI. Version ``0.0.1.dev2`` is available at:
+
+* https://test.pypi.org/project/multigit-lib/0.0.1.dev2/
 
 Artifacts prepared
 ------------------
@@ -26,8 +28,8 @@ Credentials and environment prerequisites
 3. The artifact version must be unique in TestPyPI (no overwrite attempts).
 4. Build/test/doc gates must already be green before any publication action.
 
-Publication command bundle (do not execute in this stage)
-----------------------------------------------------------
+Publication command bundle (executed for 0.0.1.dev2)
+-----------------------------------------------------
 
 1. Validate artifacts:
 
@@ -47,8 +49,8 @@ Publication command bundle (do not execute in this stage)
 
       python3 -m twine upload --repository testpypi dist/*
 
-Post-upload verification bundle (do not execute in this stage)
----------------------------------------------------------------
+Post-upload verification bundle
+-------------------------------
 
 1. Verify package page shows the expected version and files.
 2. Create a clean virtualenv and install from TestPyPI index.
