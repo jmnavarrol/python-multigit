@@ -296,8 +296,13 @@ This snapshot records the currently completed point of the split effort so later
 14. Checkpoint `G5` is completed for the `0.12.0.dev2` stage (exception-to-message/exit translation extraction into `src/multigit/cli_error_translation.py`), with negative-path parity vs `G2` green for missing-config, malformed-YAML, and domain/schema-failure scenarios using `build/evidence/g5/` evidence.
 15. Checkpoint `G6` is completed for the `0.12.0.dev2` stage: final command/negative parity matrix is green vs `G2` and ownership map is approved at `build/evidence/g6/ownership-matrix.md`.
 16. Checkpoint `G7` is completed for the `0.12.0.dev2` stage: duplicate legacy/cmd implementation logic designated library-owned was removed by replacing `src/multigit/gitrepo.py` and `src/multigit/subrepofile.py` with compatibility shims to multigit-lib; parity and offline-suite validation remain green and rollback traceability is documented in `build/evidence/g7/removal-report.md`.
-17. Checkpoint `G8` is completed for the `0.12.0.dev2` stage: root legacy/CLI lane now validates command-line behavior only (CLI tests active, domain-heavy legacy suites marked migrated to library ownership), ownership split evidence is captured in `build/evidence/g8/test-ownership-split.md`, and parity remains green vs `G2`.
+17. Checkpoint `G8` is completed for the `0.12.0.dev2` stage: root legacy/CLI lane now validates command-line behavior only (CLI tests active under `src/tests/cli`), and domain-heavy legacy suites were removed from `src/tests/gitrepo` and `src/tests/subrepos` after ownership migration to `lib/tests/`; current validation is green in both lanes (src CLI tests and lib domain tests).
 18. Checkpoint `G9` is completed for the `0.12.0.dev2` stage: closeout synchronization is complete (status docs + changelog + evidence index), final references remain at `0.12.0.dev2`, and handoff packet is published in `build/evidence/g9/`.
+19. Stage scope is extended with `G10-G13` to advance architecture cleanup in-place: strict backward-compatibility guardrails may be retired when they block cmd/lib boundary hardening, under mandatory red/green/refactor sequencing (tests first).
+20. Checkpoint `G10` is completed for the `0.12.0.dev2` stage extension: compatibility-relaxation scope and red/green/refactor workflow are locked in `build/evidence/g10/compatibility-relaxation-lock.md`.
+21. Checkpoint `G11` is completed for the `0.12.0.dev2` stage extension (selected guardrail retirement): legacy-lane env-toggle routing was retired from CLI entrypoint and red/green/refactor evidence is captured in `build/evidence/g11/`.
+22. Checkpoint `G12` is completed for the `0.12.0.dev2` stage extension (selected boundary hardening): status/run adapter no longer depends on legacy `Subrepos` class, CLI-owned renderer is used, and tests-first evidence is captured in `build/evidence/g12/`.
+23. Checkpoint `G13` is completed for the `0.12.0.dev2` stage extension: extension closeout synchronization is complete (status docs + changelog + extension evidence index), and extension handoff packet is published in `build/evidence/g13/`.
 
 ### Explicitly not done yet
 
@@ -306,8 +311,8 @@ This snapshot records the currently completed point of the split effort so later
 
 ### Safe resume point after this snapshot
 
-1. The dev2 stage is fully closed; resume from the next stage candidate documented in `build/evidence/g9/handoff-packet.md`.
-2. Use documented `C0-C10` and `G0-G9` outcomes in tracked status/stage files as the baseline reference set; `build/evidence/` remains supplemental evidence if cleanup removes artifacts.
+1. The dev2 extension is fully closed; resume from next-stage candidate documented in `build/evidence/g13/handoff-packet.md`.
+2. Use documented `C0-C10` and `G0-G13` outcomes as baseline reference for next-stage planning.
 
 ## Legacy Cleanup Stage (0.12.0.dev2) Execution Checklist
 
@@ -329,6 +334,10 @@ If any gate checkpoint fails validation: (1) Do not proceed to the next step. (2
 8. G7 End-of-stage duplicate removal: remove only validated lib-owned legacy/cmd code and adjust duplicate tests.
 9. G8 Legacy test-suite re-scope: keep legacy tests CLI-focused and keep library-domain assertions in `lib/tests/`.
 10. G9 Closeout: synchronize docs/status/evidence index, confirm final references at `0.12.0.dev2`, and publish handoff packet.
+11. G10 Compatibility-relaxation lock: document approved backward-compatibility relaxations and tests-first workflow for extension.
+12. G11 Shim/guardrail retirement: create failing tests first, then retire compatibility-only shims/guardrails, then refactor with green tests.
+13. G12 Boundary hardening: create failing CLI-focused tests first, then constrain cmd to CLI concerns and keep domain logic in lib ownership.
+14. G13 Extension closeout: synchronize extension status/evidence and publish extension handoff packet.
 
 ## Future 3-Repository Extraction Invariants
 

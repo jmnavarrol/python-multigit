@@ -17,49 +17,20 @@ The *"fixed"* name of the YAML file with subrepo definitions.
 '''  # pylint: disable=W0105
 
 # Import stuff
-import os, sys
+import os
+import sys
 import argparse
 
 # "local" imports
-from .subrepos import Subrepos
 from .status_run_adapter import process_subrepos_with_adapter
 
 
-def _process_subrepos_legacy(base_path, report_only):
-	"""Legacy execution path kept as default during migration stages."""
-	my_subrepos = Subrepos()
-	return my_subrepos.process(
-		base_path=base_path,
-		subrepos_filename=SUBREPOS_FILE,
-		report_only=report_only,
-	)
-
-
-def _process_subrepos_adapter(base_path, report_only):
-	"""Adapter seam for progressive migration to library-backed orchestration."""
+def _process_subrepos(base_path, report_only):
+	"""Run CLI status/run flow through the canonical adapter path."""
 	return process_subrepos_with_adapter(
 		base_path=base_path,
 		report_only=report_only,
 		subrepos_filename=SUBREPOS_FILE,
-	)
-
-
-def _should_use_legacy_lane():
-	"""Allow explicit rollback to legacy lane during migration diagnostics."""
-	return os.environ.get('MULTIGIT_USE_LEGACY_LANE', '0') == '1'
-
-
-def _process_subrepos(base_path, report_only):
-	"""Boundary for selecting execution path without changing CLI semantics."""
-	# Keep adapter lane as default while preserving an explicit rollback switch.
-	if _should_use_legacy_lane():
-		return _process_subrepos_legacy(
-			base_path=base_path,
-			report_only=report_only,
-		)
-	return _process_subrepos_adapter(
-		base_path=base_path,
-		report_only=report_only,
 	)
 
 

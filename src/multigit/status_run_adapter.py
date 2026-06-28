@@ -3,8 +3,8 @@
 import os
 import sys
 
-from .subrepos import Subrepos
 from .cli_error_translation import exit_from_orchestration_error
+from .cli_rendering import print_subrepo_status
 
 
 def _load_multigit_lib_status_orchestrator():
@@ -39,8 +39,7 @@ def process_subrepos_with_adapter(base_path, report_only, subrepos_filename):
     except orchestration_error as error:
         exit_from_orchestration_error(error, base_path, subrepos_filename)
 
-    legacy_renderer = Subrepos()
     for current_subrepo in processed_subrepos:
-        legacy_renderer._Subrepos__print_subrepo_status(current_subrepo)
+        print_subrepo_status(current_subrepo)
 
     return None

@@ -5,6 +5,11 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import inspect
+
+import multigit.__main__ as cli_main
+import multigit.status_run_adapter as status_run_adapter
+import multigit.cli_rendering as cli_rendering
 
 
 class TestCliBehavior(unittest.TestCase):
@@ -46,6 +51,20 @@ class TestCliBehavior(unittest.TestCase):
             result = self._run_cli('--status', cwd=temp_dir)
         self.assertEqual(result.returncode, 2)
         self.assertIn("Couldn't find any 'subrepos' file... exiting.", result.stdout)
+
+    def test_legacy_lane_env_toggle_retired(self):
+        source = inspect.getsource(cli_main)
+        self.assertNotIn('MULTIGIT_USE_LEGACY_LANE', source)
+
+    def test_legacy_lane_selector_helper_removed(self):
+        self.assertFalse(hasattr(cli_main, '_should_use_legacy_lane'))
+
+    def test_status_run_adapter_does_not_depend_on_subrepos_class(self):
+        source = inspect.getsource(status_run_adapter)
+        self.assertNotIn('from .subrepos import Subrepos', source)
+
+    def test_cli_rendering_exposes_subrepo_status_renderer(self):
+        self.assertTrue(hasattr(cli_rendering, 'print_subrepo_status'))
 
 
 if __name__ == '__main__':

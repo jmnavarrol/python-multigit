@@ -67,6 +67,30 @@ After each completed checkpoint, update:
 49. G9 acceptance criteria: all gates are green and documented.
 50. G9 checkpoint tracker: update Stage checkpoint subsection entry for G9 with status and evidence.
 
+51. Phase 10 - Compatibility-relaxation lock for architecture cleanup.
+52. G10 entry criteria: G9 completed.
+53. G10 actions: explicitly lock that strict backward-compatibility guardrails may be retired when they block cmd/lib boundary cleanup; define mandatory red/green/refactor workflow (update/create failing unit tests first, then code changes, then refactor).
+54. G10 acceptance criteria: compatibility-relaxation scope and red/green/refactor workflow are documented and approved for remaining work in this stage.
+55. G10 checkpoint tracker: update Stage checkpoint subsection entry for G10 with status and evidence.
+
+56. Phase 11 - Retire compatibility shims and rollback guardrails.
+57. G11 entry criteria: G10 completed.
+58. G11 actions: write/update failing unit tests first for target behavior with direct cmd/lib boundaries; then remove compatibility shims/guardrails that exist only for backward-compatibility (including legacy-lane toggles and pass-through wrappers), and refactor imports/call paths to canonical ownership.
+59. G11 acceptance criteria: shim/guardrail retirements are complete for selected scope, tests are green after refactor, and removed compatibility paths are listed in evidence.
+60. G11 checkpoint tracker: update Stage checkpoint subsection entry for G11 with status and evidence.
+
+61. Phase 12 - Boundary hardening (cmd responsibilities only).
+62. G12 entry criteria: G11 completed.
+63. G12 actions: write/update failing CLI-focused tests first; then constrain cmd package to argument parsing/routing/rendering/exit mapping only, removing residual domain logic from cmd-side modules and redirecting domain behavior to library ownership.
+64. G12 acceptance criteria: cmd-side modules contain only CLI concerns, library owns domain behavior, and parity/functional checks pass against updated expected behavior.
+65. G12 checkpoint tracker: update Stage checkpoint subsection entry for G12 with status and evidence.
+
+66. Phase 13 - Stage extension closeout.
+67. G13 entry criteria: G12 completed.
+68. G13 actions: refresh status docs/changelog/evidence index for G10-G12 outcomes, publish extension handoff packet, and confirm references remain aligned to 0.12.0.dev2 unless an explicit version bump gate is opened.
+69. G13 acceptance criteria: extension gates are documented as green, evidence index is complete, and handoff packet is published.
+70. G13 checkpoint tracker: update Stage checkpoint subsection entry for G13 with status and evidence.
+
 If any gate fails validation:
 1. Do not proceed to next phase.
 2. Document failure and evidence in checkpoint subsection.
@@ -82,8 +106,12 @@ If any gate fails validation:
 - G5 (DONE 2026-JUN-28): extraction slice C completed by moving exception-to-message/exit translation into CLI-owned `src/multigit/cli_error_translation.py` and delegating from `src/multigit/status_run_adapter.py`; negative-path parity vs G2 is green for missing-config, malformed-YAML, and domain/schema-failure cases (`build/evidence/g5/*.txt`) with normalized path comparison to account for sandbox location.
 - G6 (DONE 2026-JUN-28): final command and negative-path parity matrix are green vs G2 baseline (`build/evidence/g6/*.txt`, normalized comparisons `*.g2.norm` and `*.g6.norm` all MATCH) and ownership matrix is approved at `build/evidence/g6/ownership-matrix.md`.
 - G7 (DONE 2026-JUN-28): duplicate legacy/cmd implementation logic removed where ownership matrix marks library ownership (`src/multigit/gitrepo.py`, `src/multigit/subrepofile.py` now compatibility shims to `multigit-lib`); parity remains green vs G2 and offline suites are green (`make test`: 17 passed); rollback traceability documented in `build/evidence/g7/removal-report.md`.
-- G8 (DONE 2026-JUN-28): legacy/CLI test lane re-scoped to command-line validation only (`src/tests/cli/test_cli_behavior.py` active; domain-heavy legacy suites in `src/tests/gitrepo/*` and `src/tests/subrepos/test_subrepos.py` marked migrated to library ownership and skipped); ownership split evidence documented in `build/evidence/g8/test-ownership-split.md`; parity remains green vs G2 (`build/evidence/g8/*.txt` normalized comparisons all MATCH).
+- G8 (DONE 2026-JUN-28): legacy/CLI test lane re-scoped to command-line validation only (`src/tests/cli/test_cli_behavior.py` active), and domain-heavy legacy suites were removed from `src/tests/gitrepo/*` and `src/tests/subrepos/*` after ownership migration to `lib/tests/`; current validation is green with src lane (8 tests) and lib lane (25 tests).
 - G9 (DONE 2026-JUN-28): closeout synchronized (status docs + changelog + evidence index), final stage references confirmed at 0.12.0.dev2, and handoff packet published (`build/evidence/g9/evidence-index.md`, `build/evidence/g9/handoff-packet.md`).
+- G10 (DONE 2026-JUN-28): compatibility-relaxation scope and mandatory red/green/refactor workflow are locked in `build/evidence/g10/compatibility-relaxation-lock.md`; strict backward-compatibility guardrails may be retired when they block boundary cleanup.
+- G11 (DONE 2026-JUN-28): selected compatibility guardrail retirement completed by removing legacy-lane env-toggle routing from CLI entrypoint (`MULTIGIT_USE_LEGACY_LANE`, `_should_use_legacy_lane`, `_process_subrepos_legacy`, `_process_subrepos_adapter` retired); red/green/refactor evidence captured in `build/evidence/g11/red_cli_behavior.log`, `build/evidence/g11/green_cli_behavior.log`, `build/evidence/g11/refactor_root_make_test.log`, and summary in `build/evidence/g11/change-set-01-retire-legacy-lane-guardrail.md`.
+- G12 (DONE 2026-JUN-28): selected boundary hardening completed by removing status/run adapter dependency on legacy `Subrepos` class and moving subrepo status rendering into CLI-owned `print_subrepo_status` (`src/multigit/cli_rendering.py`); red/green/refactor evidence captured in `build/evidence/g12/red_cli_boundary.log`, `build/evidence/g12/green_cli_boundary.log`, `build/evidence/g12/refactor_root_make_test.log`; runtime signature verification recorded in `build/evidence/g12/change-set-01-boundary-hardening.md`.
+- G13 (DONE 2026-JUN-28): extension closeout synchronized (status docs + changelog + extension evidence index), references remain aligned to 0.12.0.dev2, and extension handoff packet published (`build/evidence/g13/evidence-index.md`, `build/evidence/g13/handoff-packet.md`).
 
 **Relevant files**
 - python-multigit-diseno-final.md - authoritative split governance/status.
@@ -96,16 +124,21 @@ If any gate fails validation:
 - CHANGELOG.md - stage/version history sync.
 
 **Verification**
-1. Gate acceptance criteria are defined inside each G0-G9 block in Steps and are authoritative.
+1. Gate acceptance criteria are defined inside each G0-G13 block in Steps and are authoritative.
 2. At each gate: run root offline tests plus command matrix evidence collection.
 3. At G1: validate 0.12.0.dev2 alignment in metadata and runtime output.
 4. At G3-G6: enforce parity definition from G3 for output and exit-code comparisons vs G2 baseline.
 5. At G7-G8: verify removed legacy/cmd lib-owned code remains covered by lib tests and CLI tests assert CLI behavior only.
 6. At G9: verify docs, evidence, and gate records are synchronized.
+7. At G10-G12: require red/green/refactor evidence (tests-first commit intent, initial failing test evidence, green run after implementation, and post-refactor green run).
+8. At G11-G12: verify removed compatibility paths no longer drive runtime and cmd-side domain logic is retired.
+9. At G13: verify extension docs, evidence index, and handoff packet are synchronized.
 
 **Decisions**
 - Included: staged extraction + end-of-stage duplicate removal for lib-owned logic.
 - Included: legacy test-suite re-scope to CLI-only validation after final parity gate.
 - Included: early version alignment to 0.12.0.dev2 before functional work.
+- Included: post-closeout stage extension to relax strict backward-compatibility where needed for architecture cleanup.
+- Included: red/green/refactor workflow requirement (tests first) for G10-G12 changes.
 - Excluded: production publication execution, rename gate execution, final architecture-purity refactor.
 - Priority: releaseability and parity first, architecture ideal-state second.

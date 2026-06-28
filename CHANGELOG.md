@@ -5,6 +5,7 @@
 * CLI migration stage C4: version path/metadata synced to `0.12.0.dev2`.
 * CLI migration stage C8: runtime dependency range now declares `multigit-lib>=0.0.2.dev1,<1`.
 * Legacy cleanup dev2 stage (G0-G9) completed with parity/ownership evidence under `build/evidence/g2` through `build/evidence/g9`.
+* Legacy cleanup dev2 extension (G10-G13) completed with tests-first guardrail retirement/boundary-hardening evidence under `build/evidence/g10` through `build/evidence/g13`.
 * copilot: AI-related configuration refined.
 
 
