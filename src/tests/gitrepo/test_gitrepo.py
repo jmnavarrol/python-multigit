@@ -10,6 +10,7 @@ from git_scaffold import build_test_remotes, write_subrepos_file
 
 from multigit import Gitrepo
 
+@unittest.skip("G8 migration: domain/gitrepo assertions moved to lib/tests ownership")
 class TestGitrepo(unittest.TestCase):
 	
 	@classmethod

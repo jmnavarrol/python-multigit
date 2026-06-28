@@ -54,6 +54,8 @@ Local test scaffolding:
 - Do not run publication commands (TestPyPI/PyPI uploads) unless the user explicitly asks for that specific step.
 - When adding or editing Makefile targets, model real source-to-target dependencies (inputs and concrete outputs), not stamp-only shortcuts.
 - Component-level build targets should depend on test and doc targets so packaging happens only after quality gates pass.
+- Temporary artifacts policy: prefer paths already ignored by Git (for example build/ or subpaths under it) for one-off scripts, logs, and generated evidence.
+- If a repository-root temporary directory is needed for tooling compatibility, it must be explicitly gitignored before use.
 
 ## 5) Real Risks Seen in the Suite
 The suite in src/tests remains integration-like in several places, but its default execution is designed to be offline.

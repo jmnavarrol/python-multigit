@@ -74,16 +74,16 @@ If any gate fails validation:
 4. If still failing, record blocker in handoff and stop.
 
 **Stage checkpoint subsection**
-- G0 (PENDING): scope/version/gate/failure policies locked for 0.12.0.dev2 stage.
-- G1 (PENDING): early version alignment completed and verified.
-- G2 (PENDING): baseline/negative matrices captured and reproducible.
-- G3 (PENDING): extraction slice A parity green.
-- G4 (PENDING): extraction slice B parity green.
-- G5 (PENDING): extraction slice C negative-path parity green.
-- G6 (PENDING): final parity cross-check green + ownership map approved.
-- G7 (PENDING): duplicate legacy/cmd code removed where lib-owned coverage exists.
-- G8 (PENDING): legacy/CLI tests re-scoped to command-line validation only.
-- G9 (PENDING): closeout synchronized, handoff packet complete.
+- G0 (DONE 2026-JUN-28): scope/version/gate/failure policies locked for 0.12.0.dev2 stage.
+- G1 (DONE 2026-JUN-28): early version alignment completed and verified (`src/multigit/__main__.py` and changelog/status references synced; local `PYTHONPATH=src python -m multigit -V` reports `0.12.0.dev2`).
+- G2 (DONE 2026-JUN-28): baseline and negative-path signatures captured in `build/evidence/g2/run1/` and replayed in `build/evidence/g2/run2/`; hash manifests (`run1.sha256`, `run2.sha256`) are identical and `replay.diff` is empty; baseline exit signatures: `-h=0`, `-V=0`, `--status=2`, `--run=2`; negative signatures: missing config `=2`, malformed YAML `=22`, domain/schema failure `=22`.
+- G3 (DONE 2026-JUN-28): extraction slice A completed by moving CLI rendering/message helpers to `src/multigit/cli_rendering.py` and wiring `src/multigit/__main__.py` to use them; parity vs G2 baseline is exact (`build/evidence/g3/baseline_help.txt`, `baseline_version.txt`, `baseline_status.txt`, `baseline_run.txt` all match `build/evidence/g2/run1/` byte-for-byte).
+- G4 (DONE 2026-JUN-28): extraction slice B completed by moving status/run adapter glue to `src/multigit/status_run_adapter.py` and keeping rollback capability via `MULTIGIT_USE_LEGACY_LANE=1`; parity vs G2 baseline is exact (`build/evidence/g4/baseline_help.txt`, `baseline_version.txt`, `baseline_status.txt`, `baseline_run.txt` all match `build/evidence/g2/run1/` byte-for-byte) and offline suites are green (`make test`: 17 passed).
+- G5 (DONE 2026-JUN-28): extraction slice C completed by moving exception-to-message/exit translation into CLI-owned `src/multigit/cli_error_translation.py` and delegating from `src/multigit/status_run_adapter.py`; negative-path parity vs G2 is green for missing-config, malformed-YAML, and domain/schema-failure cases (`build/evidence/g5/*.txt`) with normalized path comparison to account for sandbox location.
+- G6 (DONE 2026-JUN-28): final command and negative-path parity matrix are green vs G2 baseline (`build/evidence/g6/*.txt`, normalized comparisons `*.g2.norm` and `*.g6.norm` all MATCH) and ownership matrix is approved at `build/evidence/g6/ownership-matrix.md`.
+- G7 (DONE 2026-JUN-28): duplicate legacy/cmd implementation logic removed where ownership matrix marks library ownership (`src/multigit/gitrepo.py`, `src/multigit/subrepofile.py` now compatibility shims to `multigit-lib`); parity remains green vs G2 and offline suites are green (`make test`: 17 passed); rollback traceability documented in `build/evidence/g7/removal-report.md`.
+- G8 (DONE 2026-JUN-28): legacy/CLI test lane re-scoped to command-line validation only (`src/tests/cli/test_cli_behavior.py` active; domain-heavy legacy suites in `src/tests/gitrepo/*` and `src/tests/subrepos/test_subrepos.py` marked migrated to library ownership and skipped); ownership split evidence documented in `build/evidence/g8/test-ownership-split.md`; parity remains green vs G2 (`build/evidence/g8/*.txt` normalized comparisons all MATCH).
+- G9 (DONE 2026-JUN-28): closeout synchronized (status docs + changelog + evidence index), final stage references confirmed at 0.12.0.dev2, and handoff packet published (`build/evidence/g9/evidence-index.md`, `build/evidence/g9/handoff-packet.md`).
 
 **Relevant files**
 - python-multigit-diseno-final.md - authoritative split governance/status.

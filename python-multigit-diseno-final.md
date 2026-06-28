@@ -181,7 +181,7 @@ Bash Magic Enviro remains rooted at repository top level:
 
 CLI distribution depends on library distribution using a compatible major range:
 
-1. Transitional phase (current `0.12.0.dev1` stage): multigit depends on multigit-lib>=0.0.2.dev1,<1
+1. Transitional phase (current `0.12.0.dev2` stage): multigit depends on multigit-lib>=0.0.2.dev1,<1
 2. Post-split-finalization phase: multigit depends on multigit-lib>=1.0,<2
 
 This allows independent evolution while protecting runtime compatibility.
@@ -288,21 +288,26 @@ This snapshot records the currently completed point of the split effort so later
 6. Active stage target version is locked to `0.12.0.dev2`, with mandatory early version-alignment at `G1` before extraction/removal.
 7. Active stage objective requires end-of-stage removal of duplicated legacy/cmd-side code that is already validated and owned by `multigit-lib`.
 8. Active ownership target is fixed: after final parity cross-check, legacy/CLI tests must cover command-line behavior only, and library-domain assertions must remain in `lib/tests/`.
+9. Checkpoint `G0` is completed for the `0.12.0.dev2` stage (scope/version/control model/failure policy lock).
+10. Checkpoint `G1` is completed for the `0.12.0.dev2` stage (version-bearing files aligned and local `-V` check returns `0.12.0.dev2`).
+11. Checkpoint `G2` is completed for the `0.12.0.dev2` stage (baseline/negative matrices captured and replayed twice with identical hash manifests under `build/evidence/g2/`).
+12. Checkpoint `G3` is completed for the `0.12.0.dev2` stage (low-risk CLI rendering/message helper extraction into `src/multigit/cli_rendering.py`), and baseline command parity vs `G2` remains exact using `build/evidence/g3/` command outputs.
+13. Checkpoint `G4` is completed for the `0.12.0.dev2` stage (status/run adapter glue extraction into `src/multigit/status_run_adapter.py` with explicit rollback toggle), with exact baseline command parity vs `G2` using `build/evidence/g4/` outputs and offline suites green via `make test`.
+14. Checkpoint `G5` is completed for the `0.12.0.dev2` stage (exception-to-message/exit translation extraction into `src/multigit/cli_error_translation.py`), with negative-path parity vs `G2` green for missing-config, malformed-YAML, and domain/schema-failure scenarios using `build/evidence/g5/` evidence.
+15. Checkpoint `G6` is completed for the `0.12.0.dev2` stage: final command/negative parity matrix is green vs `G2` and ownership map is approved at `build/evidence/g6/ownership-matrix.md`.
+16. Checkpoint `G7` is completed for the `0.12.0.dev2` stage: duplicate legacy/cmd implementation logic designated library-owned was removed by replacing `src/multigit/gitrepo.py` and `src/multigit/subrepofile.py` with compatibility shims to multigit-lib; parity and offline-suite validation remain green and rollback traceability is documented in `build/evidence/g7/removal-report.md`.
+17. Checkpoint `G8` is completed for the `0.12.0.dev2` stage: root legacy/CLI lane now validates command-line behavior only (CLI tests active, domain-heavy legacy suites marked migrated to library ownership), ownership split evidence is captured in `build/evidence/g8/test-ownership-split.md`, and parity remains green vs `G2`.
+18. Checkpoint `G9` is completed for the `0.12.0.dev2` stage: closeout synchronization is complete (status docs + changelog + evidence index), final references remain at `0.12.0.dev2`, and handoff packet is published in `build/evidence/g9/`.
 
 ### Explicitly not done yet
 
-1. Execution of the new `0.12.0.dev2` legacy-cleanup stage has not started yet (G0-G9 are pending).
-2. End-of-stage duplicate-code removals (legacy/cmd-side code already owned by `multigit-lib`) have not been executed yet.
-3. Legacy/CLI test-suite re-scope to command-line-only validation has not been executed yet.
-4. No publication to production PyPI has been executed in this milestone.
-5. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
+1. No publication to production PyPI has been executed in this milestone.
+2. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
 
 ### Safe resume point after this snapshot
 
-1. Resume at checkpoint `G0` in `plan-multigitLegacyCleanupDev2Stage.prompt.md` to lock scope/version/governance for target CLI version `0.12.0.dev2`.
-2. Execute `G1` early version alignment before any extraction/removal work so all relevant version-bearing files report `0.12.0.dev2`.
-3. Continue sequentially through `G2-G9` with parity evidence and explicit human approval at each main gate.
-4. Use documented `C0-C10` gate outcomes in tracked status/stage files as the baseline reference set; if `build/evidence/c2/` through `build/evidence/c9/` exists, use it as supplemental context only, and execute from `plan-multigitLegacyCleanupDev2Stage.prompt.md`.
+1. The dev2 stage is fully closed; resume from the next stage candidate documented in `build/evidence/g9/handoff-packet.md`.
+2. Use documented `C0-C10` and `G0-G9` outcomes in tracked status/stage files as the baseline reference set; `build/evidence/` remains supplemental evidence if cleanup removes artifacts.
 
 ## Legacy Cleanup Stage (0.12.0.dev2) Execution Checklist
 
