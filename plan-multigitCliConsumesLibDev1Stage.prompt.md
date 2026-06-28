@@ -1,6 +1,6 @@
 ## Plan: multigit CLI consumes multigit-lib (0.12.0.dev1 stage)
 
-Migrate the current CLI implementation to consume published `multigit-lib==0.0.1.dev2` with minimal behavioral impact, preserving command compatibility and rollback safety. This stage is readiness-only (no CLI publication execution), checkpoint-driven, and portable across separate environments/sessions.
+Migrate the current CLI implementation to consume published `multigit-lib==0.0.2.dev1` with minimal behavioral impact, preserving command compatibility and rollback safety. This stage is readiness-only (no CLI publication execution), checkpoint-driven, and portable across separate environments/sessions.
 
 After each completed step, update:
 
@@ -47,7 +47,7 @@ If any lock constraint conflicts with a migration step, the lock constraint take
 32. Gate checkpoint C8: editable-local full suite passes.
 
 33. Phase 5 - External verification lane and closeout.
-34. Switch to the dedicated TestPyPI verification lane: create a clean virtualenv and install `multigit-lib==0.0.1.dev2` from TestPyPI.
+34. Switch to the dedicated TestPyPI verification lane: create a clean virtualenv and install `multigit-lib==0.0.2.dev1` from TestPyPI.
 35. Run CLI smoke/integration matrix under TestPyPI-installed lane.
 36. Compare key outcomes and exit codes with editable-local lane.
 37. Gate checkpoint C9: lane parity passes.
@@ -66,7 +66,7 @@ If any gate checkpoint fails validation: (1) Do not proceed to the next step. (2
 - C5 (`GREEN`, 2026-06-28): `--status` path is migrated to `multigit_lib` orchestration through adapter boundary in `src/multigit/__main__.py`, while CLI rendering and exit mapping are preserved through legacy-compatible output handling. Status golden scenario parity (labels/order/semantics) and run-path non-regression checks passed versus C2 baseline (see `build/evidence/c5/summary.json` and `build/evidence/c5/drift.json`), and root regression suite remains green via `make test`.
 - C6 (`GREEN`, 2026-06-28): `--run` path is now migrated to `multigit_lib` orchestration through the same adapter boundary in `src/multigit/__main__.py`, preserving CLI rendering and exit mapping. Run/status parity checks passed versus C2 baseline (`build/evidence/c6/summary.json`, `build/evidence/c6/drift.json`) and root regression suite remains green via `make test`.
 - C7 (`GREEN`, 2026-06-28): exception translation contract between `multigit_lib` orchestration errors and CLI-facing messages/exit codes is hardened, including legacy-compatible missing-subrepos context lines. Negative-path matrix parity (`missing subrepos`, `malformed YAML`, `bad remote`) now matches C2 baseline (`build/evidence/c7/summary.json`, `build/evidence/c7/drift.json`) and root regression suite remains green via `make test`.
-- C8 (`GREEN`, 2026-06-28): CLI dependency declaration is wired to `multigit-lib>=0.0.1.dev2,<1` in `pyproject.toml` (also reflected in `CHANGELOG.md`). Editable-local lane full offline suite is green (`make test`, `make -C lib test`, `make -C lib doc`), with evidence captured in `build/evidence/c8/summary.json`.
+- C8 (`GREEN`, 2026-06-28): CLI dependency declaration is wired to `multigit-lib>=0.0.2.dev1,<1` in `pyproject.toml` (also reflected in `CHANGELOG.md`). Editable-local lane full offline suite is green (`make test`, `make -C lib test`, `make -C lib doc`), with evidence captured in `build/evidence/c8/summary.json`.
 - C9 (`GREEN`, 2026-06-28): clean-venv TestPyPI lane verification completed. Initial lane parity attempt failed due missing CLI runtime dependencies in the clean venv (`build/evidence/c9/drift.json`), then one remediation pass was applied in-phase (install CLI runtime dependencies in the clean venv) and parity succeeded (`build/evidence/c9/summary_remediation.json`, `build/evidence/c9/drift_remediation.json`).
 - C10 (`GREEN`, 2026-06-28 15:15:23 +0200): closeout synchronized across stage docs/changelog/evidence references; no legacy retirement detected (`git diff --name-status` contains only `M` entries, no deletions in `src/multigit` or `src/tests`).
 - Next checkpoint: none (stage complete, all checkpoints green and documented).
@@ -124,6 +124,6 @@ Use this block at the end of each work session:
 - Evidence artifacts updated: `build/evidence/c2/, build/evidence/c3/, build/evidence/c4/, build/evidence/c5/, build/evidence/c6/, build/evidence/c7/, build/evidence/c8/, build/evidence/c9/`
 
 **Further Considerations**
-1. Set the `multigit-lib` dependency range in `pyproject.toml` to `>=0.0.1.dev2,<1` for this stage. This range must also appear verbatim in the stage governance doc and changelog.
+1. Set the `multigit-lib` dependency range in `pyproject.toml` to `>=0.0.2.dev1,<1` for this stage. This range must also appear verbatim in the stage governance doc and changelog.
 2. Before starting Phase 4, document the chosen evidence storage format (text snapshots or structured assertions) in `python-multigit-diseno-final.md` under a new `Evidence Format Decision` section. Default to text snapshots if no decision is reached by checkpoint C7.
 3. Reassess root recursive orchestration policy only after this stage is complete.

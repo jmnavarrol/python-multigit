@@ -181,7 +181,7 @@ Bash Magic Enviro remains rooted at repository top level:
 
 CLI distribution depends on library distribution using a compatible major range:
 
-1. Transitional phase (current `0.12.0.dev1` stage): multigit depends on multigit-lib>=0.0.1.dev2,<1
+1. Transitional phase (current `0.12.0.dev1` stage): multigit depends on multigit-lib>=0.0.2.dev1,<1
 2. Post-split-finalization phase: multigit depends on multigit-lib>=1.0,<2
 
 This allows independent evolution while protecting runtime compatibility.
@@ -276,14 +276,14 @@ Clarification:
 
 ## Current Refactoring Status (2026-JUN-28)
 
-This snapshot records the currently completed point of the split effort so later sessions can resume safely without reconstructing the PoC milestone from scratch. The 0.0.1.dev2 parity stage is tracked step-by-step, and this section is updated after each completed step.
+This snapshot records the currently completed point of the split effort so later sessions can resume safely without reconstructing the PoC milestone from scratch. The 0.0.2.dev1 parity stage is tracked step-by-step, and this section is updated after each completed step.
 
 ### Completed in the current milestone
 
 1. Library incubation component `lib/` is established and self-contained (`pyproject.toml`, `Makefile`, `tests/`, `docs/`, `CHANGELOG.md`) under transitional import namespace `multigit_lib`.
-2. Library parity stage for `0.0.1.dev2` is complete: core modules were copied with compatibility-first policy, offline parity tests are in place, and docs were upgraded to real API/boundary coverage.
+2. Library parity stage for `0.0.2.dev1` is complete: core modules were copied with compatibility-first policy, offline parity tests are in place, and docs were upgraded to real API/boundary coverage.
 3. Quality gates are green for the library component (`make test`, `make doc`, `make build`), and local install smoke confirms `multigit_lib` import/version without exposing the `multigit` CLI.
-4. Publication status is complete for `multigit-lib==0.0.1.dev2` on TestPyPI, with verification and rollback notes recorded in `lib/docs/testpypi_release_checklist_dev2.rst`.
+4. Publication status is complete for `multigit-lib==0.0.2.dev1` on TestPyPI.
 5. Migration-start declaration gate is closed: root smoke remains passing, legacy trees are intact, and there are no open blockers for starting CLI consumption of the library.
 6. CLI migration planning package is prepared with checkpoint-first execution policy, target CLI version `0.12.0.dev1`, hybrid dependency mode (editable-local default execution lane for Phases 0-4 + dedicated TestPyPI verification lane in Phase 5), and cross-session handoff guidance.
 7. Detailed phase-by-phase history for the completed library parity stage remains available in `plan-multigitLibDev2ParityStage.prompt.md` to avoid losing forensic context while keeping this status summary compact.
@@ -293,7 +293,7 @@ This snapshot records the currently completed point of the split effort so later
 11. C5 is completed: `--status` path migration now routes through `multigit_lib` orchestration with CLI rendering/exit compatibility preserved, parity evidence recorded in `build/evidence/c5/summary.json`, and root tests still green.
 12. C6 is completed: `--run` path migration now routes through `multigit_lib` orchestration with parity evidence recorded in `build/evidence/c6/summary.json`, and root tests remain green.
 13. C7 is completed: exception translation is hardened to preserve legacy CLI-facing messages/exit mapping, and negative-path parity evidence is recorded in `build/evidence/c7/summary.json`.
-14. C8 is completed: CLI dependency declaration now includes `multigit-lib>=0.0.1.dev2,<1`, and editable-local full offline suite validation is recorded in `build/evidence/c8/summary.json`.
+14. C8 is completed: CLI dependency declaration now includes `multigit-lib>=0.0.2.dev1,<1`, and editable-local full offline suite validation is recorded in `build/evidence/c8/summary.json`.
 15. C9 is completed: clean-venv TestPyPI lane parity is green after one in-phase remediation pass to install missing CLI runtime dependencies in the verification venv (`build/evidence/c9/summary_remediation.json`).
 16. C10 closeout is completed: all checkpoints C0-C10 are green and documented; no legacy-retirement deletions were introduced in this stage.
 
@@ -308,8 +308,8 @@ This snapshot records the currently completed point of the split effort so later
 
 ### Safe resume point after this snapshot
 
-1. TestPyPI publication and clean-virtualenv fresh-install smoke validation are completed for `multigit-lib==0.0.1.dev2`.
-2. Stage `0.0.1.dev2` is closed for parity objectives and is now the baseline for CLI migration start.
+1. TestPyPI publication and clean-virtualenv fresh-install smoke validation are completed for `multigit-lib==0.0.2.dev1`.
+2. Stage `0.0.2.dev1` is closed for parity objectives and is now the baseline for CLI migration start.
 3. CLI migration stage `0.12.0.dev1` checkpoints C0-C10 are now complete and documented in `plan-multigitCliConsumesLibDev1Stage.prompt.md`.
 4. Detailed evidence artifacts are stored under `build/evidence/c2/` through `build/evidence/c9/`.
 
@@ -346,10 +346,10 @@ If any gate checkpoint fails validation: (1) Do not proceed to the next step. (2
    - Finalize `multigit_lib` exception translation to CLI messages + exit codes.
    - Go/No-Go: negative-path matrix matches baseline behavior.
 9. C8 Dependency wiring:
-	- Apply CLI/runtime dependency declaration for `multigit-lib>=0.0.1.dev2,<1`; keep hybrid dependency mode.
+	- Apply CLI/runtime dependency declaration for `multigit-lib>=0.0.2.dev1,<1`; keep hybrid dependency mode.
    - Go/No-Go: full offline suite passes in editable-local lane.
 10. C9 External lane verification:
-	- Switch to the dedicated TestPyPI verification lane: clean venv, install `multigit-lib==0.0.1.dev2` from TestPyPI, run smoke/integration matrix.
+	- Switch to the dedicated TestPyPI verification lane: clean venv, install `multigit-lib==0.0.2.dev1` from TestPyPI, run smoke/integration matrix.
    - Go/No-Go: outcomes/exit codes match editable-local lane.
 11. C10 Closeout:
    - Update status docs/changelog/evidence, confirm no legacy retirements, produce handoff packet.
