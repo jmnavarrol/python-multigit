@@ -293,8 +293,8 @@ This snapshot records the currently completed point of the split effort so later
 11. C5 is completed: `--status` path migration now routes through `multigit_lib` orchestration with CLI rendering/exit compatibility preserved, parity evidence recorded in `build/evidence/c5/summary.json`, and root tests still green.
 12. C6 is completed: `--run` path migration now routes through `multigit_lib` orchestration with parity evidence recorded in `build/evidence/c6/summary.json`, and root tests remain green.
 13. C7 is completed: exception translation is hardened to preserve legacy CLI-facing messages/exit mapping, and negative-path parity evidence is recorded in `build/evidence/c7/summary.json`.
-14. C8 is completed: CLI dependency declaration now includes `multigit-lib>=0.0.2.dev1,<1`, and editable-local full offline suite validation is recorded in `build/evidence/c8/summary.json`.
-15. C9 is completed: clean-venv TestPyPI lane parity is green after one in-phase remediation pass to install missing CLI runtime dependencies in the verification venv (`build/evidence/c9/summary_remediation.json`).
+14. C8 is completed and revalidated for the bumped library baseline: CLI dependency declaration includes `multigit-lib>=0.0.2.dev1,<1`, and editable-local full offline suite validation remains green (`build/evidence/c8/summary.json`).
+15. C9 is completed and revalidated for `multigit-lib==0.0.2.dev1`: clean-venv TestPyPI lane parity is green against editable-local lane (`build/evidence/c9/summary_002dev1.json`).
 16. C10 closeout is completed: all checkpoints C0-C10 are green and documented; no legacy-retirement deletions were introduced in this stage.
 
 ### Explicitly not done yet

@@ -5,7 +5,8 @@
   
 ## 0.0.2.dev1 (2026-JUN-28)
 * Differences from [0.0.1.dev1 publication commit](/../../compare/fbb7409d848f1a2278eb05ad60200cc680aa1ffc...039eeac5b2efef6f94e28d16d7b67f577d89d86d).
-* Bumped version to 0.0.2.dev1 to avoind clashing with a higher previous version.
+* Bumped version to 0.0.2.dev1 to avoid clashing with a higher previous version.
+* TestPyPI publication checklist for this version is tracked in `lib/docs/testpypi_release_checklist_dev1.rst`.
 
 ## 0.0.1.dev2 (2026-JUN-28)
 * Differences from [0.0.1.dev1 publication commit](/../../compare/8d53bf5c0e9303841a6e514ee5291d6452f92338...fbb7409d848f1a2278eb05ad60200cc680aa1ffc).
