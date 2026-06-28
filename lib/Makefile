@@ -8,7 +8,7 @@ TEST_FILES = $(shell find tests -type f -name '*.py')
 VERSION = $(shell sed -nE 's/^__version__ = "([^"]+)"/\1/p' src/multigit_lib/__init__.py)
 DIST_DIR = dist
 BUILD_DIR = $(CURDIR)/build
-TEST_LOG = $(BUILD_DIR)/test.log
+TEST_STAMP = $(BUILD_DIR)/test.stamp
 SPHINXDIR = docs
 SPHINX_OUTPUT = $(BUILD_DIR)/sphinx-doc
 DOC_FILES = $(shell find $(SPHINXDIR) -type f \( -name '*.rst' -o -name '*.py' -o -name 'Makefile' \))
@@ -26,7 +26,7 @@ export C_GREEN := \033[1;32m
 export C_NC := \033[0m
 
 # Basic targets
-.PHONY: help targets test build doc upload-tmp clean
+.PHONY: help targets test build doc clean-stale-doc upload-tmp clean
 
 help: targets
 
@@ -39,11 +39,12 @@ targets:
 	@echo -e "\t${C_BOLD}upload-tmp:${C_NC} upload lib artifacts to TestPyPI."
 	@echo -e "\t${C_BOLD}clean:${C_NC} remove local build artifacts."
 
-test: $(TEST_LOG)
+test: $(TEST_STAMP)
 
-$(TEST_LOG): $(TEST_INPUTS)
+$(TEST_STAMP): $(TEST_INPUTS)
 	@mkdir -p $(BUILD_DIR)
-	PYTHONPATH=src python3 -m unittest discover --start-directory tests > $(TEST_LOG)
+	PYTHONPATH=src python3 -m unittest discover --start-directory tests -v
+	@touch $@
 
 build: test doc $(SDIST_FILE) $(WHEEL_FILE)
 
@@ -53,13 +54,17 @@ $(SDIST_FILE): $(BUILD_INPUTS)
 $(WHEEL_FILE): $(BUILD_INPUTS)
 	python3 -m hatchling build --target wheel
 
-doc: $(DOC_INDEX)
+doc: clean-stale-doc $(DOC_INDEX)
+
+clean-stale-doc:
+	rm -rf $(SPHINXDIR)/build/
 
 $(DOC_INDEX): $(DOC_INPUTS)
 	$(MAKE) BUILDDIR=$(SPHINX_OUTPUT) html --directory=$(SPHINXDIR)
+	$(MAKE) BUILDDIR=${SPHINX_OUTPUT} linkcheck --directory=$(SPHINXDIR)
 
 upload-tmp: build
 	$(UPLOADER) --repository testpypi $(DIST_DIR)/*
 
 clean:
-	rm -rf $(DIST_DIR)/ $(BUILD_DIR)/
+	rm -rf $(DIST_DIR)/ $(BUILD_DIR)/ $(SPHINXDIR)/build/

@@ -2,11 +2,10 @@
 
 ## Next Release
 * Differences from [0.0.1.dev1 publication commit](/../../compare/8d53bf5c0e9303841a6e514ee5291d6452f92338...splitting-plan).
-* Changelog policy for this stage: do not add a new version section until `0.0.1.dev2` is published; record interim updates under this `Next Release` section.
-* Release target for this stage is now set to `0.0.1.dev2`.
-* Version source in `lib/src/multigit_lib/__init__.py` updated to `__version__ = 0.0.1.dev2`.
-* Compatibility-preservation rule for copied modules is active in this stage: preserve legacy status strings, exception handling, and printing behavior unless a packaging/test-unblocking change is strictly required.
-* Boundary-purity refactors are deferred for this stage; parity work proceeds copy-first without rendering-separation or exception-model redesign changes.
+* Library functional parity with legacy behavior is now achieved for the stage scope, including representative status/update/error scenarios validated by copied ownership tests plus explicit legacy-vs-lib parity tests.
+* Release-readiness gates are green in `lib`: expanded offline tests (including parity suite), documentation build, packaging build, and clean local artifact install validation.
+* Migration-start declaration gate is closed: root legacy test lane still passes unchanged, and legacy trees under `src/multigit` and `src/tests` remain intact.
+* TestPyPI publication bundle/checklist for `0.0.1.dev2` is prepared in `lib/docs/testpypi_release_checklist_dev2.rst`, and publication execution remains intentionally deferred in this stage.
 
 ## 0.0.1.dev1 (2026-JUN-27)
 * Publication reference commit: [8d53bf5c0e93](/../../commit/8d53bf5c0e9303841a6e514ee5291d6452f92338) (tip of `splitting-plan` at publication time).

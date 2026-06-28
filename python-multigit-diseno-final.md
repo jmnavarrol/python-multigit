@@ -301,6 +301,20 @@ This snapshot records the currently completed point of the split effort so later
 19. Phase 1 Step 7 is completed: a minimal stable package surface is now defined in `lib/src/multigit_lib/__init__.py` (`__version__`, `Gitrepo`, `Subrepofile`, `SubrepofileError`) using deferred imports so copied modules remain importable/testable without redesigning behavior.
 20. Phase 1 Step 8 is completed: compatibility-preservation policy for copied modules is explicitly locked for this stage (keep legacy status strings, exception handling, and printing behavior; allow only packaging/test-unblocking changes; document any unavoidable delta before proceeding).
 21. Phase 1 Step 9 is completed: cmd/lib boundary-purity refactors are explicitly deferred to post-split phases, so this stage remains focused on copy-first parity progression without rendering/exception-model/data-contract redesign.
+22. Phase 2 Step 11 is completed: copied `gitrepo.py`, `subrepofile.py`, and `subrepos_schema.yaml` from `src/multigit` into `lib/src/multigit_lib`, and added a controlled library-safe orchestration slice in `subrepos_orchestration.py` with no direct stdout/stderr writes, no `sys.exit`, and no `colorama` import.
+23. Phase 2 Step 12 is completed: copied subrepos orchestration was aligned to legacy-style flow (class + process method and recursive queue processing), with only library-safe adjustments retained and parity-oriented status semantics preserved.
+24. Phase 2 Step 13 is completed: lib runtime dependencies were updated in `lib/pyproject.toml` to include `GitPython`, `PyYAML`, and `Cerberus`, while `colorama` remained out of required runtime dependencies by making it optional in copied `subrepofile.py`.
+25. Phase 3 Step 15 is completed: lib test ownership expanded by copying fixtures (`git_scaffold.py`), gitrepo tests, and subrepos domain tests from `src/tests` into `lib/tests` with minimal import and exception-model adaptations for library-safe behavior.
+26. Phase 3 Step 16 is completed: explicit legacy-vs-lib parity tests were added in `lib/tests/parity/test_legacy_parity.py` and validated against offline fixtures for status, update, and Subrepofile load/error parity scenarios.
+27. Phase 3 Step 17 is completed: root/legacy tests remain runnable (`make test` at repository root passes) and legacy trees were kept intact (`src/multigit` and `src/tests` still present with files), satisfying the transition guardrail.
+28. Phase 4 Step 19 is completed: `lib/docs/api.rst` now contains concrete API coverage for copied modules and exceptions (`multigit_lib`, `multigit_lib.gitrepo`, `multigit_lib.subrepofile`, and `multigit_lib.subrepos_orchestration`), and documentation/build gates pass.
+29. Phase 4 Step 20 is completed: `lib/docs/index.rst` was updated from PoC framing to parity-stage framing with explicit boundaries for what is currently in `lib` versus still in CLI/legacy areas.
+30. Phase 4 Step 21 is completed: transitional notes now explicitly state this stage prioritizes split ease and behavior parity, while target architecture refactors are deferred to post-split phases.
+31. Phase 4 Step 22 is completed: top-level design/status tracking remains synchronized after each step, with dev2 progress and remaining CLI-migration-start blockers explicitly documented.
+32. Phase 5 Step 24 is completed: component gates in `lib` are green (`make test`, `make doc`, `make build`) and clean virtualenv smoke install from local wheel artifact was validated (`multigit_lib` import + `__version__ == 0.0.1.dev2`, and no `multigit` CLI exposed).
+33. Phase 5 Step 25 is completed: parity gate checklist is now consolidated as green (offline tests passing, representative behavior parity confirmed, docs/changelog synchronized, and runtime dependencies complete for the copied modules).
+34. Phase 5 Step 26 is completed: TestPyPI publication bundle/checklist for `0.0.1.dev2` was prepared in `lib/docs/testpypi_release_checklist_dev2.rst` (credentials prechecks, commands, post-upload verification bundle, rollback notes), with no publication execution.
+35. Phase 5 Step 27 is completed: migration-start declaration gate is now satisfied (`make test` at repository root passes unchanged with 17 tests, legacy trees remain intact with files under `src/multigit` and `src/tests`, and blocker-owner documentation is explicitly closed for this gate).
 
 ### Explicitly not done yet
 
@@ -309,12 +323,16 @@ This snapshot records the currently completed point of the split effort so later
 3. No CLI adaptation work has started yet; the current CLI still runs from the legacy production implementation.
 4. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
 
+### Remaining blockers for CLI migration start gate
+
+1. None for the declaration gate. Owner status: N/A (all required preconditions for migration-start declaration are met).
+
 ### Safe resume point after this snapshot
 
 1. TestPyPI publication and clean-virtualenv fresh-install smoke validation are already completed for `0.0.1.dev1`.
-2. Stage `0.0.1.dev2` is in progress with Steps 1-5, 7, 8, and 9 complete (scope lock, stage-end boundary confirmation, legacy baseline capture, copy-first guardrail enforcement, release-target update, minimal package surface definition, compatibility-preservation policy lock, and deferred-refactor lock).
-3. The next immediate step is Phase 2 Step 11: copy domain modules from src/multigit into lib/src/multigit_lib in the defined order (gitrepo.py, subrepofile.py, subrepos_schema.yaml, then controlled library-safe subrepos orchestration).
-4. CLI adaptation may start only against a published and validated library release, with dependency range and compatibility checks gated by the documented publish policy.
+2. Stage `0.0.1.dev2` is in progress with Steps 1-5, 7, 8, 9, 11, 12, 13, 15, 16, 17, 19, 20, 21, 22, 24, 25, 26, and 27 complete (scope lock, stage-end boundary confirmation, legacy baseline capture, copy-first guardrail enforcement, release-target update, minimal package surface definition, compatibility-preservation policy lock, deferred-refactor lock, first core module copy, parity-preserving subrepos alignment, runtime dependency completion, ownership-based test expansion, explicit parity-test validation, root/legacy test-runnability confirmation, API-doc parity coverage, index/boundary update, transitional-note update, top-level status synchronization, release-readiness gate execution, consolidated parity checklist closure, publication-bundle preparation without execution, and migration-start declaration gate closure).
+3. The next immediate step is to begin main code migration so CLI paths consume `multigit_lib` incrementally, preserving parity and keeping rollback-safe checkpoints.
+4. CLI adaptation should continue to honor publish-policy gates for any dependency/version changes tied to public release usage.
 
 ## Future 3-Repository Extraction Invariants
 

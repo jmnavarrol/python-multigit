@@ -4,18 +4,25 @@
 [project]
 name = 'multigit-lib'
 authors = [
-    { name  = 'Jesús M. Navarro', email = 'jesusmnavarrolopez@gmail.com' },
+    { name = 'Jesús M. Navarro', email = 'jesusmnavarrolopez@gmail.com' },
 ]
 
 description = 'Minimal library PoC for packaging flow validation.'
 readme = 'README.md'
 requires-python = '>=3.7'
 dynamic = ['version']
+dependencies = [
+    'GitPython',
+    'PyYAML',
+    'Cerberus',
+]
 
 [project.optional-dependencies]
 development = [
     'hatch',
     'Sphinx',
+    'sphinxcontrib-programoutput',
+    'sphinx-rtd-theme',
     'twine',
 ]
 

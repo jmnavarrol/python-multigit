@@ -13,23 +13,23 @@ Evolve multigit-lib from PoC packaging-only status to offline feature parity for
 8. Completed: compatibility-preservation rule is now locked for copied code in this stage. Preserve legacy status strings, exception handling, and printing behavior; only packaging/test-unblocking changes are allowed, and any unavoidable behavior delta must be documented before proceeding. Depends on 7.
 9. Completed: cmd/lib boundary-purity refactors are explicitly deferred to post-split phases (rendering separation, exception-model redesign, strict data-contract cleanup), and are out of scope for this parity stage. Depends on 7.
 10. Phase 2 - Core module copy into lib.
-11. Copy domain modules from src/multigit into lib/src/multigit_lib in this order: gitrepo.py, subrepofile.py, subrepos_schema.yaml, then controlled parts of subrepos orchestration that contain no direct stdout/stderr writes, no sys.exit calls, and no colorama imports. Depends on 8.
-12. Keep mixed responsibilities in copied subrepos logic as close as possible to legacy behavior for parity; only adjustments required to resolve import errors or packaging failures; do not change function signatures, return values, exception types, or output strings. Depends on 11.
-13. Update lib/pyproject.toml runtime dependencies to match copied domain code requirements (GitPython, PyYAML, Cerberus; keep colorama out of lib unless strictly unavoidable). Depends on 11.
+11. Completed: copied domain modules from src/multigit into lib/src/multigit_lib in this order: gitrepo.py, subrepofile.py, subrepos_schema.yaml, then controlled parts of subrepos orchestration that contain no direct stdout/stderr writes, no sys.exit calls, and no colorama imports (implemented in subrepos_orchestration.py). Depends on 8.
+12. Completed: mixed responsibilities in copied subrepos logic are kept close to legacy behavior for parity. Adjustments were limited to library-safety/packaging needs (no direct stdout/stderr writes, no sys.exit, no colorama), while preserving the legacy orchestration flow and status semantics in the copied logic. Depends on 11.
+13. Completed: updated lib/pyproject.toml runtime dependencies to match copied domain code requirements (GitPython, PyYAML, Cerberus), and kept colorama out of required runtime dependencies by making its use optional in copied code. Depends on 11.
 14. Phase 3 - Test copy and parity safety net.
-15. Expand lib/tests from smoke-only to ownership-based coverage: copy gitrepo tests and fixtures from src/tests first, then subrepos domain tests.
-16. Add explicit parity tests comparing legacy module outputs vs new library outputs for representative scenarios (status matrix, updates, error/edge cases) using offline fixtures. If a parity test reveals a behavioral difference that cannot be resolved without a non-minimal change, document the delta in lib/CHANGELOG.md under a "Known Parity Deltas" section and escalate to a decision before proceeding to Phase 4.
-17. Keep root/legacy tests runnable during transition; avoid deleting legacy tests until parity evidence is complete. Parallel with 15-16 where feasible.
+15. Completed: expanded lib/tests from smoke-only to ownership-based coverage by copying gitrepo tests and fixtures from src/tests first, then subrepos domain tests, with minimal import/exception adaptations for multigit_lib library-safe behavior.
+16. Completed: added explicit parity tests comparing legacy module outputs vs new library outputs for representative scenarios (status matrix, updates, error/edge cases) using offline fixtures, via lib/tests/parity/test_legacy_parity.py. If a parity test reveals a behavioral difference that cannot be resolved without a non-minimal change, document the delta in lib/CHANGELOG.md under a "Known Parity Deltas" section and escalate to a decision before proceeding to Phase 4.
+17. Completed: root/legacy tests remain runnable during transition and legacy tests were not deleted while parity evidence was completed (root `make test` passes, and legacy `src/multigit` / `src/tests` trees remain present). Parallel with 15-16 where feasible.
 18. Phase 4 - Documentation parity for library consumers.
-19. Upgrade lib/docs/api.rst from placeholder to real API coverage for copied modules and exceptions.
-20. Update lib/docs/index.rst from PoC language to parity-stage language and include current boundaries (what is in lib vs still in CLI/legacy).
-21. Add/extend transitional notes in lib/docs (or existing docs) to state that current stage prioritizes split ease and behavior parity, while target architecture refactors are deferred. Depends on 12.
-22. Keep top-level design/status docs updated after each completed step, specifically "Current Refactoring status" and "Completed in the current milestone" in python-multigit-diseno-final.md, and reflect dev2 progress plus remaining blocker list for CLI migration start gate. Depends on 16 and 20.
+19. Completed: upgraded lib/docs/api.rst from placeholder to real API coverage for copied modules and exceptions (package surface, gitrepo, subrepofile, and subrepos_orchestration).
+20. Completed: updated lib/docs/index.rst from PoC language to parity-stage language and current boundaries (what is in lib vs still in CLI/legacy).
+21. Completed: added transitional notes in lib/docs stating this stage prioritizes split ease and behavior parity while target architecture refactors are deferred. Depends on 12.
+22. Completed: top-level design/status docs remain updated after each completed step, including Current Refactoring status and Completed in the current milestone, with dev2 progress and an explicit remaining blocker list for the CLI migration start gate. Depends on 16 and 20.
 23. Phase 5 - Release-readiness and migration-start gate.
-24. Run component gates in lib: make test, make doc, make build, then clean virtualenv installation smoke from locally built artifacts.
-25. Validate parity gate checklist is green: offline tests passing, behavior parity confirmed for required operations, docs updated, changelog updated, dependencies complete.
-26. Prepare TestPyPI publication bundle/checklist for 0.0.1.dev2 (credentials, command, rollback notes) but do not execute publication in this stage, including urgent bugfix publication.
-27. Declare "ready to start main code migration to use library" only when 25-26 pass, no legacy files under src/multigit/ or src/tests/ have been deleted or moved, root-level make test still passes without modification, and unresolved blockers are documented with owners.
+24. Completed: ran component gates in lib (make test, make doc, make build), then executed clean virtualenv installation smoke from locally built artifacts.
+25. Completed: parity gate checklist is green (offline tests passing, behavior parity confirmed for required operations, docs updated, changelog updated, dependencies complete).
+26. Completed: prepared TestPyPI publication bundle/checklist for 0.0.1.dev2 (credentials, command, rollback notes) in lib/docs/testpypi_release_checklist_dev2.rst, without executing publication in this stage (including urgent bugfix publication).
+27. Completed: declared "ready to start main code migration to use library" after confirming 25-26 pass, legacy trees remain intact (src/multigit: 11 files; src/tests: 14 files), root-level make test passes without modification (17 tests), and unresolved blockers are documented with owners (none open at declaration gate).
 
 **Relevant files**
 All paths in this section are relative to the git repository root (`python-multigit/`).
