@@ -3,7 +3,7 @@
 from importlib import import_module
 from typing import Any
 
-__version__ = "0.0.1.dev2"
+__version__ = "0.0.2.dev1"
 
 # Keep the package-level surface stable while modules are copied in later steps.
 __all__ = [
