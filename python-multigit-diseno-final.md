@@ -181,8 +181,8 @@ Bash Magic Enviro remains rooted at repository top level:
 
 CLI distribution depends on library distribution using a compatible major range:
 
-1. Transitional phase (current `0.12.0.dev2` stage): multigit depends on multigit-lib>=0.0.2.dev1,<1
-2. Post-split-finalization phase: multigit depends on multigit-lib>=1.0,<2
+1. Transitional phase (dev2, dev3, and through rename gate): multigit depends on multigit-lib>=0.0.2.dev1,<1
+2. Post-split-finalization phase (after rename gate): multigit depends on multigit-lib>=1.0,<2
 
 This allows independent evolution while protecting runtime compatibility.
 
@@ -281,10 +281,8 @@ This snapshot records the currently completed point of the split effort so later
 ### Completed in the current milestone
 
 1. **Dev2 Stage Complete (0.12.0.dev2)**: Legacy cleanup and boundary hardening (G0–G13) finished; duplicate lib-owned code removed; CLI tests re-scoped to command-line validation only; library-domain assertions in lib/tests.
-2. **Current State**: Both `multigit==0.12.0.dev2` and `multigit-lib==0.0.2.dev1` are published to TestPyPI and functionally verified as drop-in replacements for the monolithic main branch, with two known regressions:
-   - **Regression 1**: No colored output (root cause: missing colorama imports in `cli_rendering.py` after split)
-   - **Regression 2**: Buffered output instead of real-time (deferred to later stage)
-3. **Active Follow-on Stage**: `plan-multigitColorizedOutputDev3Stage.prompt.md` targets restoration of colored output in CLI. Scope: multigit → 0.12.0.dev3; multigit-lib → 0.0.2.dev1 (unchanged). Root cause analyzed; minimal-impact fix isolated to CLI layer only.
+2. **Dev3 Stage Complete (0.12.0.dev3)**: Colorized output restored to CLI via colorama integration (8 status values mapped: ERROR→RED, success→GREEN, warning→YELLOW); version bumped to 0.12.0.dev3; multigit-lib unchanged at 0.0.2.dev1. **Regression 1 resolved** (colored output now functional). **Regression 2 deferred** (buffered output instead of real-time—architectural, requires streaming or async; targeted for future stage).
+3. **Current State**: Both `multigit==0.12.0.dev3` and `multigit-lib==0.0.2.dev1` published to TestPyPI and functionally verified as drop-in replacements with only Regression 2 (buffering) remaining.
 
 ### Explicitly not done yet
 
@@ -293,33 +291,20 @@ This snapshot records the currently completed point of the split effort so later
 
 ### Safe resume point after this snapshot
 
-1. The dev3 colorization stage is beginning; refer to `plan-multigitColorizedOutputDev3Stage.prompt.md` for detailed step-by-step execution.
-2. Use 0.12.0.dev2 baseline as reference for version numbering and prior milestone completion.
+1. Dev3 stage is complete; 0.12.0.dev3 published with colorama integration and all tests passing.
+2. Next session candidate: Problem 2 (buffered output) planning and implementation, targeting future stage post-dev3.
+3. Use 0.12.0.dev3 as current baseline; 0.0.2.dev1 (lib) remains paired until next feature/fix cycle.
 
-## Legacy Cleanup Stage (0.12.0.dev2) Execution Checklist
+### Development Stage Strategy
 
-Mandatory sequence. Do not advance unless the current checkpoint is green.
+Each development stage is managed with the following lifecycle:
 
-Authoritative execution source: `plan-multigitLegacyCleanupDev2Stage.prompt.md` defines gate entry criteria, actions, acceptance criteria, parity definition, and failure policy. This checklist is a compact navigation index to avoid duplicating executable gate rules.
-
-If any lock constraint conflicts with a migration step, the lock constraint takes precedence and the step must be scoped to avoid the violation. Document the constraint application in checkpoint evidence.
-
-If any gate checkpoint fails validation: (1) Do not proceed to the next step. (2) Document the failure and its evidence in the checkpoint subsection. (3) Attempt one remediation pass limited to the current phase. (4) If the checkpoint still fails after remediation, record it as a blocker in the Session Handoff Template and stop. Do not skip checkpoints.
-
-1. G0 Scope and governance lock: record stage objective, target version `0.12.0.dev2`, control model, and locked failure policy.
-2. G1 Early version alignment: align metadata/runtime/changelog references to `0.12.0.dev2` before extraction/removal work.
-3. G2 Baseline freeze: capture command and negative-path signatures and complete reproducibility replay.
-4. G3 Extraction slice A: extract low-risk command-only rendering/message helpers.
-5. G4 Extraction slice B: extract status/run CLI adapter glue while preserving the `multigit_lib` orchestration boundary.
-6. G5 Extraction slice C: extract exception-to-message/exit translation and re-run negative-path matrix.
-7. G6 Final parity cross-check and ownership map: run final parity matrix and approve library-vs-CLI ownership mapping.
-8. G7 End-of-stage duplicate removal: remove only validated lib-owned legacy/cmd code and adjust duplicate tests.
-9. G8 Legacy test-suite re-scope: keep legacy tests CLI-focused and keep library-domain assertions in `lib/tests/`.
-10. G9 Closeout: synchronize docs/status/evidence index, confirm final references at `0.12.0.dev2`, and publish handoff packet.
-11. G10 Compatibility-relaxation lock: document approved backward-compatibility relaxations and tests-first workflow for extension.
-12. G11 Shim/guardrail retirement: create failing tests first, then retire compatibility-only shims/guardrails, then refactor with green tests.
-13. G12 Boundary hardening: create failing CLI-focused tests first, then constrain cmd to CLI concerns and keep domain logic in lib ownership.
-14. G13 Extension closeout: synchronize extension status/evidence and publish extension handoff packet.
+1. **Stage plan file created**: Dedicated working document `plan-multigit{Feature}Dev{N}Stage.prompt.md` (e.g., `plan-multigitColorizedOutputDev3Stage.prompt.md`) defines gates, checkpoint criteria, acceptance rules, and parity definitions.
+2. **Execution authority**: The stage plan contains the complete checkpoint-by-checkpoint execution model, not this design document. Checkpoints are numbered (C1–C10, G0–G13, etc.) and tracked with status and evidence.
+3. **Build evidence**: Session-temporary artifacts (gate outputs, parity matrices, test logs) captured in `build/evidence/{checkpoint}/` during active work. Ephemeral—deleted by `make clean`.
+4. **Completion and promotion**: Stage outcomes recorded in "Current Refactoring Status" section (this document). CHANGELOG updated with feature summary. Source code changes committed to git.
+5. **Plan file deletion**: Once stage is complete and status promoted to this design document, the stage plan file is deleted (working document, not long-term artifact).
+6. **Permanent record**: Design doc (this file), CHANGELOG, source code, and git history remain. Build evidence is session-temporary.
 
 ## Future 3-Repository Extraction Invariants
 
