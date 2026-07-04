@@ -36,10 +36,10 @@ class TestCliBehavior(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertIn('usage:', result.stdout)
 
-    def test_version_reports_dev2(self):
+    def test_version_reports_current_version(self):
         result = self._run_cli('-V')
         self.assertEqual(result.returncode, 0)
-        self.assertIn('0.12.0.dev2', result.stdout)
+        self.assertIn(cli_main.__version__, result.stdout)
 
     def test_no_args_requires_arguments(self):
         result = self._run_cli()
