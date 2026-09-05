@@ -285,16 +285,18 @@ This snapshot records the currently completed point of the split effort so later
 2. **Dev3 Stage Complete (0.12.0.dev3)**: Colorized output restored to CLI via colorama integration (8 status values mapped: ERROR→RED, success→GREEN, warning→YELLOW); **Regression 1 resolved**.
 3. **Dev4 Stage Complete (0.12.0.dev4 / multigit-lib 0.0.2.dev2)**: Real-time per-repository output restored through a synchronous library iterator; repository-level failures yield structured `ERROR` results and processing continues. **Regression 2 resolved**.
 4. **Current State**: `multigit==0.12.0.dev4` and `multigit-lib==0.0.2.dev2` are published to TestPyPI and externally verified on another machine. Local tests, packaging, documentation, reliable library test-target execution, and the example CLI lifecycle gate are complete. Production PyPI publication is intentionally blocked until the full scope of this design snapshot is reached.
+5. **Dev5 Stage Planned (CLI Migration and Legacy-Retirement Preparation)**: The next stage is tracked in `plan-multigitCliMigrationLegacyRetirementDev5Stage.prompt.md`. It will introduce the design-prescribed `cli/` component, validate the CLI against an installed `multigit-lib` artifact, and prepare legacy retirement without changing the transitional `multigit_lib` namespace.
 
 ### Explicitly not done yet
 
 1. Production PyPI publication is intentionally deferred until the full design scope and split-completion gates are reached.
 2. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
+3. CLI migration and legacy-retirement preparation have not started; the Dev5 tracker is the execution authority for that work.
 
 ### Safe resume point after this snapshot
 
 1. Dev4/dev2 is complete and published to TestPyPI; use `multigit==0.12.0.dev4` and `multigit-lib==0.0.2.dev2` as the current development releases.
-2. Next session candidate: continue the rename gate and remaining split-completion work; do not schedule production publication yet.
+2. Next session candidate: begin Dev5 using `plan-multigitCliMigrationLegacyRetirementDev5Stage.prompt.md`; do not begin the namespace rename or schedule production publication yet.
 3. Production publication becomes eligible only after the full scope of this design snapshot and its Definition of Done are satisfied.
 
 ### Development Stage Strategy
@@ -303,10 +305,11 @@ Each development stage is managed with the following lifecycle:
 
 1. **Stage plan file created**: Dedicated working document `plan-multigit{Feature}Dev{N}Stage.prompt.md` (e.g., `plan-multigitColorizedOutputDev3Stage.prompt.md`) defines gates, checkpoint criteria, acceptance rules, and parity definitions.
 2. **Execution authority**: The stage plan contains the complete checkpoint-by-checkpoint execution model, not this design document. Checkpoints are numbered (C1–C10, G0–G13, etc.) and tracked with status and evidence.
-3. **Build evidence**: Session-temporary artifacts (gate outputs, parity matrices, test logs) captured in `build/evidence/{checkpoint}/` during active work. Ephemeral—deleted by `make clean`.
-4. **Completion and promotion**: Stage outcomes recorded in "Current Refactoring Status" section (this document). CHANGELOG updated with feature summary. Source code changes committed to git.
-5. **Plan file deletion**: Once stage is complete and status promoted to this design document, the stage plan file is deleted (working document, not long-term artifact).
-6. **Permanent record**: Design doc (this file), CHANGELOG, source code, and git history remain. Build evidence is session-temporary.
+3. **Red/green development**: Before working code is modified, the related distribution version is bumped. Each behaviour change begins with reviewed tests for the intended future behaviour; those tests must fail for the expected reason, and implementation pauses for human review before the green step.
+4. **Build evidence**: Session-temporary artifacts (gate outputs, parity matrices, test logs) captured in `build/evidence/{checkpoint}/` during active work. Ephemeral—deleted by `make clean`.
+5. **Completion and promotion**: Stage outcomes recorded in "Current Refactoring Status" section (this document). CHANGELOG updated with feature summary. Source code changes committed to git.
+6. **Plan file deletion**: Once stage is complete and status promoted to this design document, the stage plan file is deleted (working document, not long-term artifact).
+7. **Permanent record**: Design doc (this file), CHANGELOG, source code, and git history remain. Build evidence is session-temporary.
 
 ## Future 3-Repository Extraction Invariants
 
@@ -343,3 +346,4 @@ To keep a future split into three repositories low-friction, the following must 
 ## Open Decisions to Resolve Before Implementation
 
 1. Final wording review for dependency-transition narrative (`>=0.1,<1` to `>=1.0,<2`) and release communications.
+2. **Resolved for Dev5:** create the design-prescribed `cli/` component now; do not introduce a temporary root `src/multigit_cli` layout.
