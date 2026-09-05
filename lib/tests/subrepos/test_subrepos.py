@@ -2,6 +2,7 @@
 
 import unittest
 import os, shutil, errno
+from unittest.mock import patch
 
 from . import TESTS_PATH, PROJECT_PATH
 from git_scaffold import build_test_remotes, write_subrepos_file
@@ -93,6 +94,69 @@ class TestSubrepos(unittest.TestCase):
 			)
 			print(str(result))
 			self.assertIsInstance(result, list)
+
+
+	def test_process_materializes_all_results_before_return(self):
+		print("TEST: 'test_process_materializes_all_results_before_return'")
+		processed_paths = []
+
+		def record_status(repoconf):
+			processed_paths.append(os.path.basename(repoconf['path']))
+			repoconf['status'] = 'UP_TO_DATE'
+			return repoconf
+
+		with patch(
+			'multigit_lib.subrepos_orchestration.Gitrepo.status',
+			side_effect=record_status,
+		):
+			result = self.my_subrepos.process(
+				base_path=os.path.join(self.scenarios_path, 'standard'),
+				report_only=True,
+			)
+
+		self.assertEqual(processed_paths, ['empty-repo', 'standard-repo'])
+		self.assertIsInstance(result, list)
+		self.assertEqual(len(result), len(processed_paths))
+
+
+	def test_iter_process_yields_before_second_repository_finishes(self):
+		print("TEST: 'test_iter_process_yields_before_second_repository_finishes'")
+		from multigit_lib.subrepos_orchestration import iter_process_subrepos
+
+		results = iter_process_subrepos(
+			base_path=os.path.join(self.scenarios_path, 'standard'),
+			report_only=True,
+		)
+		self.assertEqual(next(results)['path'], os.path.join(
+			self.scenarios_path, 'standard', 'empty-repo'
+		))
+
+
+	def test_iter_process_continues_after_repository_error(self):
+		print("TEST: 'test_iter_process_continues_after_repository_error'")
+		from multigit_lib.subrepos_orchestration import iter_process_subrepos
+
+		def fail_first_status(repoconf):
+			if repoconf['path'].endswith('empty-repo'):
+				raise RuntimeError('simulated repository failure')
+			repoconf['status'] = 'UP_TO_DATE'
+			return repoconf
+
+		with patch(
+			'multigit_lib.subrepos_orchestration.Gitrepo.status',
+			side_effect=fail_first_status,
+		):
+			results = list(iter_process_subrepos(
+				base_path=os.path.join(self.scenarios_path, 'standard'),
+				report_only=True,
+			))
+
+		self.assertEqual(len(results), 2)
+		self.assertEqual(results[0]['status'], 'ERROR')
+		self.assertIn('simulated repository failure', results[0]['extra_info'])
+		self.assertEqual(results[1]['path'], os.path.join(
+			self.scenarios_path, 'standard', 'standard-repo'
+		))
 			
 		
 	def test_process_run_ok(self):

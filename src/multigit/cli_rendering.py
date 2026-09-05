@@ -35,7 +35,11 @@ def print_subrepo_status(subrepo):
     print("\trepository: " + Style.BRIGHT + "'%s'" % subrepo['repo'])
     if subrepo['gitref_type']:
         gitref_type = subrepo['gitref_type']
-        print("\trequested %s: " + Style.BRIGHT + "'%s'" % (gitref_type, subrepo[gitref_type]))
+        print(
+            "\trequested %s: " % gitref_type
+            + Style.BRIGHT
+            + "'%s'" % subrepo[gitref_type]
+        )
     else:
         print("\tno gitref requested (working on default repo branch)")
 

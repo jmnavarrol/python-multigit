@@ -65,6 +65,13 @@ Implications for agents:
 Default execution rule:
 - The suite run by `make test` must remain offline to avoid dependence on network access and external credentials.
 
+Example CLI acceptance gate before stage completion/publication:
+- From `example/`, begin with only the original `subrepos` file present.
+- Run `multigit -h|--help`, `multigit -V|--version`, and `multigit -s|--status`; run `multigit -r|--run` last.
+- Repeat all modes after `--run` to detect state-dependent regressions.
+- Restore `example/` to its original state by removing generated subrepository content.
+- Keep this as a development-process gate, not a Makefile target.
+
 Publication/documentation:
 - Project documentation is built with Sphinx and published from those artifacts.
 - Any relevant functional change should also be evaluated for impact on `src/sphinx`.

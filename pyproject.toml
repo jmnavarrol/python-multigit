@@ -23,7 +23,7 @@ classifiers = [
 
 requires-python = '>=3.7'
 dependencies = [
-	'multigit-lib>=0.0.2.dev1,<1',
+	'multigit-lib>=0.0.2.dev2,<1',
 	'Cerberus',
 	'colorama',
 	'GitPython',

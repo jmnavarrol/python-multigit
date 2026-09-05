@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import os
+import io
 import subprocess
 import sys
 import tempfile
+import threading
 import unittest
 import inspect
+from contextlib import redirect_stdout
+from unittest.mock import patch
 
 import multigit.__main__ as cli_main
 import multigit.status_run_adapter as status_run_adapter
@@ -65,6 +69,110 @@ class TestCliBehavior(unittest.TestCase):
 
     def test_cli_rendering_exposes_subrepo_status_renderer(self):
         self.assertTrue(hasattr(cli_rendering, 'print_subrepo_status'))
+
+    def test_cli_rendering_prints_requested_gitref(self):
+        subrepo = {
+            'path': '/tmp/example-repo',
+            'repo': 'example-origin',
+            'gitref_type': 'branch',
+            'branch': 'python-example',
+            'status': 'UP_TO_DATE',
+        }
+        output = io.StringIO()
+
+        with redirect_stdout(output):
+            cli_rendering.print_subrepo_status(subrepo)
+
+        rendered = output.getvalue()
+        self.assertIn("requested branch:", rendered)
+        self.assertIn("'python-example'", rendered)
+
+    def test_adapter_renders_each_streamed_result_before_completion(self):
+        first_result = {
+            'path': '/tmp/first-repo',
+            'repo': 'first-origin',
+            'gitref_type': None,
+            'status': 'UP_TO_DATE',
+        }
+        second_result = {
+            'path': '/tmp/second-repo',
+            'repo': 'second-origin',
+            'gitref_type': None,
+            'status': 'UP_TO_DATE',
+        }
+        first_rendered = threading.Event()
+        release_second = threading.Event()
+        rendered = []
+        worker_errors = []
+
+        def streamed_process(**kwargs):
+            yield first_result
+            if not release_second.wait(timeout=2):
+                raise AssertionError('second result was not released')
+            yield second_result
+
+        def record_rendered(result):
+            rendered.append(result)
+            if result is first_result:
+                first_rendered.set()
+
+        def run_adapter():
+            try:
+                status_run_adapter.process_subrepos_with_adapter(
+                    base_path=self.repo_root,
+                    report_only=True,
+                    subrepos_filename='subrepos',
+                )
+            except Exception as error:  # pragma: no cover - assertion below reports it
+                worker_errors.append(error)
+
+        with patch.object(
+            status_run_adapter,
+            '_load_multigit_lib_status_orchestrator',
+            return_value=(streamed_process, RuntimeError),
+        ), patch.object(
+            status_run_adapter,
+            'print_subrepo_status',
+            side_effect=record_rendered,
+        ):
+            worker = threading.Thread(target=run_adapter)
+            worker.start()
+            self.assertTrue(first_rendered.wait(timeout=2))
+            self.assertEqual(rendered, [first_result])
+            release_second.set()
+            worker.join(timeout=2)
+
+        self.assertFalse(worker.is_alive())
+        self.assertEqual(worker_errors, [])
+        self.assertEqual(rendered, [first_result, second_result])
+
+    def test_adapter_passes_status_and_run_modes_to_orchestrator(self):
+        received_modes = []
+
+        def streamed_process(**kwargs):
+            received_modes.append(kwargs['report_only'])
+            return iter(())
+
+        with patch.object(
+            status_run_adapter,
+            '_load_multigit_lib_status_orchestrator',
+            return_value=(streamed_process, RuntimeError),
+        ):
+            for report_only in (True, False):
+                status_run_adapter.process_subrepos_with_adapter(
+                    base_path=self.repo_root,
+                    report_only=report_only,
+                    subrepos_filename='subrepos',
+                )
+
+        self.assertEqual(received_modes, [True, False])
+
+    def test_adapter_resolves_streaming_library_orchestrator(self):
+        from multigit_lib.subrepos_orchestration import iter_process_subrepos
+
+        resolved_process, _ = status_run_adapter._load_multigit_lib_status_orchestrator()
+
+        self.assertIs(resolved_process, iter_process_subrepos)
 
 
 if __name__ == '__main__':

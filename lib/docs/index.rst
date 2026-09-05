@@ -80,4 +80,4 @@ Current Status Summary
 * API documentation now reflects copied modules and exceptions.
 * Root and legacy tests remain runnable during transition.
 * Legacy source and tests remain in place until explicit retirement gates.
-* TestPyPI publication completed for ``multigit-lib==0.0.2.dev1``.
+* TestPyPI publication completed for ``multigit-lib==0.0.2.dev2``.

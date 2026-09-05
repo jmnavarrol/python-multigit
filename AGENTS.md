@@ -77,6 +77,16 @@ When reporting test results, always distinguish:
 5. Briefly document functional impact and residual risks.
 6. If documentation or public API is affected, update src/sphinx content and validate make doc.
 
+### Example CLI Acceptance Gate
+Before considering a development stage complete and ready for publication, validate the editable development CLI from `example/` using the sample `subrepos` file:
+
+1. Confirm the directory is clean apart from the original `subrepos` file.
+2. Run every CLI mode from that clean state: `-h`/`--help`, `-V`/`--version`, `-s`/`--status`, and `-r`/`--run`; run `-r`/`--run` last.
+3. After `-r`/`--run`, run every CLI mode again and confirm each still works.
+4. Remove all generated example content and restore the directory to its original state, containing only the sample `subrepos` file.
+
+This is a development/release gate, not a Makefile target. Record its result in the active stage plan or completion report.
+
 ## 8) What an Agent Delivery Must Include
 - Short summary of functional changes.
 - Modified files and reason for each change.

@@ -24,6 +24,10 @@ class Subrepos(object):
 
     def process(self, base_path, subrepos_filename="subrepos", report_only=True):
         """Recursively process subrepos and return processed entries."""
+        return list(self.iter_process(base_path, subrepos_filename, report_only))
+
+    def iter_process(self, base_path, subrepos_filename="subrepos", report_only=True):
+        """Yield each processed subrepo as soon as its operation completes."""
         subrepos_file = self._resolve_subrepos_entrypoint(base_path, subrepos_filename)
 
         subrepo_loader = Subrepofile()
@@ -38,17 +42,20 @@ class Subrepos(object):
                 error_no=errno.ENOENT,
             )
 
-        processed = []
         while len(subrepos):
             current_subrepo = subrepos[0]
 
             git_subrepo = Gitrepo()
-            if report_only:
-                current_subrepo = git_subrepo.status(current_subrepo)
-            else:
-                current_subrepo = git_subrepo.update(current_subrepo)
+            try:
+                if report_only:
+                    current_subrepo = git_subrepo.status(current_subrepo)
+                else:
+                    current_subrepo = git_subrepo.update(current_subrepo)
+            except Exception as err:
+                current_subrepo["status"] = "ERROR"
+                current_subrepo["extra_info"] = str(err)
 
-            processed.append(current_subrepo)
+            yield current_subrepo
 
             try:
                 new_subrepos = subrepo_loader.load(
@@ -67,7 +74,6 @@ class Subrepos(object):
 
             subrepos.remove(current_subrepo)
 
-        return processed
 
     def _resolve_subrepos_entrypoint(self, base_path, subrepos_filename):
         candidate = os.path.join(base_path, subrepos_filename)
@@ -94,3 +100,8 @@ class Subrepos(object):
 def process_subrepos(base_path, subrepos_filename="subrepos", report_only=True):
     """Function wrapper for class-based orchestration."""
     return Subrepos().process(base_path, subrepos_filename, report_only)
+
+
+def iter_process_subrepos(base_path, subrepos_filename="subrepos", report_only=True):
+    """Function wrapper for incremental class-based orchestration."""
+    return Subrepos().iter_process(base_path, subrepos_filename, report_only)

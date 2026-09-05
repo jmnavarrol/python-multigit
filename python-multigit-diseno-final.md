@@ -107,6 +107,7 @@ All implementation decisions for this split must satisfy the following constrain
 16. Legacy releaseability policy: throughout parity stages, the current root/legacy distribution must remain buildable and publishable so urgent bugfix releases can be produced without waiting for split completion.
 17. Split-first pragmatism policy: during parity stages, prefer the direct implementation path that preserves current runtime behavior and avoids unnecessary redesign.
 18. Deferred-refactor policy: enforce final architecture boundaries strictly only after split completion; before that, boundary violations inherited from legacy code may be tolerated when needed for low-risk parity.
+19. Production-publication policy: do not publish either distribution to production PyPI until the full scope of this design snapshot has been reached and the split-completion gates are satisfied. TestPyPI publication may be used for development validation.
 
 ## Target Repository Layout
 
@@ -181,7 +182,7 @@ Bash Magic Enviro remains rooted at repository top level:
 
 CLI distribution depends on library distribution using a compatible major range:
 
-1. Transitional phase (dev2, dev3, and through rename gate): multigit depends on multigit-lib>=0.0.2.dev1,<1
+1. Transitional phase (dev2, dev3, dev4, and through rename gate): multigit depends on multigit-lib>=0.0.2.dev2,<1
 2. Post-split-finalization phase (after rename gate): multigit depends on multigit-lib>=1.0,<2
 
 This allows independent evolution while protecting runtime compatibility.
@@ -274,26 +275,27 @@ Clarification:
 10. Refactor both cmd and library components to fully honor the final design goals once split completion is achieved.
 11. Normalize root recursive orchestration, component docs/test ownership, and future extraction seams for cmd/lib/lifecycle.
 
-## Current Refactoring Status (2026-JUL-04)
+## Current Refactoring Status (2026-SEP-05)
 
-This snapshot records the currently completed point of the split effort so later sessions can resume safely without reconstructing the PoC milestone from scratch. The 0.0.2.dev1 parity stage history is summarized here, and this section is updated after each completed step.
+This snapshot records the currently completed point of the split effort so later sessions can resume safely without reconstructing the PoC milestone from scratch. The transition through the 0.0.2.dev2 library stage is summarized here, and this section is updated after each completed step.
 
 ### Completed in the current milestone
 
 1. **Dev2 Stage Complete (0.12.0.dev2)**: Legacy cleanup and boundary hardening (G0–G13) finished; duplicate lib-owned code removed; CLI tests re-scoped to command-line validation only; library-domain assertions in lib/tests.
-2. **Dev3 Stage Complete (0.12.0.dev3)**: Colorized output restored to CLI via colorama integration (8 status values mapped: ERROR→RED, success→GREEN, warning→YELLOW); version bumped to 0.12.0.dev3; multigit-lib unchanged at 0.0.2.dev1. **Regression 1 resolved** (colored output now functional). **Regression 2 deferred** (buffered output instead of real-time—architectural, requires streaming or async; targeted for future stage).
-3. **Current State**: Both `multigit==0.12.0.dev3` and `multigit-lib==0.0.2.dev1` published to TestPyPI and functionally verified as drop-in replacements with only Regression 2 (buffering) remaining.
+2. **Dev3 Stage Complete (0.12.0.dev3)**: Colorized output restored to CLI via colorama integration (8 status values mapped: ERROR→RED, success→GREEN, warning→YELLOW); **Regression 1 resolved**.
+3. **Dev4 Stage Complete (0.12.0.dev4 / multigit-lib 0.0.2.dev2)**: Real-time per-repository output restored through a synchronous library iterator; repository-level failures yield structured `ERROR` results and processing continues. **Regression 2 resolved**.
+4. **Current State**: `multigit==0.12.0.dev4` and `multigit-lib==0.0.2.dev2` are published to TestPyPI and externally verified on another machine. Local tests, packaging, documentation, reliable library test-target execution, and the example CLI lifecycle gate are complete. Production PyPI publication is intentionally blocked until the full scope of this design snapshot is reached.
 
 ### Explicitly not done yet
 
-1. No publication to production PyPI has been executed in this milestone.
+1. Production PyPI publication is intentionally deferred until the full design scope and split-completion gates are reached.
 2. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
 
 ### Safe resume point after this snapshot
 
-1. Dev3 stage is complete; 0.12.0.dev3 published with colorama integration and all tests passing.
-2. Next session candidate: Problem 2 (buffered output) planning and implementation, targeting future stage post-dev3.
-3. Use 0.12.0.dev3 as current baseline; 0.0.2.dev1 (lib) remains paired until next feature/fix cycle.
+1. Dev4/dev2 is complete and published to TestPyPI; use `multigit==0.12.0.dev4` and `multigit-lib==0.0.2.dev2` as the current development releases.
+2. Next session candidate: continue the rename gate and remaining split-completion work; do not schedule production publication yet.
+3. Production publication becomes eligible only after the full scope of this design snapshot and its Definition of Done are satisfied.
 
 ### Development Stage Strategy
 

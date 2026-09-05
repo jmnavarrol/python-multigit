@@ -1,4 +1,5 @@
 --extra-index-url https://test.pypi.org/simple/
 pip>=23
 # $BME_PROJECT_DIR is defined by Bash Magic Enviro to be the root of this repository
+--editable "${BME_PROJECT_DIR}/lib[development]"
 --editable "${BME_PROJECT_DIR}/[development]"
