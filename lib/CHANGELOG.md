@@ -1,8 +1,10 @@
 # CHANGELOG
 
 ## Next Release
+* Differences from [0.0.2.dev2 publication commit](/../../compare/2e839c33bd48b6127071a7d0773b0544dec203ae...splitting-plan).
 
 ## 0.0.2.dev2 (2026-SEP-05)
+* Differences from [0.0.2.dev1 publication commit](/../../compare/7a31073d9c7028374296d5db8b6d0b90901ccdc2...2e839c33bd48b6127071a7d0773b0544dec203ae).
 * Synchronous iterator-based processing added with per-repository `ERROR` results and continued traversal after repository-level failures.
 * Published to TestPyPI: https://test.pypi.org/project/multigit-lib/0.0.2.dev2/
   
