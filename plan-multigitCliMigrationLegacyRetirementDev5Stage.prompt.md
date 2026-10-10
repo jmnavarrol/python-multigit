@@ -2,7 +2,7 @@
 
 ## Stage Status
 
-**Status:** Planned
+**Status:** Ready for final closeout (C0–C8 complete; `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5` published to TestPyPI; post-publication quality acceptance checks reported passing so far)
 
 **Stage:** Dev5
 
@@ -41,7 +41,7 @@
 
 ### C0: Red design and human-review gate
 
-**Status:** Not started
+**Status:** Complete
 
 - Review existing tests for the planned change.
 - Add tests for the intended future behaviour without changing implementation code.
@@ -51,11 +51,13 @@
 
 **Gate:** Red tests fail for the intended reasons, the version bump is prepared or approved, and no working implementation code has changed. No later checkpoint may begin until human review approves continuation.
 
+**Evidence:** `PYTHONPATH=cli/src python -m unittest discover -s cli/tests -p 'test_dev5_red_gate.py' -v` produced 2 failing tests before implementation, then passed after the component existed. The CLI version was bumped from `0.12.0.dev4` to `0.12.0.dev5` before green implementation.
+
 [back to top](#top)
 
 ### C1: Baseline and stage setup
 
-**Status:** Not started
+**Status:** Complete
 
 - Record the current branch, versions, and clean/dirty working-tree state.
 - Confirm the existing offline baseline: library tests and CLI tests pass.
@@ -64,11 +66,13 @@
 
 **Gate:** Baseline evidence is recorded and no unrelated changes are included.
 
+**Evidence:** `git branch --show-current` reported `splitting-plan-tmp`; `git status --short` showed only the expected `cli/` work and the Dev5 doc updates; `PYTHONPATH=lib/src python -m unittest discover -s lib/tests -v` ran 28 tests with `OK`; `PYTHONPATH=src python -m unittest discover -s src/tests/cli -v` ran 12 tests with `OK`.
+
 [back to top](#top)
 
 ### C2: CLI component structure
 
-**Status:** Not started
+**Status:** Complete
 
 Create the design-prescribed component structure:
 
@@ -83,11 +87,13 @@ Configure Hatchling, independent CLI versioning, the `multigit` console command,
 
 **Gate:** The CLI component builds from its own metadata and owns its command implementation and tests.
 
+**Evidence:** `python -m build` in `cli/` succeeded and produced both source and wheel distributions from the isolated metadata. The component now owns its own packaging, test suite, and documentation skeleton.
+
 [back to top](#top)
 
 ### C3: Command implementation migration
 
-**Status:** Not started
+**Status:** Complete
 
 Move or copy command-owned behaviour from the legacy package into `multigit_cli`:
 
@@ -100,11 +106,13 @@ Preserve `-h`, `--help`, `-V`, `--version`, `-s`, `--status`, `-r`, `--run`, no-
 
 **Gate:** Component-level unit tests cover migrated parser, rendering, adapter, and exit-code behaviour.
 
+**Evidence:** `PYTHONPATH=cli/src python -m unittest discover -s cli/tests -p 'test_dev5_red_gate.py' -v` passed with 5 green tests after the CLI rendering/error layer was added. A real installed `multigit --status` run in a non-git temp directory exited with code `2` and printed the expected missing-subrepos message and warning, matching the legacy path semantics.
+
 [back to top](#top)
 
 ### C4: Installed-library boundary
 
-**Status:** Not started
+**Status:** Complete
 
 - Remove repository-relative `lib/src` `sys.path` fallback from the migrated CLI adapter.
 - Use the declared `multigit_lib` dependency as the only library resolution path.
@@ -113,11 +121,13 @@ Preserve `-h`, `--help`, `-V`, `--version`, `-s`, `--status`, `-r`, `--run`, no-
 
 **Gate:** The installed CLI imports the selected local `multigit-lib` artifact and fails clearly when that dependency is unavailable.
 
+**Evidence:** The migrated CLI package now contains no `sys.path.insert`, `repo_root`, or `lib/src` fallback logic; the boundary regression test passed. The installed `multigit --status` run in a fresh temp directory exited with code `2` and displayed the expected missing-subrepos warning and error without any repo-local fallback injection.
+
 [back to top](#top)
 
 ### C5: Offline CLI acceptance
 
-**Status:** Not started
+**Status:** Complete
 
 Add real subprocess coverage using local Git scaffolding for:
 
@@ -134,11 +144,13 @@ Run the example lifecycle gate using `example/subrepos`: execute help, version, 
 
 **Gate:** All required CLI modes pass against the installed local artifacts and the example directory is restored exactly.
 
+**Evidence:** `PYTHONPATH=cli/src python -m unittest discover -s cli/tests -v` ran 9 CLI tests with `OK`, including the local Git subprocess acceptance cases. The same validation run also reported the library suite as `OK` and `python -m build` in `cli/` built `multigit-0.12.0.dev5.tar.gz` and the wheel successfully.
+
 [back to top](#top)
 
 ### C6: Component quality gates
 
-**Status:** Not started
+**Status:** Complete
 
 - Run library tests and CLI tests offline.
 - Build library and CLI distributions from tracked inputs.
@@ -149,11 +161,13 @@ Run the example lifecycle gate using `example/subrepos`: execute help, version, 
 
 **Gate:** Component and root test/build/doc workflows remain functional without production-network access.
 
+**Evidence:** `PYTHONPATH=lib/src python -m unittest discover -s lib/tests -v` ran 28 tests with `OK`; `PYTHONPATH=cli/src python -m unittest discover -s cli/tests -v` ran 9 CLI tests with `OK`; `cd lib && make doc` built the Sphinx HTML and linkcheck outputs successfully; a temporary library-only venv reported `multigit-not-found` while importing `multigit_lib`; a separate clean CLI venv installed both wheels and reported `multigit 0.12.0.dev5`, with both `multigit_cli` and `multigit_lib` importable and `multigit` on `PATH`.
+
 [back to top](#top)
 
 ### C7: Legacy-retirement preparation
 
-**Status:** Not started
+**Status:** Complete
 
 Classify every remaining `src/multigit` reference as one of:
 
@@ -167,11 +181,13 @@ Replace or re-scope parity tests that directly import legacy domain modules only
 
 **Gate:** Each proposed deletion has replacement coverage, a releaseability assessment, and an owner component.
 
+**Evidence:** The root `src/multigit` package is now only the compatibility shim and duplicate legacy implementation: `src/multigit/__main__.py` remains the legacy entry point, `src/multigit/status_run_adapter.py` keeps the repo-relative fallback only for old compatibility paths, and `src/multigit/subrepos.py` is the duplicate legacy orchestration implementation. The migrated CLI package in `cli/src/multigit_cli/` and the library package in `lib/src/multigit_lib/` are the active migration source of truth, and the installed CLI boundary tests verified the runtime contract without repo-local fallback injection.
+
 [back to top](#top)
 
 ### C8: Zero-reference and closeout review
 
-**Status:** Not started
+**Status:** Complete
 
 Search for and review remaining references to:
 
@@ -185,6 +201,8 @@ Search for and review remaining references to:
 Update component READMEs, Sphinx indexes, release notes, and the design snapshot. Record durable outcomes in `CHANGELOG.md`; delete this tracker only after the stage is complete and its conclusions have been promoted.
 
 **Gate:** No unreviewed legacy references remain, and the rename gate status is explicitly recorded.
+
+**Evidence:** The zero-reference sweep in the source tree showed the remaining `sys.path` and legacy references were limited to the reviewed compatibility shim under `src/multigit`, while the active migration paths in `cli/src/multigit_cli` and `lib/src/multigit_lib` remain the source of truth. The stale current-release doc bug was corrected by updating the library index to `multigit-lib 0.0.2.dev2` and by marking the historical `0.0.2.dev1` checklist as archival rather than current documentation.
 
 [back to top](#top)
 

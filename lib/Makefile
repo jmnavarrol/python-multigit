@@ -35,6 +35,7 @@ targets:
 	@echo -e "\t${C_BOLD}build:${C_NC} build sdist and wheel for lib."
 	@echo -e "\t${C_BOLD}doc:${C_NC} build HTML Sphinx docs recursively from docs/."
 	@echo -e "\t${C_BOLD}upload-tmp:${C_NC} upload lib artifacts to TestPyPI."
+# 	@echo -e "\t${C_BOLD}upload:${C_NC} upload lib artifacts to PyPI."
 	@echo -e "\t${C_BOLD}clean:${C_NC} remove local build artifacts."
 
 test:
@@ -59,6 +60,9 @@ $(DOC_INDEX): $(DOC_INPUTS)
 
 upload-tmp: build
 	$(UPLOADER) --repository testpypi $(DIST_DIR)/*
+
+# upload: build
+# 	$(UPLOADER) --repository pypi $(DIST_DIR)/*
 
 clean:
 	rm -rf $(DIST_DIR)/ $(BUILD_DIR)/ $(SPHINXDIR)/build/

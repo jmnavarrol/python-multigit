@@ -6,6 +6,10 @@
 
 ## Final Objective
 
+## Development Status
+
+Dev5 implementation, acceptance gates C0–C8, and TestPyPI publication are complete. TestPyPI contains `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5`; the CLI metadata requires `multigit-lib>=0.0.2.dev3,<1`. The post-publication quality acceptance checks are reported as passing so far. Dev5 is pending final closeout review. Production PyPI publication remains blocked until the full design scope and split-completion gates are satisfied.
+
 Split the current single Python distribution into two independent distributions, kept in a single Git repository and still built with hatchling:
 
 1. A reusable library distribution.
@@ -104,7 +108,7 @@ All implementation decisions for this split must satisfy the following constrain
 13. CI policy: component lanes are mandatory release gates; root smoke lane is optional and non-blocking.
 14. Makefile dependency policy: component Makefile targets must declare real source-to-target dependencies with concrete outputs; build/package targets must depend on test and doc quality gates.
 15. Copy-first migration policy: during parity stages, code/tests/docs are copied into `lib/` and validated there; legacy sources remain in place until explicit retirement gates are met.
-16. Legacy releaseability policy: throughout parity stages, the current root/legacy distribution must remain buildable and publishable so urgent bugfix releases can be produced without waiting for split completion.
+16. Legacy releaseability policy: throughout parity stages, the current root/legacy distribution must remain buildable; production publication remains subject to policy 19, and final-PyPI Makefile targets are disabled during the transition to prevent accidental releases.
 17. Split-first pragmatism policy: during parity stages, prefer the direct implementation path that preserves current runtime behavior and avoids unnecessary redesign.
 18. Deferred-refactor policy: enforce final architecture boundaries strictly only after split completion; before that, boundary violations inherited from legacy code may be tolerated when needed for low-risk parity.
 19. Production-publication policy: do not publish either distribution to production PyPI until the full scope of this design snapshot has been reached and the split-completion gates are satisfied. TestPyPI publication may be used for development validation.
@@ -275,29 +279,30 @@ Clarification:
 10. Refactor both cmd and library components to fully honor the final design goals once split completion is achieved.
 11. Normalize root recursive orchestration, component docs/test ownership, and future extraction seams for cmd/lib/lifecycle.
 
-## Current Refactoring Status (2026-SEP-05)
+## Current Refactoring Status (2026-OCT-10)
 
-This snapshot records the currently completed point of the split effort so later sessions can resume safely without reconstructing the PoC milestone from scratch. The transition through the 0.0.2.dev2 library stage is summarized here, and this section is updated after each completed step.
+This snapshot records the completed Dev5 implementation and the remaining release and architecture gates so work can resume without reconstructing the migration history.
 
 ### Completed in the current milestone
 
 1. **Dev2 Stage Complete (0.12.0.dev2)**: Legacy cleanup and boundary hardening (G0–G13) finished; duplicate lib-owned code removed; CLI tests re-scoped to command-line validation only; library-domain assertions in lib/tests.
 2. **Dev3 Stage Complete (0.12.0.dev3)**: Colorized output restored to CLI via colorama integration (8 status values mapped: ERROR→RED, success→GREEN, warning→YELLOW); **Regression 1 resolved**.
 3. **Dev4 Stage Complete (0.12.0.dev4 / multigit-lib 0.0.2.dev2)**: Real-time per-repository output restored through a synchronous library iterator; repository-level failures yield structured `ERROR` results and processing continues. **Regression 2 resolved**.
-4. **Current State**: `multigit==0.12.0.dev4` and `multigit-lib==0.0.2.dev2` are published to TestPyPI and externally verified on another machine. Local tests, packaging, documentation, reliable library test-target execution, and the example CLI lifecycle gate are complete. Production PyPI publication is intentionally blocked until the full scope of this design snapshot is reached.
-5. **Dev5 Stage Planned (CLI Migration and Legacy-Retirement Preparation)**: The next stage is tracked in `plan-multigitCliMigrationLegacyRetirementDev5Stage.prompt.md`. It will introduce the design-prescribed `cli/` component, validate the CLI against an installed `multigit-lib` artifact, and prepare legacy retirement without changing the transitional `multigit_lib` namespace.
+4. **Dev5 Implementation and Gates Complete (`multigit==0.12.0.dev5`)**: The isolated `cli/` distribution consumes the installed `multigit-lib` dependency, preserves CLI compatibility, and has completed checkpoints C0–C8, including offline acceptance, component quality gates, and legacy-retirement preparation. On 2026-OCT-10, all 9 CLI tests and 28 library tests passed; both package builds and documentation/linkcheck targets succeeded; `twine check` passed for all four artifacts. The library Sphinx build reports one non-blocking warning because `lib/docs/_static` does not exist.
+5. **Development Releases Published**: TestPyPI contains `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5`; the CLI release declares `multigit-lib>=0.0.2.dev3,<1`. The project owner reports that post-publication quality acceptance checks are passing so far. Dev5 is pending final closeout review. Production PyPI publication remains blocked by policy 19, and final-PyPI Makefile targets are disabled during the transition.
 
 ### Explicitly not done yet
 
-1. Production PyPI publication is intentionally deferred until the full design scope and split-completion gates are reached.
-2. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
-3. CLI migration and legacy-retirement preparation have not started; the Dev5 tracker is the execution authority for that work.
+1. Final Dev5 closeout review remains pending.
+2. Production PyPI publication is intentionally deferred until the full design scope and split-completion gates are reached.
+3. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
+4. Actual removal of the root legacy compatibility package remains deferred until the legacy-retirement gates are satisfied.
 
 ### Safe resume point after this snapshot
 
-1. Dev4/dev2 is complete and published to TestPyPI; use `multigit==0.12.0.dev4` and `multigit-lib==0.0.2.dev2` as the current development releases.
-2. Next session candidate: begin Dev5 using `plan-multigitCliMigrationLegacyRetirementDev5Stage.prompt.md`; do not begin the namespace rename or schedule production publication yet.
-3. Production publication becomes eligible only after the full scope of this design snapshot and its Definition of Done are satisfied.
+1. TestPyPI development releases are `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5`; the CLI depends on the published library version.
+2. Complete the final Dev5 closeout review; do not publish either distribution to production PyPI.
+3. Keep the `multigit_lib` namespace and root legacy compatibility package until their separate rename and retirement gates are satisfied.
 
 ### Development Stage Strategy
 

@@ -47,9 +47,9 @@ Generated HTML documentation is written under `build/sphinx-doc/html/`.
 <sub>[back to top](#top).</sub>
 
 ### publish<a name="publish"></a>
-The current TestPyPI publication is `multigit-lib==0.0.2.dev2`.
+The current TestPyPI publication is `multigit-lib==0.0.2.dev3`.
 
-Published package page: https://test.pypi.org/project/multigit-lib/0.0.2.dev2/
+Published package page: https://test.pypi.org/project/multigit-lib/0.0.2.dev3/
 
 For future uploads (new versions only), configure a `[testpypi]` entry in `~/.pypirc` with the credentials to be used by `twine upload --repository testpypi`, then run `make upload-tmp`.
 

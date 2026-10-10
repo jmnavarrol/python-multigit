@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "multigit"
+dynamic = ["version"]
+description = "CLI distribution for multigit repository orchestration."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "multigit-lib>=0.0.2.dev3,<1",
+    "colorama",
+]
+
+[project.scripts]
+multigit = "multigit_cli.__main__:main"
+
+[tool.hatch.version]
+path = "src/multigit_cli/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/multigit_cli"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/multigit_cli",
+    "README.md",
+]

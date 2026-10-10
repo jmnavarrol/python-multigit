@@ -1,5 +1,9 @@
-TestPyPI publication checklist for 0.0.2.dev1
-==============================================
+:orphan:
+
+Historical TestPyPI publication checklist for 0.0.2.dev1
+=========================================================
+
+This file is retained as a historical record for the earlier dev publication. The current library release under active development is ``multigit-lib==0.0.2.dev2``.
 
 Status
 ------

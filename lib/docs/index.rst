@@ -16,7 +16,7 @@ multigit-lib documentation
 ==========================
 multigit-lib script and module.
 
-:package: multigit-lib 0.0.2.dev1
+:package: multigit-lib 0.0.2.dev2
 :author: Jesús M. Navarro
 :license: GNU General Public License v3.0
 :source: https://github.com/jmnavarrol/python-multigit
