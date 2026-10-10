@@ -14,6 +14,5 @@ Pending actions, general notes, etc. (in no particular order):
 
 ## IN PROGRESS
 * Refactoring multigit so it can be used in library mode by other applications.
-  * Local development should use from now on the cli version in ediatable mode instead of the legacy one.
   * Review unit tests so they are functional, not historically-named.
   * Restore *upload* Makefile target.
