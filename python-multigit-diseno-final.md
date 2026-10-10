@@ -6,9 +6,13 @@
 
 ## Final Objective
 
+Retire the legacy root Python distribution only after compatibility, ownership, and zero-reference gates pass. Keep the repository root as a control plane for the independently packaged Hatchling distributions: the reusable library in `lib/` and the CLI in `cli/`. Preserve boundaries that allow later extraction into separate CLI, library, and lifecycle/orchestration repositories.
+
 ## Development Status
 
-Dev5 implementation, acceptance gates C0–C8, and TestPyPI publication are complete. TestPyPI contains `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5`; the CLI metadata requires `multigit-lib>=0.0.2.dev3,<1`. The post-publication quality acceptance checks are reported as passing so far. Dev5 is pending final closeout review. Production PyPI publication remains blocked until the full design scope and split-completion gates are satisfied.
+Dev5 implementation, acceptance, TestPyPI publication, post-publication quality acceptance, and final closeout are complete. TestPyPI contains `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5`; the CLI metadata requires `multigit-lib>=0.0.2.dev3,<1`. The remaining work is the Dev6 root-package retirement and final split completion; production publication remains blocked until the full design scope and split-completion gates are satisfied.
+
+Dev6 begins with a documentation-first gate. The current implementation step is intentionally limited to updating the repository design documents and the stage tracker so the retirement plan is explicit before any real code work starts. No root package deletion, package metadata removal, or compatibility-layer retirement is allowed until the Dev6 documentation is reviewed and approved.
 
 Split the current single Python distribution into two independent distributions, kept in a single Git repository and still built with hatchling:
 
@@ -267,6 +271,8 @@ Clarification:
 
 ## Implementation Sequence (Approved)
 
+This is the approved migration strategy that guided the completed split work. It is retained as historical design context, not as the current checkpoint tracker. Dev6's stage plan is the execution authority for retiring the remaining root package and completing the final split.
+
 1. Incubate a new library track in parallel, without moving current production files from their existing locations.
 2. Build the first library package, tests, and docs as a compatibility-focused drop-in until behavior parity is reached against the current implementation, using copy-first and minimal-change principles.
 3. Publish a first stable `multigit-lib` release only after offline parity and compatibility checks pass.
@@ -281,27 +287,26 @@ Clarification:
 
 ## Current Refactoring Status (2026-OCT-10)
 
-This snapshot records the completed Dev5 implementation and the remaining release and architecture gates so work can resume without reconstructing the migration history.
+This snapshot records the completed Dev5 stage and the remaining release and architecture gates.
 
 ### Completed in the current milestone
 
 1. **Dev2 Stage Complete (0.12.0.dev2)**: Legacy cleanup and boundary hardening (G0–G13) finished; duplicate lib-owned code removed; CLI tests re-scoped to command-line validation only; library-domain assertions in lib/tests.
 2. **Dev3 Stage Complete (0.12.0.dev3)**: Colorized output restored to CLI via colorama integration (8 status values mapped: ERROR→RED, success→GREEN, warning→YELLOW); **Regression 1 resolved**.
 3. **Dev4 Stage Complete (0.12.0.dev4 / multigit-lib 0.0.2.dev2)**: Real-time per-repository output restored through a synchronous library iterator; repository-level failures yield structured `ERROR` results and processing continues. **Regression 2 resolved**.
-4. **Dev5 Implementation and Gates Complete (`multigit==0.12.0.dev5`)**: The isolated `cli/` distribution consumes the installed `multigit-lib` dependency, preserves CLI compatibility, and has completed checkpoints C0–C8, including offline acceptance, component quality gates, and legacy-retirement preparation. On 2026-OCT-10, all 9 CLI tests and 28 library tests passed; both package builds and documentation/linkcheck targets succeeded; `twine check` passed for all four artifacts. The library Sphinx build reports one non-blocking warning because `lib/docs/_static` does not exist.
-5. **Development Releases Published**: TestPyPI contains `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5`; the CLI release declares `multigit-lib>=0.0.2.dev3,<1`. The project owner reports that post-publication quality acceptance checks are passing so far. Dev5 is pending final closeout review. Production PyPI publication remains blocked by policy 19, and final-PyPI Makefile targets are disabled during the transition.
+4. **Dev5 Complete (`multigit==0.12.0.dev5`)**: Dev5 established the independently packaged `cli/` component, integrated it with `multigit-lib`, preserved CLI compatibility, and completed the offline acceptance and component quality gates. Legacy root-package retirement was prepared for the subsequent Dev6 stage.
+5. **Development Releases and Dev5 Closeout Complete**: TestPyPI contains `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5`; the CLI release declares `multigit-lib>=0.0.2.dev3,<1`. Post-publication quality acceptance checks passed and the final Dev5 closeout is complete. Production PyPI publication remains blocked by policy 19, and final-PyPI Makefile targets are disabled during the transition.
 
 ### Explicitly not done yet
 
-1. Final Dev5 closeout review remains pending.
-2. Production PyPI publication is intentionally deferred until the full design scope and split-completion gates are reached.
-3. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
-4. Actual removal of the root legacy compatibility package remains deferred until the legacy-retirement gates are satisfied.
+1. Production PyPI publication is intentionally deferred until the full design scope and split-completion gates are reached.
+2. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
+3. Actual removal of the root legacy compatibility package remains deferred until the Dev6 legacy-retirement gates are satisfied.
 
 ### Safe resume point after this snapshot
 
 1. TestPyPI development releases are `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5`; the CLI depends on the published library version.
-2. Complete the final Dev5 closeout review; do not publish either distribution to production PyPI.
+2. Dev5 is closed. The active next step is review of the Dev6 documentation; do not begin code retirement until that review is approved.
 3. Keep the `multigit_lib` namespace and root legacy compatibility package until their separate rename and retirement gates are satisfied.
 
 ### Development Stage Strategy
@@ -318,16 +323,16 @@ Each development stage is managed with the following lifecycle:
 
 ## Future 3-Repository Extraction Invariants
 
-To keep a future split into three repositories low-friction, the following must remain true:
+The library and CLI are already separate, independently packaged components in this repository. A future extraction into command-line, library, and lifecycle/orchestration repositories must preserve these established boundaries:
 
-1. Library incubation happens in parallel and does not require early relocation of current production files.
-2. CLI adopts library capabilities only after a published and validated library release is available.
-3. During migration, CLI adaptation is done in place first; structural extraction is deferred until integration stability is proven.
-4. cli depends on lib only through explicit public interfaces and declared version ranges.
-5. Root orchestration does not own component business logic.
-6. Component docs, tests, and packaging metadata are self-contained.
+1. Keep the existing `cli/` and `lib/` package boundaries stable; repository extraction must not require unrelated runtime redesign or premature relocation within this repository.
+2. The CLI consumes the library through its installed distribution and declared compatible version range, not through repository-relative source imports. Releases must preserve the library-before-CLI dependency availability gate.
+3. Defer physical extraction into separate repositories until installed integration, component CI, and release workflows are stable; extraction must preserve the validated runtime behaviour.
+4. `cli` depends on `lib` only through explicit public interfaces and declared version ranges.
+5. Root orchestration and lifecycle governance do not own component business logic.
+6. Component docs, tests, and packaging metadata remain self-contained and independently usable.
 7. Cross-component assumptions are documented as contracts, not implicit imports.
-8. Lifecycle concerns (stack-wide automation/governance) remain separable from cli/lib runtime behavior.
+8. Lifecycle concerns (stack-wide automation and governance) remain separable from `cli`/`lib` runtime behaviour.
 
 ## Definition of Done for the Split
 

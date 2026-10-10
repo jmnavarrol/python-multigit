@@ -15,4 +15,7 @@ Pending actions, general notes, etc. (in no particular order):
 ## IN PROGRESS
 * Refactoring multigit so it can be used in library mode by other applications.
   * Review unit tests so they are functional, not historically-named.
+  * Refactor main Makefile targets so they point to the modules and not the root anymore
   * Restore *upload* Makefile target.
+  * Work on more sofisticated github actions.
+  * Reenable Sphinx doc publication (quite possibly by means of two sites, one for cli and one for lib)
