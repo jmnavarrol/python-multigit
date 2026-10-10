@@ -2,17 +2,17 @@
 
 ## Stage Status
 
-**Status:** Planning complete; first execution gate is documentation review only
+**Status:** Documentation review approved; implementation authorised to begin at D1
 
 **Stage:** Dev6
 
-**Scope:** Define the full implementation plan for retiring the legacy root Python module and completing the final `cli/` + `lib/` split, while explicitly stopping the active work at the documentation-review gate until that plan is approved.
+**Scope:** Retire the legacy root Python module and complete the final `cli/` + `lib/` split, with all root `src/` content dispositioned and the entire root `src/` directory removed after the specified ownership, compatibility, and zero-reference gates pass.
 
 **Baseline:** Dev5 is complete and the repository is already operating in the transitional split state: the authoritative implementation lives under `lib/` and `cli/`, while the root `src/` tree remains as compatibility and retirement coverage.
 
-**Execution rule:** This document is the authoritative plan for Dev6. It describes the real migration sequence in detail, but the current execution state is intentionally limited to documentation review. No code deletion, root-package retirement, metadata cleanup, or packaging changes may begin until the human reviewer approves this document.
+**Execution rule:** This document is the authoritative plan for Dev6. The project owner approved the documentation-review gate on 2026-OCT-10. Implementation may begin at D1; later destructive changes remain gated by their specified evidence and acceptance criteria.
 
-**Development rule:** The implementation sequence below is the plan to be executed later, but it is not the current working phase. The current stage ends at approval of the plan and the design review gate.
+**Development rule:** Work in the documented checkpoint order. Preserve the compatibility baseline until the relevant retirement gate passes, and do not remove root `src/` contents before their ownership, replacements, and references have been verified.
 
 [back to top](#top)
 
@@ -22,7 +22,7 @@
 2. Preserve the root repository as the control surface while making `lib/` and `cli/` the only authoritative implementation and packaging homes.
 3. Create an explicit migration sequence for the remaining legacy code, tests, docs, and package metadata.
 4. Define the zero-reference, compatibility, and rollback gates that must pass before any root package removal is accepted.
-5. Keep the implementation work blocked behind a documentation review gate until the plan is approved.
+5. Begin implementation only after the documentation review gate is approved; that approval is now recorded below.
 
 [back to top](#top)
 
@@ -188,29 +188,11 @@ Gate:
 
 [back to top](#top)
 
-## Documentation Review Gate (Current Stage)
+## Documentation Review Gate (Approved)
 
-This is the only stage that is active right now.
+The project owner approved this plan on 2026-OCT-10. The review-only hold is complete; implementation is authorised to begin at D1. Approval does not waive the migration, compatibility, zero-reference, or validation gates later in this plan.
 
-The review gate is intentionally placed before implementation because the root-package retirement is a structural and compatibility-sensitive change. The repository still contains a compatibility bridge, and deleting that bridge too early would risk breaking the legacy workflow before a clean split is proven.
-
-### Current allowed action
-
-- Review the implementation plan in this document.
-- Confirm the migration sequence is correct and complete.
-- Approve or reject the plan before any code edits begin.
-
-### Current forbidden action
-
-- No root package deletion.
-- No compatibility shim removal.
-- No packaging metadata cleanup.
-- No root Makefile simplification.
-- No `src/` tree retirement work.
-- No deletion of the repository-root `src/` directory or any of its contents.
-- No release or publication action.
-
-This step is not a code change. It is the final documentation and design approval checkpoint before the implementation sequence described above becomes active.
+The gate was placed before implementation because root-package retirement is structural and compatibility-sensitive. The compatibility bridge remains until replacement coverage and the retirement gates prove it is safe to remove. Approval does not authorise skipping those later gates or production publication.
 
 [back to top](#top)
 
@@ -218,21 +200,21 @@ This step is not a code change. It is the final documentation and design approva
 
 ### D0: Documentation review gate
 
-**Status:** Active now
+**Status:** Complete; approved 2026-OCT-10
 
 - Confirm the full Dev6 implementation plan is complete and reflects the actual retirement path.
 - Confirm the migration strategy is explicit about ownership, zero-reference checks, and rollback.
-- Confirm that implementation remains blocked until the plan is reviewed and approved.
+- Record that implementation is authorised now that the plan has been reviewed and approved.
 
-**Gate:** Human approval of the design and migration sequence is required before any real implementation starts.
+**Gate:** Human approval of the design and migration sequence was required before implementation; approval is recorded above.
 
-**Evidence:** This file is the work-in-progress Dev6 plan, and it intentionally stops at the review gate rather than performing code changes.
+**Evidence:** The project owner approved the Dev6 plan on 2026-OCT-10 and authorised implementation to begin at D1.
 
 [back to top](#top)
 
 ### D1: Baseline freeze and migration inventory
 
-**Status:** Pending implementation
+**Status:** Active; next work checkpoint
 
 - Freeze the current transitional baseline.
 - Inventory all root package references.
@@ -285,12 +267,12 @@ This step is not a code change. It is the final documentation and design approva
 | Area | Required result | Status |
 | --- | --- | --- |
 | Development plan | Full root-retirement and split-completion sequence recorded | Complete |
-| Documentation gate | Review-only stage enforced before code changes | Active |
-| Root compatibility | Preserved until the approved review gate passes | Preserved |
+| Documentation gate | Plan reviewed and approved before code changes | Complete |
+| Root compatibility | Preserved until the retirement gates pass | Preserved |
 | Ownership clarity | `lib/` and `cli/` defined as final source of truth | Documented |
 | Root `src/` retirement | Entire root `src/` removed after all contents are dispositioned and gates pass | Required |
 | Zero-reference gate | Required before deletion is allowed | Documented |
-| Real implementation | Deferred until review approval | Pending |
+| Real implementation | Authorised from D1, subject to checkpoint gates | Active |
 
 [back to top](#top)
 
@@ -299,13 +281,19 @@ This step is not a code change. It is the final documentation and design approva
 1. The root package retirement is a structural change and therefore must not be implemented without a documented plan and review gate.
 2. The compatibility bridge is deliberately kept in place during the split so urgent rollback is possible.
 3. The final architecture must be explicit before any deletion starts; otherwise root code may be removed while a still-needed compatibility path remains.
-4. The split-completion work is intentionally blocked from the current phase to keep the repo stable during the design review.
+4. Implementation is authorised after documentation approval, but root-package and root-`src/` deletion remain blocked until their specific gates pass.
 5. Production publication remains out of scope until the final split state is accepted and the full release gate is satisfied.
+
+[back to top](#top)
+
+## Next Session Handoff
+
+Start implementation at D1; the documentation-review hold is complete. Read this plan, the current `AGENTS.md`, and the current design snapshot. Inspect `git status` and establish the baseline without overwriting existing changes. Inventory and classify every repository-root `src/` item before moving or deleting anything. Follow D1's gate and the repository's incremental review instructions; do not jump ahead to root `src/` deletion.
 
 [back to top](#top)
 
 ## Completion Criteria
 
-The current documentation-review gate must be approved before implementation begins. Dev6 is complete only when the legacy root package is retired, every required root `src/` responsibility has an owned replacement or documented disposition, the entire repository-root `src/` directory is deleted, `lib/src/` and `cli/src/` remain intact, and the final split validation gates pass.
+Dev6 is complete only when the legacy root package is retired, every required root `src/` responsibility has an owned replacement or documented disposition, the entire repository-root `src/` directory is deleted, `lib/src/` and `cli/src/` remain intact, and the final split validation gates pass.
 
 [back to top](#top)
