@@ -9,6 +9,7 @@
 * `0.12.0.dev4` / `multigit-lib 0.0.2.dev2`: restored real-time per-repository output through a library iterator; repository-level errors are rendered as `ERROR` results and do not stop remaining repositories.
 * `multigit-lib 0.0.2.dev3`: published the follow-up library development release to TestPyPI.
 * `0.12.0.dev5`: published the isolated CLI distribution to TestPyPI; it depends on `multigit-lib>=0.0.2.dev3,<1`. Post-publication quality acceptance checks passed and Dev5 final closeout is complete.
+* `0.12.0.dev6`: removed repository-relative library source fallbacks from the legacy root compatibility wrappers.
 
 ## 0.11.9 (2026-MAY-31)
 * Differences from [previous tag](/../../compare/v0.11.8…v0.11.9).

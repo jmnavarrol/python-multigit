@@ -22,7 +22,7 @@ class TestDev5CliRedGate(unittest.TestCase):
         with redirect_stdout(version_buffer):
             result = module.main(['--version'])
         self.assertEqual(result, 0)
-        self.assertIn('multigit', version_buffer.getvalue())
+        self.assertIn(module.__version__, version_buffer.getvalue())
 
         help_buffer = io.StringIO()
         with redirect_stdout(help_buffer):

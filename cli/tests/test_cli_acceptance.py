@@ -4,6 +4,9 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
+
+from multigit_cli import __main__ as cli_main
 
 
 class TestCliOfflineAcceptance(unittest.TestCase):
@@ -82,6 +85,69 @@ class TestCliOfflineAcceptance(unittest.TestCase):
             result = self._run_multigit(cwd=temp_dir)
         self.assertEqual(result.returncode, 0)
         self.assertIn('arguments required', result.stdout.lower())
+
+    def test_status_without_subrepos_reports_missing_config(self):
+        with tempfile.TemporaryDirectory(prefix='multigit-acceptance-') as temp_dir:
+            result = self._run_multigit('--status', cwd=temp_dir)
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("Couldn't find any 'subrepos' file... exiting.", result.stdout)
+
+    def test_each_subrepo_is_rendered_before_next_result_is_requested(self):
+        first_result = {'path': '/tmp/first-repo', 'status': 'UP_TO_DATE'}
+        second_result = {'path': '/tmp/second-repo', 'status': 'UP_TO_DATE'}
+        rendered = []
+
+        def streamed_process(**kwargs):
+            yield first_result
+            self.assertEqual(rendered, [first_result])
+            yield second_result
+
+        with patch.object(
+            cli_main,
+            '_load_orchestrator',
+            return_value=(streamed_process, RuntimeError),
+        ), patch.object(
+            cli_main,
+            'print_subrepo_status',
+            side_effect=rendered.append,
+        ):
+            cli_main._process_subrepos('/tmp', report_only=True)
+
+        self.assertEqual(rendered, [first_result, second_result])
+
+    def test_process_passes_status_and_run_modes_to_orchestrator(self):
+        received_calls = []
+
+        def streamed_process(**kwargs):
+            received_calls.append(kwargs)
+            return iter(())
+
+        with patch.object(
+            cli_main,
+            '_load_orchestrator',
+            return_value=(streamed_process, RuntimeError),
+        ):
+            cli_main._process_subrepos('/tmp/example', report_only=True)
+            cli_main._process_subrepos('/tmp/example', report_only=False)
+
+        self.assertEqual(
+            [call['report_only'] for call in received_calls],
+            [True, False],
+        )
+        self.assertTrue(all(call['base_path'] == '/tmp/example' for call in received_calls))
+        self.assertTrue(all(call['subrepos_filename'] == 'subrepos' for call in received_calls))
+
+    def test_cli_resolves_installed_library_orchestrator(self):
+        from multigit_lib.subrepos_orchestration import (
+            iter_process_subrepos,
+            SubreposOrchestrationError,
+        )
+
+        resolved_process, resolved_error = cli_main._load_orchestrator()
+
+        self.assertIs(resolved_process, iter_process_subrepos)
+        self.assertIs(resolved_error, SubreposOrchestrationError)
 
     def test_status_runs_against_local_git_scenario(self):
         with tempfile.TemporaryDirectory(prefix='multigit-acceptance-') as temp_dir:

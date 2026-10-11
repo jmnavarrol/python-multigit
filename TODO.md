@@ -15,6 +15,7 @@ Pending actions, general notes, etc. (in no particular order):
 ## IN PROGRESS
 * Refactoring multigit so it can be used in library mode by other applications.
   * Review unit tests so they are functional, not historically-named.
+    * Ask copilot to individually review unit tests for reorg/completion suggestions (first for lib/, then for cli/)
   * Refactor main Makefile targets so they point to the modules and not the root anymore
   * Restore *upload* Makefile target.
   * Work on more sofisticated github actions.

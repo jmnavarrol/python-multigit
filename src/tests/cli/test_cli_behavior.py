@@ -12,6 +12,8 @@ from contextlib import redirect_stdout
 from unittest.mock import patch
 
 import multigit.__main__ as cli_main
+import multigit.gitrepo as gitrepo_compat
+import multigit.subrepofile as subrepofile_compat
 import multigit.status_run_adapter as status_run_adapter
 import multigit.cli_rendering as cli_rendering
 
@@ -66,6 +68,17 @@ class TestCliBehavior(unittest.TestCase):
     def test_status_run_adapter_does_not_depend_on_subrepos_class(self):
         source = inspect.getsource(status_run_adapter)
         self.assertNotIn('from .subrepos import Subrepos', source)
+
+    def test_legacy_cli_compatibility_modules_have_no_repo_relative_lib_fallback(self):
+        compatibility_modules = (
+            gitrepo_compat,
+            subrepofile_compat,
+            status_run_adapter,
+        )
+        for module in compatibility_modules:
+            source = inspect.getsource(module)
+            self.assertNotIn('sys.path.insert', source, module.__name__)
+            self.assertNotIn('lib_src', source, module.__name__)
 
     def test_cli_rendering_exposes_subrepo_status_renderer(self):
         self.assertTrue(hasattr(cli_rendering, 'print_subrepo_status'))

@@ -214,25 +214,99 @@ The gate was placed before implementation because root-package retirement is str
 
 ### D1: Baseline freeze and migration inventory
 
-**Status:** Active; next work checkpoint
+**Status:** Complete; inventory approved 2026-10-11
 
 - Freeze the current transitional baseline.
 - Inventory all root package references.
 - Group them by compatibility, migration bridge, duplicate implementation, or stale documentation.
 
-**Gate:** Baseline and root ownership map are recorded and approved.
+#### Root `src/` ownership inventory
+
+The baseline was captured on branch `splitting-plan-tmp` at commit `6934e6e` (2026-10-10); the worktree was clean. All 21 tracked paths under repository-root `src/` are accounted for below. Root `src/multigit_cli/` exists only as an empty, untracked directory; the ignored `src/multigit/__pycache__/` is generated state and is not migration content.
+
+| Tracked item(s) | D1 classification and disposition |
+| --- | --- |
+| `src/multigit/__init__.py`, `src/multigit/__main__.py` | Legacy import/export surface, CLI entry point, and version source. The CLI entry point is owned by `cli/`; keep the `multigit_lib` namespace until its separate rename gate. Retire this surface only after CLI compatibility and packaging gates pass. |
+| `src/multigit/cli_error_translation.py`, `src/multigit/cli_rendering.py`, `src/multigit/status_run_adapter.py` | Legacy CLI adapters/rendering. Corresponding CLI-owned code exists under `cli/src/multigit_cli/`; migrate any unique behavior coverage before retirement. |
+| `src/multigit/gitrepo.py`, `src/multigit/subrepofile.py` | Compatibility wrappers that import `multigit_lib` through a repository-relative fallback. `lib/tests/parity/test_legacy_parity.py` still imports these modules; migrate or replace that parity dependency before removal. |
+| `src/multigit/subrepos.py` | Legacy recursive implementation still exported by the root package. The replacement responsibilities are split between library orchestration and CLI rendering; verify behavior and coverage before retirement. |
+| `src/multigit/subrepos_schema.yaml` | Legacy package data. Compare it with the library-owned schema and verify package-data coverage before removing it. |
+| `src/tests/cli/__init__.py`, `src/tests/cli/test_cli_behavior.py` | Legacy CLI tests import root `multigit` modules directly. Port unique assertions to `cli/tests/` and remove remaining direct imports before deleting root tests. |
+| `src/sphinx/Makefile`, `src/sphinx/_static/.gitignore`, `src/sphinx/_templates/.gitignore`, `src/sphinx/conf.py`, `src/sphinx/index.rst`, `src/sphinx/gitrepo.rst`, `src/sphinx/subrepofile.rst`, `src/sphinx/subrepos.rst` | Legacy Sphinx stack and API/CLI content. Review and assign content to `lib/docs/`, `cli/docs/`, or root project docs; the component docs are not yet proven complete replacements. |
+| `src/README.md` | Legacy pointer to the project README; superseded by root `README.md`, subject to reference removal. |
+| `src/LICENSE` | Tracked symlink to `../LICENSE`; legal material already exists at repository root. Remove the duplicate path only after root package metadata/build no longer includes it. |
+
+#### Root references outside `src/`
+
+- Root `pyproject.toml` still builds distribution `multigit`, exposes `multigit:multigit.__main__:main`, and sources its version from root `src/`. It is legacy metadata slated for removal in D4 after the retirement gates pass. Its library dependency is `multigit-lib>=0.0.2.dev2,<1`, while the active CLI requires `>=0.0.2.dev3,<1` and the library source is version `0.0.2.dev3`.
+- The active development environment is managed by Bash Magic Enviro. `python-virtualenvs/multigit-development.requirements` installs editable `lib[development]` and editable `cli`, with the root editable install commented out as legacy mode; it also configures TestPyPI as an extra index. Baseline package builds used this project virtualenv.
+- Root `Makefile` still contains legacy test/build/doc targets as well as component delegation. Plain `make test` does not put root `src/` on the import path; `PYTHONPATH=src make test` passes. Do not run root `make clean`: it includes `rm -rf ../projects`.
+- `AGENTS.md` and `docs/AI_DEVELOPMENT_PLAYBOOK.md` describe root `src/` as the implementation/test/docs home. Root `README.md`, component READMEs/docs, and this design snapshot contain transitional references that need final-state review. The imports in `lib/tests/parity/test_legacy_parity.py` are intentional active parity dependencies, not stale prose.
+
+#### Baseline validation
+
+| Check | Result |
+| --- | --- |
+| Root tests | Plain `make test` failed to import `multigit` because root `src/` was not on `sys.path`; `PYTHONPATH=src make test` passed (12 tests). |
+| Library tests | `make -C lib test` passed (28 tests). |
+| CLI tests | `make -C cli test` passed (9 tests). |
+| Package builds | Hatchling from the BME-managed project virtualenv built sdist and wheel for root `multigit==0.12.0.dev5`, `multigit-lib==0.0.2.dev3`, and CLI `multigit==0.12.0.dev5`. |
+| Sphinx HTML | Root, lib, and CLI HTML builds succeeded. Lib emitted one warning: configured `_static/` directory is missing. Network linkcheck was not run. |
+| CLI smoke | Root `--help` and `--version` passed; CLI suite covers component help/version. |
+
+**Gate:** Baseline and root ownership map are recorded and approved by the owner on 2026-10-11. No root package or `src/` deletion is authorised by this record.
 
 [back to top](#top)
 
 ### D2: Ownership transfer and component hardening
 
-**Status:** Pending implementation
+**Status:** Active; increment 1 complete, awaiting review before further ownership transfers
 
 - Move root-owned logic into `lib/` or `cli/`.
 - Remove repo-relative library fallback paths from the CLI boundary.
 - Ensure tests and docs match the new ownership boundaries.
 
 **Gate:** The final source-of-truth locations are clear and verified.
+
+#### D2 increment 1: Legacy import-path fallback
+
+**Red/green status:** Added `test_legacy_cli_compatibility_modules_have_no_repo_relative_lib_fallback` to the legacy CLI suite. It first failed as expected because `multigit.gitrepo` injected repository-relative `lib/src` into `sys.path`; after the implementation, it passes for all three legacy wrappers.
+
+**Implementation:** Bumped the root compatibility distribution to `0.12.0.dev6` before changing runtime code. The `gitrepo`, `subrepofile`, and status adapter wrappers now import from the installed `multigit_lib` package without modifying `sys.path`. The active component CLI remains at `0.12.0.dev5`.
+
+**Validation:** The focused fallback test passes. Root compatibility tests pass (13), library tests pass (28), and CLI tests pass (9) in the BME-managed development environment. The root `0.12.0.dev6` sdist and wheel build successfully; root Sphinx HTML builds successfully; installed CLI `--help` and `--version` smoke checks pass. A source search confirms the three wrappers contain no `sys.path.insert`, `lib_src`, or `repo_root` fallback logic. Network linkcheck was not run.
+
+**Review gate:** This increment is complete. Pause for owner review before continuing D2 ownership, test, or documentation transfers.
+
+#### D2 increment 2: Missing-config CLI coverage
+
+**Ownership:** Added `test_status_without_subrepos_reports_missing_config` to `cli/tests/test_cli_acceptance.py`. It covers the installed CLI's exit code and missing-`subrepos` message without changing or deleting the legacy test.
+
+**Evidence:** Running `multigit --status` from an empty temporary directory returned exit code `2` and printed the expected missing-configuration message.
+
+**Validation:** The focused CLI test passed, and `make -C cli test` passed (10 tests) in the BME-managed development environment. `git diff --check` passed.
+
+**Review gate:** This coverage-transfer increment is complete. Pause for owner review before proceeding with another D2 ownership transfer.
+
+#### D2 increment 3: Streamed result rendering coverage
+
+**Ownership:** Added `test_each_subrepo_is_rendered_before_next_result_is_requested` to `cli/tests/test_cli_acceptance.py`. It verifies the CLI renders each library result before requesting the next item from the iterator, without changing runtime code.
+
+**Validation:** The focused test passed, and `make -C cli test` passed (11 tests) in the BME-managed development environment.
+
+**Review gate:** This test-transfer increment is complete. Pause for owner review before proceeding with another D2 ownership transfer.
+
+#### D2 CLI test ownership batch
+
+**Status:** Complete; awaiting owner review
+
+The component CLI suite now owns the externally relevant CLI coverage formerly asserted in `src/tests/cli/test_cli_behavior.py`: help/version and exact version reporting, no-argument usage, missing-config output and exit code, local status/run workflows, requested gitref rendering, streamed result rendering, status/run mode forwarding, and resolution of the installed library orchestrator and exception type.
+
+Legacy assertions about removed lane-selection helpers, root compatibility wrappers, and `status_run_adapter` implementation structure are root-only retirement checks, not CLI component contracts. Renderer-existence and requested-gitref assertions are covered by the component's rendering behavior test. The legacy test file remains untouched for now; its deletion is gated on root `src/` retirement and zero-reference validation.
+
+**Validation:** `make -C cli test` passes (13 tests) in the BME-managed development environment. The focused mode-forwarding, installed-orchestrator, and exact-version tests pass. `git diff --check` and editor diagnostics pass.
+
+**Review gate:** The CLI test ownership batch is complete. Pause here for owner review before moving to another module or D2 documentation/implementation ownership work.
 
 [back to top](#top)
 
