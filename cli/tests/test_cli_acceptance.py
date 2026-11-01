@@ -6,55 +6,11 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from git_scaffold import create_seeded_bare_remote, write_subrepos_file
 from multigit_cli import __main__ as cli_main
 
 
 class TestCliOfflineAcceptance(unittest.TestCase):
-    def _git(self, args, cwd):
-        result = subprocess.run(['git', *args], cwd=cwd, capture_output=True, text=True, check=False)
-        self.assertEqual(result.returncode, 0, msg=result.stderr)
-        return result
-
-    def _create_remote(self, remote_dir, default_branch='main', extra_branches=None):
-        extra_branches = extra_branches or []
-        os.makedirs(os.path.dirname(remote_dir), exist_ok=True)
-        self._git(['init', '--bare', remote_dir], cwd=os.getcwd())
-
-        work_dir = tempfile.mkdtemp(prefix='multigit-remote-')
-        try:
-            self._git(['init', work_dir], cwd=os.getcwd())
-            self._git(['config', 'user.name', 'multigit-tests'], cwd=work_dir)
-            self._git(['config', 'user.email', 'multigit-tests@example.com'], cwd=work_dir)
-            with open(os.path.join(work_dir, 'README.md'), 'w', encoding='utf-8') as handle:
-                handle.write('seed\n')
-            self._git(['add', 'README.md'], cwd=work_dir)
-            self._git(['commit', '-m', 'initial commit'], cwd=work_dir)
-            self._git(['branch', '-M', default_branch], cwd=work_dir)
-            self._git(['remote', 'add', 'origin', remote_dir], cwd=work_dir)
-            self._git(['push', '--set-upstream', 'origin', default_branch], cwd=work_dir)
-
-            for branch_name in extra_branches:
-                self._git(['checkout', '-b', branch_name], cwd=work_dir)
-                with open(os.path.join(work_dir, f'{branch_name}.txt'), 'w', encoding='utf-8') as handle:
-                    handle.write(f'branch: {branch_name}\n')
-                self._git(['add', f'{branch_name}.txt'], cwd=work_dir)
-                self._git(['commit', '-m', f'commit on {branch_name}'], cwd=work_dir)
-                self._git(['push', '--set-upstream', 'origin', branch_name], cwd=work_dir)
-
-            self._git(['checkout', default_branch], cwd=work_dir)
-            self._git(['symbolic-ref', 'HEAD', f'refs/heads/{default_branch}'], cwd=remote_dir)
-        finally:
-            shutil.rmtree(work_dir)
-
-    def _write_subrepos(self, directory, entries):
-        with open(os.path.join(directory, 'subrepos'), 'w', encoding='utf-8') as handle:
-            handle.write('---\nsubrepos:\n')
-            for entry in entries:
-                handle.write(f"- path: '{entry['path']}'\n")
-                handle.write(f"  repo: '{entry['repo']}'\n")
-                if 'branch' in entry:
-                    handle.write(f"  branch: '{entry['branch']}'\n")
-
     def _run_multigit(self, *args, cwd=None):
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
         venv_bin = os.path.join(project_root, '.bme.d', '.virtualenvs', 'multigit-development', 'bin')
@@ -138,23 +94,26 @@ class TestCliOfflineAcceptance(unittest.TestCase):
         self.assertTrue(all(call['base_path'] == '/tmp/example' for call in received_calls))
         self.assertTrue(all(call['subrepos_filename'] == 'subrepos' for call in received_calls))
 
-    def test_cli_resolves_installed_library_orchestrator(self):
-        from multigit_lib.subrepos_orchestration import (
+    def test_cli_orchestrator_uses_library_repository_service(self):
+        from multigit_lib import Gitrepo
+        from multigit_cli.subrepos_orchestration import (
             iter_process_subrepos,
             SubreposOrchestrationError,
+            Gitrepo as OrchestratorGitrepo,
         )
 
         resolved_process, resolved_error = cli_main._load_orchestrator()
 
         self.assertIs(resolved_process, iter_process_subrepos)
         self.assertIs(resolved_error, SubreposOrchestrationError)
+        self.assertIs(OrchestratorGitrepo, Gitrepo)
 
     def test_status_runs_against_local_git_scenario(self):
         with tempfile.TemporaryDirectory(prefix='multigit-acceptance-') as temp_dir:
             remote_path = os.path.join(temp_dir, 'remotes', 'python-multigit-empty-repo.git')
-            self._create_remote(remote_path, default_branch='main', extra_branches=['a-branch'])
-            self._write_subrepos(
-                temp_dir,
+            create_seeded_bare_remote(remote_path, default_branch='main', extra_branches=['a-branch'])
+            write_subrepos_file(
+                os.path.join(temp_dir, 'subrepos'),
                 [{'path': 'child-repo', 'repo': remote_path, 'branch': 'a-branch'}],
             )
             result = self._run_multigit('--status', cwd=temp_dir)
@@ -166,9 +125,9 @@ class TestCliOfflineAcceptance(unittest.TestCase):
     def test_run_clones_local_subrepo(self):
         with tempfile.TemporaryDirectory(prefix='multigit-acceptance-') as temp_dir:
             remote_path = os.path.join(temp_dir, 'remotes', 'python-multigit-empty-repo.git')
-            self._create_remote(remote_path, default_branch='main', extra_branches=['a-branch'])
-            self._write_subrepos(
-                temp_dir,
+            create_seeded_bare_remote(remote_path, default_branch='main', extra_branches=['a-branch'])
+            write_subrepos_file(
+                os.path.join(temp_dir, 'subrepos'),
                 [{'path': 'child-repo', 'repo': remote_path, 'branch': 'a-branch'}],
             )
             result = self._run_multigit('--run', cwd=temp_dir)

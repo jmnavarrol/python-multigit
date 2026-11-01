@@ -10,7 +10,7 @@ The general idea is to offer a simple way of managing *"workspaces"* integrating
 1. [usage](#usage)
    * [subrepos' file format](#subrepos-file-format)
 1. [development](#development)
-   * [transitional package layout](#transitional-package-layout)
+   * [component package layout](#component-package-layout)
    * [tests](#tests)
    * [code documentation](#code-documentation)
    * [build](#build)
@@ -85,28 +85,17 @@ It creates a Python 3 *virtualenv* using [the companion requirements file](./pyt
 
 Once the *virtualenv* is (automatically) activated, you can run the code via the project entry points or through the package-specific local workflows.
 
-The repository is currently in a transitional packaging split:
-
-* the legacy root package under [src/multigit/](./src/multigit/) is still kept as compatibility and retirement coverage;
-* the library package lives under [lib/](./lib/);
-* the CLI package lives under [cli/](./cli/);
-* the root [Makefile](./Makefile) remains available for the old workflow and also exposes the new delegated component targets.
-
-This means the project is intentionally supporting both the historical root layout and the new split distribution layout while the migration is still in progress.
-
-> Warning: while the repository is being migrated, the root workflow is still kept alive for compatibility, but the canonical development and release work happens in the component-specific directories under [lib](./lib/) and [cli](./cli/). The old root package remains a compatibility layer until the retirement stage is complete.
+The project is maintained as two independently packaged components: the reusable library in [lib/](./lib/) and the command-line application in [cli/](./cli/). The repository root is a control plane; its [Makefile](./Makefile) delegates test, build, documentation, and clean operations to those components.
 
 <sub>[back to top](#top).</sub>
 
-### transitional package layout<a name="poc-incubation"></a>
+### component package layout<a name="component-package-layout"></a>
 
-The root [Makefile](./Makefile) keeps the older command set working for backwards compatibility, while the component workflows are owned by their local Makefiles:
+The component workflows are owned by their local Makefiles:
 
 * `cd lib && make test`, `make build`, `make doc`, `make upload-tmp`
 * `cd cli && make test`, `make build`, `make doc`, `make upload-tmp`
-* `make targets` at the repository root shows both the legacy commands and the delegated `lib-*` and `cli-*` targets
-
-The root `src/` tree is not the canonical runtime surface for the split packages. It remains part of the migration bridge, compatibility layer, and retirement preparation path until the old single-package layout is fully retired.
+* root `make test`, `make build`, `make doc`, and `make clean` recursively coordinate both components
 
 <sub>[back to top](#top).</sub>
 
@@ -115,34 +104,36 @@ When adding or modifying tests, preserve these rules:
 * keep the local development workflows runnable offline;
 * prefer local scaffolding over external remotes;
 * use mocks only when a condition cannot be reproduced reliably with local Git state;
-* preserve the legacy root workflow while validating the library and CLI package boundaries.
+* keep both component test workflows offline by default;
+* keep file discovery, YAML parsing, and recursive traversal in CLI tests;
+* keep per-repository Git status and update behavior in library tests.
 
 Typical component-level validation is still performed directly within each package subtree.
 
 <sub>[back to top](#top).</sub>
 
 ### code documentation<a name="sphinx"></a>
-Code documentation is produced with the help of [Sphinx](https://www.sphinx-doc.org). The legacy package still has its documentation configuration under [src/sphinx/](./src/sphinx/), while the split packages keep their own local Sphinx configuration under [lib/docs/](./lib/docs/) and [cli/docs/](./cli/docs/).
+Code documentation is produced with the help of [Sphinx](https://www.sphinx-doc.org). The components keep their documentation and Sphinx configuration under [lib/docs/](./lib/docs/) and [cli/docs/](./cli/docs/).
 
-The root [Makefile](./Makefile) still offers the legacy build route, and the component directories expose their own documentation targets, which are the preferred entry points for the split phase.
+The root `make doc` target builds both component sites; the documentation workflow publishes CLI docs at the site root and library docs under `/lib/`.
 
 You can browse the public project documentation online at https://jmnavarrol.github.io/python-multigit.
 
 <sub>[back to top](#top).</sub>
 
 ### build<a name="build"></a>
-The project currently supports both the historical root build flow and the split package flow:
+The root remains an orchestration surface, not a Python distribution:
 
-* root flow: `make targets`, `make test`, `make build`, `make doc`, `make clean`
+* root flow: `make test`, `make build`, `make doc`, `make clean`
 * library flow: `cd lib && make test`, `make build`, `make doc`, `make upload-tmp`
 * CLI flow: `cd cli && make test`, `make build`, `make doc`, `make upload-tmp`
 
-The accepted packaging backend for both package splits is [Hatchling](https://hatch.pypa.io), and the build frontend is invoked through the component Makefiles rather than assuming the old root package is still the only canonical source tree.
+Both distributions use [Hatchling](https://hatch.pypa.io), with independent metadata and version streams in their component directories.
 
 <sub>[back to top](#top).</sub>
 
 ### publish<a name="publish"></a>
-The component Makefiles provide TestPyPI upload targets through *twine*. Production PyPI upload targets are intentionally commented out during this transitional phase; do not re-enable them until the full design scope and split-completion gates are satisfied. The root Makefile does not orchestrate publishing.
+The component Makefiles provide TestPyPI upload targets through *twine*. Production PyPI uploads remain blocked until the full design scope and split-completion gates are satisfied. The root Makefile does not orchestrate publishing.
 
 Configure the `[testpypi]` entry in `~/.pypirc` before uploading a development release. A published version cannot be uploaded again, so bump the relevant component version before its next upload.
 

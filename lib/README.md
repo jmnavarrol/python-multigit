@@ -1,8 +1,8 @@
-# multigit-lib PoC<a name="top"></a>
+# multigit-lib<a name="top"></a>
 
-Minimal packaging PoC for the future reusable library split of python-multigit.
+Reusable library component for python-multigit. It owns per-repository Git status and update operations over normalized native configuration objects.
 
-This component currently exists to validate package layout, local build/test/doc workflows, and installability without changing the production runtime under `src/multigit`.
+The current development version is `multigit-lib==0.0.2.dev4`. The repository root provides shared guidance and recursive build, test, documentation, and cleanup orchestration. This component owns the library source, tests, documentation, and packaging for `multigit-lib`.
 
 **Contents:**<a name="contents"></a>
 1. [usage](#usage)
@@ -16,38 +16,38 @@ This component currently exists to validate package layout, local build/test/doc
 ----
 
 ## usage<a name="usage"></a>
-This PoC package is not intended yet as the production runtime implementation of `python-multigit`.
+Install `multigit-lib` to use the library independently of the CLI distribution.
 
-The transitional import package name is `multigit_lib`, intentionally separated from `multigit` so the PoC can coexist with the current production package without import shadowing.
+The Python import package is `multigit_lib`. The CLI distribution depends on `multigit-lib` through its installed package interface and owns subrepos file discovery, YAML parsing, validation, and recursive traversal. The library accepts normalized native repository configuration and performs per-repository Git operations.
 
 <sub>[back to top](#top).</sub>
 
 ## development<a name="development"></a>
-Development at this stage is focused on validating component-local packaging, tests, documentation, and installability for a future `multigit-lib` release line.
+Library source, offline tests, documentation, and packaging are maintained in this component. The root Makefile delegates test, build, documentation, and clean operations to both components. The BME-managed development environment is defined by the repository's `python-virtualenvs/multigit-development.requirements`.
 
 <sub>[back to top](#top).</sub>
 
 ### build<a name="build"></a>
-The [included Makefile](./Makefile) builds source and wheel artifacts for the PoC package through Hatch/Hatchling.
+The [included Makefile](./Makefile) builds the `multigit-lib` sdist and wheel through Hatchling after the test and documentation gates.
 
-Run `make` to see the available component targets.
+Run `make -C lib test`, `make -C lib doc`, or `make -C lib build` from the repository root. The root `make build` builds both CLI and library distributions.
 
 <sub>[back to top](#top).</sub>
 
 ### tests<a name="tests"></a>
-The current test scope is intentionally minimal and offline-only, focused on smoke validation for package import and version exposure.
+The offline unittest suite covers per-repository status/update behavior, package imports, and version exposure. Git scenarios use local fixtures and do not require network access; config-file and recursive CLI workflows are tested under `cli/tests/`.
 
 <sub>[back to top](#top).</sub>
 
 ### code documentation<a name="sphinx"></a>
 Code documentation is produced with [Sphinx](https://www.sphinx-doc.org) from the component-local [docs/](./docs/) tree.
 
-Generated HTML documentation is written under `build/sphinx-doc/html/`.
+Component HTML is written under `lib/build/sphinx-doc/html/`. The root docs workflow assembles the CLI site at the Pages root and the library site under `/lib/`.
 
 <sub>[back to top](#top).</sub>
 
 ### publish<a name="publish"></a>
-The current TestPyPI publication is `multigit-lib==0.0.2.dev3`.
+The latest published TestPyPI version is `multigit-lib==0.0.2.dev3`. The current local development version is `0.0.2.dev4` and has not been published.
 
 Published package page: https://test.pypi.org/project/multigit-lib/0.0.2.dev3/
 

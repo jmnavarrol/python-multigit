@@ -12,15 +12,17 @@ SUBREPOS_FILE = 'subrepos'
 
 
 def _load_orchestrator():
-    """Import the library boundary lazily so the CLI package can be tested before installation."""
+    """Load CLI orchestration while reporting a missing library dependency clearly."""
     try:
-        from multigit_lib.subrepos_orchestration import iter_process_subrepos, SubreposOrchestrationError
+        from .subrepos_orchestration import iter_process_subrepos, SubreposOrchestrationError
         return iter_process_subrepos, SubreposOrchestrationError
     except ModuleNotFoundError as exc:
-        raise RuntimeError(
-            "The multigit CLI requires the installed 'multigit-lib' dependency. "
-            "Install it before running the command."
-        ) from exc
+        if exc.name == 'multigit_lib':
+            raise RuntimeError(
+                "The multigit CLI requires the installed 'multigit-lib' dependency. "
+                "Install it before running the command."
+            ) from exc
+        raise
 
 
 def _process_subrepos(base_path, report_only):

@@ -3,19 +3,17 @@
 This file defines how to work on python-multigit safely, usefully, and consistently.
 
 ## 1) Project Goal
-multigit manages multiple Git repositories declared in a YAML file named subrepos, processing them recursively from a base directory.
+The CLI manages Git repositories declared in YAML files named `subrepos`; the library provides reusable per-repository Git operations.
 
 Key components:
-- CLI: src/multigit/__main__.py
-- Recursive orchestration: src/multigit/subrepos.py
-- Per-repository Git operations: src/multigit/gitrepo.py
-- YAML load/validation: src/multigit/subrepofile.py
+- CLI entry point, YAML loading, and recursive workflow: `cli/src/multigit_cli/`
+- Per-repository Git operations: `lib/src/multigit_lib/gitrepo.py`
 
 ## 2) Functional Source of Truth
 Before changing behavior, always align with:
 - README.md for user experience, subrepos semantics, and usage expectations.
-- Makefile for the official development workflow (test, build, doc, clean, upload*).
-- pyproject.toml for packaging, dependencies, entry script, and build backend.
+- Root Makefile for recursive test/build/doc/clean orchestration.
+- `cli/pyproject.toml` and `lib/pyproject.toml` for component packaging, dependencies, entry points, and build backends.
 
 Explicit build requirement:
 - The build backend is hatchling.build (via Hatch). Do not replace or diverge from it unless explicitly required.
@@ -31,15 +29,14 @@ make clean
 ```
 
 Notes:
-- make test runs unittest discover over src/tests.
+- `make test` delegates to the offline suites under `lib/tests` and `cli/tests`.
 - make test is the default suite and must remain offline.
 - make build depends on test.
-- make clean also removes potentially sensitive paths; review impact carefully before running it in non-isolated environments.
+- `make clean` removes ignored root/component build outputs only.
 
 Local test scaffolding:
-- The suite builds temporary local Git remotes to simulate clone/fetch/pull, branches, and repository states without network access.
-- The support module is src/tests/git_scaffold.py.
-- gitrepo and subrepos tests consume those local remotes in setUp.
+- Component suites build temporary local Git remotes to simulate clone/fetch/pull, branches, and repository states without network access.
+- Test helpers are owned by `lib/tests` and `cli/tests`.
 
 ## 4) Constraints Agents Must Respect
 - Do not break CLI behavior (multigit --run, multigit --status, -V, -h).
@@ -48,7 +45,7 @@ Local test scaffolding:
 - Do not change the semantics of relative configuration paths.
 - Avoid broad non-functional style-only rewrites.
 - Keep Sphinx documentation as part of the deliverable when a change requires it.
-- Respect the documentation structure under src/sphinx and its generation/publication workflow.
+- Respect the component documentation structures under `lib/docs` and `cli/docs` and their generation/publication workflow.
 - When adding or editing Python comments/docstrings, use Sphinx-compatible syntax (reStructuredText style when applicable).
 - Execute work in small, reviewable increments and stop after each increment for user approval before continuing.
 - Do not run publication commands (TestPyPI/PyPI uploads) unless the user explicitly asks for that specific step.
@@ -58,11 +55,11 @@ Local test scaffolding:
 - If a repository-root temporary directory is needed for tooling compatibility, it must be explicitly gitignored before use.
 
 ## 5) Real Risks Seen in the Suite
-The suite in src/tests remains integration-like in several places, but its default execution is designed to be offline.
+Component suites include integration-like Git workflows, but default execution is designed to be offline.
 
 Risks to monitor:
 - Behavior differences between local Git versions.
-- Fragility from leftover state if src/tests/*/scenarios is not cleaned correctly.
+- Fragility from leftover state if component `tests/*/scenarios` directories are not cleaned correctly.
 - Implicit filesystem/permissions dependencies from the host OS.
 
 When reporting test results, always distinguish:
@@ -75,7 +72,7 @@ When reporting test results, always distinguish:
 3. Confirm the subrepos contract was not unintentionally altered.
 4. If build/dependencies changed, validate consistency with pyproject.toml and Makefile.
 5. Briefly document functional impact and residual risks.
-6. If documentation or public API is affected, update src/sphinx content and validate make doc.
+6. If documentation or public API is affected, update the owning component docs and validate `make doc`.
 
 ### Example CLI Acceptance Gate
 Before considering a development stage complete and ready for publication, validate the editable development CLI from `example/` using the sample `subrepos` file:

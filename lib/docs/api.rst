@@ -17,18 +17,4 @@ Gitrepo module
    :members:
    :undoc-members:
 
-Subrepofile module
-------------------
-
-.. automodule:: multigit_lib.subrepofile
-   :no-index:
-   :members:
-   :undoc-members:
-
-Subrepos orchestration module
------------------------------
-
-.. automodule:: multigit_lib.subrepos_orchestration
-   :no-index:
-   :members:
-   :undoc-members:
+The public library API is limited to per-repository Git operations. File discovery, YAML parsing, and recursive CLI workflows are documented in the CLI component.

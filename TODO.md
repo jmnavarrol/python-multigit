@@ -7,16 +7,13 @@ Pending actions, general notes, etc. (in no particular order):
 * Find the way to simplify subrepos' format allowing for *gitref* instead of *branch|tag|commit* (the code should find what kind of object *gitref* references).
 * Add a `--check-version` option (or something like that) that looks for updates.
 * Unit tests: full review and refactoring.
-* Refactor multigit into library plus cmd in different package distributions:
-  * Review https://github.com/effigies/hatch-monorepo for a single repo / multiple packages example.
-  * https://packaging.python.org/en/latest/guides/packaging-namespace-packages/
 * Review https://github.com/fboender/multi-git-status for ideas on what `multigit --status` could do.
 
 ## IN PROGRESS
-* Refactoring multigit so it can be used in library mode by other applications.
-  * Review unit tests so they are functional, not historically-named.
-    * Ask copilot to individually review unit tests for reorg/completion suggestions (first for lib/, then for cli/)
-  * Refactor main Makefile targets so they point to the modules and not the root anymore
-  * Restore *upload* Makefile target.
-  * Work on more sofisticated github actions.
-  * Reenable Sphinx doc publication (quite possibly by means of two sites, one for cli and one for lib)
+* Review component unit tests so they verify behavior rather than historical implementation details.
+  * Library review complete: status/update tests are separated, stale YAML setup and console output removed, and branch/tag/commit update cases are covered.
+  * CLI review complete: shared Git fixtures are reused, workflow assertions check results, nested-file recursion and iterator ordering are covered, and historical Dev5 test naming was removed.
+* Review [main Makefile](./Makefile):
+  * streamline targets pointing to lib/cli ones.
+  * review publish/publish-tmp targets.
+* Improve GitHub Actions with component-specific test/build gates.

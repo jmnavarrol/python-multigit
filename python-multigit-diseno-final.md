@@ -285,9 +285,9 @@ This is the approved migration strategy that guided the completed split work. It
 10. Refactor both cmd and library components to fully honor the final design goals once split completion is achieved.
 11. Normalize root recursive orchestration, component docs/test ownership, and future extraction seams for cmd/lib/lifecycle.
 
-## Current Refactoring Status (2026-OCT-10)
+## Dev5 Closeout Snapshot (2026-OCT-10)
 
-This snapshot records the completed Dev5 stage and the remaining release and architecture gates.
+This historical snapshot records the completed Dev5 stage. The Dev6 stage plan is the execution authority for current work.
 
 ### Completed in the current milestone
 
@@ -303,11 +303,15 @@ This snapshot records the completed Dev5 stage and the remaining release and arc
 2. No rename from `multigit_lib` to `multigit` has been attempted; that remains blocked by the rename gate.
 3. Actual removal of the root legacy compatibility package remains deferred until the Dev6 legacy-retirement gates are satisfied.
 
-### Safe resume point after this snapshot
+### Resume point recorded at Dev5 closeout
 
 1. TestPyPI development releases are `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5`; the CLI depends on the published library version.
-2. Dev5 is closed. The active next step is review of the Dev6 documentation; do not begin code retirement until that review is approved.
-3. Keep the `multigit_lib` namespace and root legacy compatibility package until their separate rename and retirement gates are satisfied.
+2. Dev5 is closed. Dev6 documentation review was subsequently approved; see the active Dev6 stage plan for current progress.
+3. At this snapshot, the `multigit_lib` namespace and root compatibility package were retained pending separate gates.
+
+## Current Refactoring Status (2026-OCT-11)
+
+Dev6 retired the repository-root Python distribution and removed root `src/`. The root is now orchestration/governance only; `cli/` owns command behavior, YAML loading, and recursive workflows, while `lib/` owns per-repository Git operations. Current development versions are `multigit==0.12.0.dev6` and `multigit-lib==0.0.2.dev4`; these versions have not been published. Production PyPI publication remains blocked until split-completion policies are approved.
 
 ### Development Stage Strategy
 

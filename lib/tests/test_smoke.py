@@ -1,5 +1,6 @@
 import unittest
 import re
+import importlib
 
 import multigit_lib
 
@@ -16,6 +17,13 @@ class TestMultigitLibSmoke(unittest.TestCase):
             version,
             re.compile(r"^\d+\.\d+\.\d+(?:(?:a|b|rc)\d+|\.(?:dev|post)\d+)?$"),
         )
+
+    def test_public_surface_excludes_config_file_workflow(self):
+        self.assertTrue(hasattr(multigit_lib, 'Gitrepo'))
+        self.assertFalse(hasattr(multigit_lib, 'Subrepofile'))
+        self.assertFalse(hasattr(multigit_lib, 'SubrepofileError'))
+        with self.assertRaises(ModuleNotFoundError):
+            importlib.import_module('multigit_lib.subrepos_orchestration')
 
 
 if __name__ == "__main__":

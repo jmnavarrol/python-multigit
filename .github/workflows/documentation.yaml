@@ -24,6 +24,9 @@ jobs:
         run: |
           source ./env/bin/activate
           cd "${GITHUB_WORKSPACE}" && make doc
+          mkdir -p build/sphinx-doc/html/lib
+          cp -a cli/docs/build/sphinx-doc/html/. build/sphinx-doc/html/
+          cp -a lib/build/sphinx-doc/html/. build/sphinx-doc/html/lib/
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

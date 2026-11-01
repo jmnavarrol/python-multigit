@@ -1,0 +1,23 @@
+---
+# Subrepos' schema definition
+subrepos:
+  type: list
+  required: true
+  schema:
+    type: dict
+    schema:
+      path:
+        type: string
+        required: true
+      repo:
+        type: string
+        required: true
+      branch:
+        type: string
+        excludes: [tag, commit]
+      tag:
+        type: string
+        excludes: [branch, commit]
+      commit:
+        type: string
+        excludes: [branch, tag]

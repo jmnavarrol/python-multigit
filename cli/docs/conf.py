@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.abspath('../src'))
 
 project = 'multigit CLI'
 author = 'Jesús M. Navarro'
-release = '0.12.0.dev5'
+release = '0.12.0.dev6'
 
 extensions = [
     'sphinx.ext.autodoc',

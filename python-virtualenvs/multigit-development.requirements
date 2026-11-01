@@ -3,7 +3,7 @@ pip>=23
 # $BME_PROJECT_DIR is defined by Bash Magic Enviro to be the root of this repository
 # Install the local library and its development tools; cli depends on this editable library.
 --editable "${BME_PROJECT_DIR}/lib[development]"
-# Use the split CLI as the development entry point.
---editable "${BME_PROJECT_DIR}/cli"
+# Install the split CLI and its development tools.
+--editable "${BME_PROJECT_DIR}/cli[development]"
 # Legacy mode: uncomment this and comment out the cli editable above.
 # --editable "${BME_PROJECT_DIR}/[development]"

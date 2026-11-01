@@ -260,7 +260,7 @@ The baseline was captured on branch `splitting-plan-tmp` at commit `6934e6e` (20
 
 ### D2: Ownership transfer and component hardening
 
-**Status:** Active; increment 1 complete, awaiting review before further ownership transfers
+**Status:** Complete; CLI/lib ownership boundary implemented 2026-10-11
 
 - Move root-owned logic into `lib/` or `cli/`.
 - Remove repo-relative library fallback paths from the CLI boundary.
@@ -276,7 +276,7 @@ The baseline was captured on branch `splitting-plan-tmp` at commit `6934e6e` (20
 
 **Validation:** The focused fallback test passes. Root compatibility tests pass (13), library tests pass (28), and CLI tests pass (9) in the BME-managed development environment. The root `0.12.0.dev6` sdist and wheel build successfully; root Sphinx HTML builds successfully; installed CLI `--help` and `--version` smoke checks pass. A source search confirms the three wrappers contain no `sys.path.insert`, `lib_src`, or `repo_root` fallback logic. Network linkcheck was not run.
 
-**Review gate:** This increment is complete. Pause for owner review before continuing D2 ownership, test, or documentation transfers.
+**Review gate:** Owner approved continuation on 2026-10-11.
 
 #### D2 increment 2: Missing-config CLI coverage
 
@@ -286,7 +286,7 @@ The baseline was captured on branch `splitting-plan-tmp` at commit `6934e6e` (20
 
 **Validation:** The focused CLI test passed, and `make -C cli test` passed (10 tests) in the BME-managed development environment. `git diff --check` passed.
 
-**Review gate:** This coverage-transfer increment is complete. Pause for owner review before proceeding with another D2 ownership transfer.
+**Review gate:** Owner approved continuation on 2026-10-11.
 
 #### D2 increment 3: Streamed result rendering coverage
 
@@ -294,11 +294,11 @@ The baseline was captured on branch `splitting-plan-tmp` at commit `6934e6e` (20
 
 **Validation:** The focused test passed, and `make -C cli test` passed (11 tests) in the BME-managed development environment.
 
-**Review gate:** This test-transfer increment is complete. Pause for owner review before proceeding with another D2 ownership transfer.
+**Review gate:** Owner approved continuation on 2026-10-11.
 
 #### D2 CLI test ownership batch
 
-**Status:** Complete; awaiting owner review
+**Status:** Complete; reviewed 2026-10-11
 
 The component CLI suite now owns the externally relevant CLI coverage formerly asserted in `src/tests/cli/test_cli_behavior.py`: help/version and exact version reporting, no-argument usage, missing-config output and exit code, local status/run workflows, requested gitref rendering, streamed result rendering, status/run mode forwarding, and resolution of the installed library orchestrator and exception type.
 
@@ -306,13 +306,45 @@ Legacy assertions about removed lane-selection helpers, root compatibility wrapp
 
 **Validation:** `make -C cli test` passes (13 tests) in the BME-managed development environment. The focused mode-forwarding, installed-orchestrator, and exact-version tests pass. `git diff --check` and editor diagnostics pass.
 
-**Review gate:** The CLI test ownership batch is complete. Pause here for owner review before moving to another module or D2 documentation/implementation ownership work.
+**Review gate:** The owner reviewed this CLI batch and authorised continuation on 2026-10-11.
+
+#### D2 library test ownership batch
+
+**Status:** Superseded in part; parser tests belong to CLI
+
+The six root-comparison parity tests were retired because their legacy `Gitrepo` and `Subrepofile` imports resolve to the same `multigit_lib` implementations they compare. Existing `lib/tests/gitrepo/` cases own the not-cloned, pending-update, and wrong-remote behavior; added an explicit clone-status test for the remaining status. The direct Subrepofile tests initially placed here were misplaced because configuration-file parsing belongs to CLI.
+
+Removed `lib/tests/parity/` and all root-package imports from `lib/tests`. The library README and Sphinx index still need their responsibility wording corrected after config parsing is moved. Historical changelog/design references were retained.
+
+**Validation:** `make -C lib test` passes (25 tests) in the BME-managed development environment. The library Sphinx HTML build succeeds with the existing missing-`_static/` warning. A source search finds no imports or paths to root `multigit` under `lib/tests`; `git diff --check` and editor diagnostics pass.
+
+**Review gate:** Do not close D2 until the CLI owns config-file parsing and the library consumes already-processed data.
+
+#### D2 config parsing ownership: red-test gate
+
+Moved Subrepofile parsing, its schema, file discovery, and recursive orchestration into `cli/src/multigit_cli/`. The CLI calls the unchanged `multigit_lib.Gitrepo` API for per-repository operations. Removed the parser/schema/orchestration modules from `lib/`, reduced the lib public surface and runtime dependencies, and transferred the file/workflow tests and fixtures to `cli/tests/`.
+
+Before source changes, bumped `multigit-lib` from `0.0.2.dev3` to `0.0.2.dev4` and the CLI from `0.12.0.dev5` to `0.12.0.dev6`. The CLI dependency is now `multigit-lib>=0.0.2.dev4,<1`; it declares its direct `Cerberus`, `GitPython`, and `PyYAML` dependencies.
+
+**Validation:** CLI tests pass (22); lib tests pass (17); root `make test` passes by running both suites. `make -C cli build` and `make -C lib build` pass, including docs and package builds. Sphinx HTML/linkcheck pass for CLI and lib; lib retains the missing-`_static/` warning. CLI wheel/sdist contain the parser, orchestration, and schema; lib wheel/sdist contain none of those modules. Editor diagnostics pass. `git diff --check` still reports one extra blank line at EOF in `lib/docs/api.rst`.
+
+#### D2 CLI documentation ownership
+
+Moved the legacy CLI entry-point and command-mode documentation into `cli/docs/index.rst`. The CLI docs use component-owned autodoc and document help, version, status, and run modes; library API pages remain owned by `lib/docs/`.
+
+**Validation:** The CLI Sphinx HTML build succeeded without warnings.
+
+#### D2 closeout
+
+CLI owns config discovery/parsing, recursive traversal, rendering, and exit-code mapping. Lib accepts normalized native repository configuration through its unchanged `Gitrepo` operations. No additional refactoring of legacy implementation under root `src/` is in scope.
+
+**Gate:** Component ownership and test/build/documentation checks complete.
 
 [back to top](#top)
 
 ### D3: Legacy retirement and zero-reference check
 
-**Status:** Pending implementation
+**Status:** Complete; root source retirement and validation passed 2026-10-11
 
 - Remove or archive obsolete compatibility code.
 - Migrate or supersede all required content under repository-root `src/` and delete that entire directory once its contents and references pass the removal gate.
@@ -321,18 +353,44 @@ Legacy assertions about removed lane-selection helpers, root compatibility wrapp
 
 **Gate:** Zero-reference pass and compatibility validation complete.
 
+#### D3 increment 1: Retire root CLI test lane
+
+Deleted `src/tests/cli/` after transferring its externally relevant CLI coverage to `cli/tests/` and classifying the remaining root-only assertions as compatibility implementation details. The component lib and CLI suites remain authoritative.
+
+The root `Makefile` test target now delegates to `lib-test` and `cli-test` instead of discovering tests under root `src/tests`.
+
+**Validation:** Root `make test` passes by running the library suite (25 tests) and CLI suite (13 tests) in the BME-managed environment. `git diff --check` passes.
+
+**Next gate at that checkpoint:** Continue zero-reference validation before final D4 retirement.
+
+#### D3 increment 2: Transfer config-file workflow to CLI
+
+Moved config parsing, schema, file discovery, and recursive workflow out of `lib/`. The legacy root wrappers under `src/multigit/` still import the removed lib modules; these are now known stale references scheduled for root `src/` retirement. Do not claim the legacy root runtime is usable after this API boundary change.
+
+**Validation:** Component suites/builds and package manifests pass as recorded in D2. Root build/docs workflows now delegate only to components.
+
+#### D3 increment 3: Root package retirement
+
+Removed root `pyproject.toml` and all repository-root `src/` content after confirming replacements/dispositions in `cli/`, `lib/`, root `README.md`, and root `LICENSE`. Updated the root Makefile to component-only orchestration and removed the unsafe cleanup of `../projects`. Root AGENTS, AI playbook, README, ignore rules, and docs workflow no longer depend on root runtime/tests/docs.
+
+**Example CLI acceptance gate:** Initial state was only `example/subrepos`. Help, version, and status passed; `--run` cloned all declared and nested repositories. Help, version, status, and run passed again afterward. Removed only generated `example/projects`; verified the example directory contains only `subrepos`.
+
+**Validation:** Root `make build` passed after retirement: lib tests 17, CLI tests 22, both Sphinx HTML/linkcheck gates, and both package builds. Root `make doc` and GitHub Pages output assembly produced the CLI site at root and lib site under `/lib/`. Archive checks confirmed parser/schema/orchestration are included by CLI and absent from lib. `git diff --check` passes; no active root package references remain.
+
 [back to top](#top)
 
 ### D4: Final split completion
 
-**Status:** Pending implementation
+**Status:** Complete; component-only repository structure validated 2026-10-11
 
-- Remove stale root metadata and clean docs.
-- Finalise the repository layout and the release path.
-- Confirm repository-root `src/` is absent while `lib/src/` and `cli/src/` remain as component package sources.
-- Confirm the root is not the package source of truth anymore.
+- Removed stale root metadata and cleaned current-state docs.
+- Finalised root orchestration and component release paths.
+- Confirmed repository-root `src/` is absent while `lib/src/` and `cli/src/` remain as component package sources.
+- Confirmed the root is not a package source of truth.
 
 **Gate:** Final design snapshot matches the actual repository state.
+
+The repository root now contains orchestration and governance only. Component package metadata, code, tests, docs, and independent version streams live under `cli/` and `lib/`.
 
 [back to top](#top)
 
@@ -342,27 +400,27 @@ Legacy assertions about removed lane-selection helpers, root compatibility wrapp
 | --- | --- | --- |
 | Development plan | Full root-retirement and split-completion sequence recorded | Complete |
 | Documentation gate | Plan reviewed and approved before code changes | Complete |
-| Root compatibility | Preserved until the retirement gates pass | Preserved |
-| Ownership clarity | `lib/` and `cli/` defined as final source of truth | Documented |
-| Root `src/` retirement | Entire root `src/` removed after all contents are dispositioned and gates pass | Required |
-| Zero-reference gate | Required before deletion is allowed | Documented |
-| Real implementation | Authorised from D1, subject to checkpoint gates | Active |
+| Root compatibility | Retired after replacement and zero-reference gates | Complete |
+| Ownership clarity | `lib/` and `cli/` defined as final source of truth | Complete |
+| Root `src/` retirement | Entire root `src/` removed after all contents are dispositioned and gates pass | Complete |
+| Zero-reference gate | Required before deletion is allowed | Passed |
+| Real implementation | Authorised from D1, subject to checkpoint gates | Complete |
 
 [back to top](#top)
 
 ## Risks and Decisions
 
-1. The root package retirement is a structural change and therefore must not be implemented without a documented plan and review gate.
-2. The compatibility bridge is deliberately kept in place during the split so urgent rollback is possible.
-3. The final architecture must be explicit before any deletion starts; otherwise root code may be removed while a still-needed compatibility path remains.
-4. Implementation is authorised after documentation approval, but root-package and root-`src/` deletion remain blocked until their specific gates pass.
+1. Root-package retirement was structural and was performed only after the documented migration, replacement-coverage, and zero-reference gates passed.
+2. The transitional compatibility bridge has been retired; rollback now relies on source control and the independently packaged components.
+3. The final layout is explicit: root orchestration, CLI file/workflow ownership, and library per-repository Git operations.
+4. Root-package and root-`src/` deletion gates have passed.
 5. Production publication remains out of scope until the final split state is accepted and the full release gate is satisfied.
 
 [back to top](#top)
 
 ## Next Session Handoff
 
-Start implementation at D1; the documentation-review hold is complete. Read this plan, the current `AGENTS.md`, and the current design snapshot. Inspect `git status` and establish the baseline without overwriting existing changes. Inventory and classify every repository-root `src/` item before moving or deleting anything. Follow D1's gate and the repository's incremental review instructions; do not jump ahead to root `src/` deletion.
+Dev6 implementation and retirement are complete. Root `src/` and root package metadata are absent. Active development and release work is component-owned under `cli/` and `lib/`. Production publication remains blocked pending separate split-completion approval.
 
 [back to top](#top)
 
