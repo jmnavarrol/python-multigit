@@ -10,9 +10,11 @@ Retire the legacy root Python distribution only after compatibility, ownership, 
 
 ## Development Status
 
-Dev5 implementation, acceptance, TestPyPI publication, post-publication quality acceptance, and final closeout are complete. TestPyPI contains `multigit-lib==0.0.2.dev3` and `multigit==0.12.0.dev5`; the CLI metadata requires `multigit-lib>=0.0.2.dev3,<1`. The remaining work is the Dev6 root-package retirement and final split completion; production publication remains blocked until the full design scope and split-completion gates are satisfied.
+Dev5 implementation, acceptance, TestPyPI publication, post-publication quality acceptance, and closeout are complete. Dev6 root-package retirement and component ownership transfer are also complete: repository-root `src/` and root distribution metadata are absent, while the root Makefile orchestrates `cli/` and `lib/`.
 
-Dev6 begins with a documentation-first gate. The current implementation step is intentionally limited to updating the repository design documents and the stage tracker so the retirement plan is explicit before any real code work starts. No root package deletion, package metadata removal, or compatibility-layer retirement is allowed until the Dev6 documentation is reviewed and approved.
+The current TestPyPI releases are `multigit-lib==0.0.2.dev4` and `multigit==0.12.0.dev6`; CLI metadata requires `multigit-lib>=0.0.2.dev4,<1`. The owner reports testing both releases in other projects with no major flaws found. Neither distribution has been published to production PyPI; production release remains blocked until the full design scope and split-completion requirements are approved.
+
+The Python library import remains `multigit_lib`; rename to `multigit` and the first stable library release are future gates, not part of Dev6. Component CI workflow and required branch-protection checks are not yet active in the repository; local builds and tests remain the verified release gates until CI is committed and configured.
 
 Split the current single Python distribution into two independent distributions, kept in a single Git repository and still built with hatchling:
 
@@ -190,7 +192,7 @@ Bash Magic Enviro remains rooted at repository top level:
 
 CLI distribution depends on library distribution using a compatible major range:
 
-1. Transitional phase (dev2, dev3, dev4, and through rename gate): multigit depends on multigit-lib>=0.0.2.dev2,<1
+1. Transitional phase (dev4 and through rename gate): multigit depends on multigit-lib>=0.0.2.dev4,<1
 2. Post-split-finalization phase (after rename gate): multigit depends on multigit-lib>=1.0,<2
 
 This allows independent evolution while protecting runtime compatibility.

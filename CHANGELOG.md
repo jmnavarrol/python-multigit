@@ -9,8 +9,8 @@
 * `0.12.0.dev4` / `multigit-lib 0.0.2.dev2`: restored real-time per-repository output through a library iterator; repository-level errors are rendered as `ERROR` results and do not stop remaining repositories.
 * `multigit-lib 0.0.2.dev3`: published the follow-up library development release to TestPyPI.
 * `0.12.0.dev5`: published the isolated CLI distribution to TestPyPI; it depends on `multigit-lib>=0.0.2.dev3,<1`. Post-publication quality acceptance checks passed and Dev5 final closeout is complete.
-* `multigit-lib 0.0.2.dev4`: library surface narrowed to per-repository Git operations; CLI owns configuration parsing and recursive workflow.
-* `multigit 0.12.0.dev6`: CLI-owned configuration/orchestration release depending on `multigit-lib>=0.0.2.dev4,<1`.
+* `multigit-lib 0.0.2.dev4`: library surface narrowed to per-repository Git operations; CLI owns configuration parsing and recursive workflow. Published to TestPyPI.
+* `multigit 0.12.0.dev6`: CLI-owned configuration/orchestration release depending on `multigit-lib>=0.0.2.dev4,<1`. Published to TestPyPI.
 * Dev6 retired the root Python distribution and removed repository-root `src/`; the root Makefile now orchestrates components only.
 
 ## 0.11.9 (2026-MAY-31)

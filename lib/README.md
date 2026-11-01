@@ -47,9 +47,9 @@ Component HTML is written under `lib/build/sphinx-doc/html/`. The root docs work
 <sub>[back to top](#top).</sub>
 
 ### publish<a name="publish"></a>
-The latest published TestPyPI version is `multigit-lib==0.0.2.dev3`. The current local development version is `0.0.2.dev4` and has not been published.
+The latest published TestPyPI version is `multigit-lib==0.0.2.dev4`.
 
-Published package page: https://test.pypi.org/project/multigit-lib/0.0.2.dev3/
+Published package page: https://test.pypi.org/project/multigit-lib/0.0.2.dev4/
 
 For future uploads (new versions only), configure a `[testpypi]` entry in `~/.pypirc` with the credentials to be used by `twine upload --repository testpypi`, then run `make upload-tmp`.
 

@@ -48,4 +48,6 @@ Current Component Status
 * The library development distribution is ``multigit-lib==0.0.2.dev4``. It owns per-repository Git status and update operations and imports as ``multigit_lib``.
 * The CLI depends on ``multigit-lib>=0.0.2.dev4,<1`` through the installed distribution interface.
 * The repository root contains shared guidance and orchestration only; runtime code, tests, package metadata, and API docs are component-owned.
-* Development versions ``multigit==0.12.0.dev6`` and ``multigit-lib==0.0.2.dev4`` have not been published. Production PyPI publication remains blocked pending split-completion approval.
+* TestPyPI contains ``multigit==0.12.0.dev6`` and ``multigit-lib==0.0.2.dev4``; the owner reports testing them in other projects with no major flaws found.
+* Production PyPI publication remains blocked pending split-completion approval.
+* Component CI workflow and branch-protection checks are not yet active; local component builds and test suites remain the verified gates.
